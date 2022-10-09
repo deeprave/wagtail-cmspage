@@ -2,10 +2,9 @@
 from modelcluster.contrib.taggit import ClusterTaggableManager
 from modelcluster.fields import ParentalKey
 from taggit.models import TaggedItemBase, Tag as TaggitTag
-from wagtail.admin.edit_handlers import FieldPanel, StreamFieldPanel, MultiFieldPanel, InlinePanel
+from wagtail.admin.edit_handlers import FieldPanel, MultiFieldPanel, InlinePanel
 from wagtail.core.fields import StreamField, RichTextField
 from wagtail.core.models import Page, Orderable
-from wagtail.images.edit_handlers import ImageChooserPanel
 from wagtail.snippets.models import register_snippet
 from django.db import models
 from . import blocks as cmsblocks
@@ -78,7 +77,7 @@ class CMSPage(AbstractCMSPage):
                 InlinePanel('carousel_images', max_num=12, min_num=0, label='Carousel Image')
             ], heading='Carousel Images'
         ),
-        StreamFieldPanel('body')
+        FieldPanel('body')
     ]
 
     class Meta:
@@ -104,7 +103,7 @@ class CarouselImage(Orderable):
                                             help_text='Keep visible for time in milliseconds')
 
     panels = [
-        ImageChooserPanel('carousel_image'),
+        FieldPanel('carousel_image'),
         FieldPanel('carousel_title'),
         FieldPanel('carousel_content'),
         FieldPanel('carousel_attribution'),
