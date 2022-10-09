@@ -1,0 +1,92 @@
+{% load static wagtailcore_tags wagtailimages_tags %}
+
+  <div class="row mb-4 plain-link">
+
+    {% if self.image %}
+      {% if self.image_alignment in 'left|right' %}
+        {% if self.image_size == 'landscape' %}
+          {% image self.image fill-420x110 as img %}
+        {% elif self.image_size == 'portrait' %}
+          {% image self.image fill-420x560 as img %}
+        {% else %}
+          {% image self.image fill-420x280 as img %}
+        {% endif %}
+      {% else %}
+        {% if self.image_size == 'landscape' %}
+          {% image self.image fill-800x250 as img %}
+        {% elif self.image_size == 'portrait' %}
+          {% image self.image fill-800x1050 as img %}
+        {% else %}
+          {% image self.image fill-800x560 as img %}
+        {% endif %}
+      {% endif %}
+    {% endif %}
+
+    {% if self.link.url %}<a href="{{ self.link.url }}">{% endif %}
+
+    {% if self.image and self.image_alignment == 'left' %}
+
+      <div class="col-lg-10 offset-lg-1 d-flex flex-grow">
+        <div class="col-md-6 ywfa-iat-image ywfa-iat-image-left">
+          <picture>
+            <img src="{{ img.url }}" class="ywfa-iat-image" alt="{{ img.alt }}">
+          </picture>
+        </div>
+        <div class="col-md-6 ywfa-iat-image-content">
+          {% if self.title %}<h2 class="ywfa-iat-title ywfa-iat-title-left">{{ self.title }}</h2>{% endif %}
+          {% if self.text %}<div class="ywfa-iat-text">{{ self.text|richtext }}</div>{% endif %}
+        </div>
+      </div>
+
+    {% elif self.image and self.image_alignment == 'right' %}
+
+      <div class="col-lg-10 offset-lg-1 d-flex flex-grow">
+        <div class="col-lg-6 ywfa-iat-image-content">
+          {% if self.title %}<h2 class="ywfa-iat-title ywfa-iat-title-right">{{ self.title }}</h2>{% endif %}
+          {% if self.text %}<div class="ywfa-iat-text">{{ self.text|richtext }}</div>{% endif %}
+        </div>
+        <div class="col-lg-6 ywfa-iat-image ywfa-iat-image-right">
+          <picture>
+            <img src="{{ img.url }}" class="ywfa-iat-image" alt="{{ img.alt }}">
+          </picture>
+        </div>
+      </div>
+
+    {% else %}
+
+      <div class="col-lg-10 offset-lg-1">
+
+        {% if self.image %}
+        <div class="col-lg-12 ywfa-iat-image ywfa-iat-image-full">
+          <picture>
+            <img src="{{ img.url }}" class="ywfa-iat-image" alt="{{ img.alt }}">
+          </picture>
+        </div>
+        {% endif %}
+        <div class="col-lg-12 ywfa-iat-image-content">
+          {% if self.title %}<h2 class="ywfa-iat-title ywfa-iat-title-full">{{ self.title }}</h2>{% endif %}
+          {% if self.text %}<div class="ywfa-iat-text">{{ self.text|richtext }}</div>{% endif %}
+        </div>
+
+      </div>
+
+    {% endif %}
+    {% if self.link.url %}</a>{% endif %}
+  </div>
+
+  <div class="row iat-row mb-4">
+    {% if self.link.url and self.link.link_text %}
+      <div class="col-lg-10 offset-lg-1 text-center">
+          {% if self.link.link_text %}
+          <div class="col-lg-10 offset-lg-1">
+            <div class="col-lg-12 ywfa-iat-button text-center">
+              <a href="{{ self.link.url }}" class="btn btn-outline-primary btn-lg" style="padding-left: 3rem; padding-right: 3rem">
+                {{ self.link.link_text }}
+              </a>
+            </div>
+          </div>
+          {% endif %}
+      </div>
+    {% endif %}
+  </div>
+

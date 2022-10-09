@@ -1,0 +1,22 @@
+{% extends 'base.html' %}
+
+{% load static %}
+
+{% block metas %}
+    <meta name="twitter:image" content="{% static 'images/ywfa_logo.png' %}">
+  {% block description %}
+    <meta name="description" content="Providing advice about funerals when you need it most.">
+  {% endblock description %}
+{% endblock metas %}
+
+{% block navigation %}
+  {% include 'cms/partials/_navigation.html' %}
+{% endblock navigation %}
+
+{% block footer %}
+  {% include 'cms/partials/_footer.html' %}
+{% endblock footer %}
+
+{% block addendum %}
+  {% include 'shop/partials/_cart_item.html' %}
+{% endblock addendum %}

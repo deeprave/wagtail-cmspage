@@ -1,0 +1,51 @@
+{% extends 'cms/base.html' %}
+{% load static wagtailcore_tags wagtailimages_tags %}
+
+{% block content %}
+{% if page.display_title and page.title %}
+  <div class="row">
+    <div class="col-md-10 offset-md-1">
+      <h1 class="ywfa-page-title">{{ page.title }}</h1>
+    </div>
+  </div>
+{% endif %}
+{% if self.carousel_images.count > 0 %}
+  <div class="row">
+    <div class="col-md-10 offset-md-1 carousel-content">
+      <div id="carouselSlidesMain" class="carousel carousel slide carousel-fade" data-bs-ride="carousel">
+        <div class="carousel-indicators">
+          {% for loop_cycle in self.carousel_images.all %}
+            <button type="button" data-bs-target="#carouselSlidesMain" data-bs-slide-to="{{ forloop.counter0 }}"{% if forloop.counter == 1 %} class="active" aria-current="true"{% endif %} aria-label="Slide {{ forloop.counter }}"></button>
+          {% endfor %}
+        </div>
+        <div class="carousel-inner">
+          {% for item in self.carousel_images.all %}
+            {% image item.carousel_image fill-1024x350 as img %}
+              <div class="carousel-item{% if forloop.counter == 1 %} active{% endif %}" data-bs-interval="{{ item.carousel_interval }}">
+                <img src="{{ img.url }}" alt="" class="d-block w-100">
+                <div class="carousel-caption d-none d-md-block">
+                  {% if item.carousel_title %}<h1>{{ item.carousel_title }}</h1>{% endif %}
+                  {% if item.carousel_content %}<p>{{ item.carousel_content|richtext }}</p>{% endif %}
+                  {% if item.carousel_attribution %}<p class="attribution">{{ item.carousel_attribution }}</p>{% endif %}
+                </div>
+              </div>
+          {% endfor %}
+        </div>
+        <button class="carousel-control-prev" type="button" data-bs-target="#carouselSlidesMain" data-bs-slide="prev">
+          <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+          <span class="visually-hidden">Previous</span>
+        </button>
+        <button class="carousel-control-next" type="button" data-bs-target="#carouselSlidesMain"  data-bs-slide="next">
+          <span class="carousel-control-next-icon" aria-hidden="true"></span>
+          <span class="visually-hidden">Next</span>
+        </button>
+      </div>
+    </div>
+  </div>
+{% endif %}
+{% block inner-content %}
+{% for body in page.body %}
+  {% include_block body %}
+{% endfor %}
+{% endblock inner-content %}
+{% endblock content %}
