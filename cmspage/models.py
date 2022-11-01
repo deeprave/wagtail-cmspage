@@ -16,7 +16,7 @@ __all__ = (
 
 
 class PageTag(TaggedItemBase):
-    content_object = ParentalKey('cms.CMSPage', related_name='page_tags')
+    content_object = ParentalKey('cmspage.CMSPage', related_name='page_tags')
 
 
 @register_snippet
@@ -29,7 +29,7 @@ class AbstractCMSPage(Page):
     """
     Abstract base page for the CMS
     """
-    tags = ClusterTaggableManager(through='cms.PageTag', blank=True,
+    tags = ClusterTaggableManager(through='cmspage.PageTag', blank=True,
                                   help_text='Tags used to search for this page (optional)')
     display_title = models.BooleanField(default=True)
 
@@ -48,7 +48,7 @@ AbstractCMSPage.promote_panels = [
 
 
 class CMSPage(AbstractCMSPage):
-    parent_page_types = ['wagtailcore.page', 'cms.CMSPage']
+    parent_page_types = ['wagtailcore.page', 'cmspage.CMSPage']
 
     body = StreamField([
         ('title',           cmsblocks.TitleBlock()),
@@ -70,7 +70,7 @@ class CMSPage(AbstractCMSPage):
         ('new_section',     cmsblocks.NewSectionBlock(
             help_text='Insert a horizontal rule'
         )),
-    ], blank=True, null=True)
+    ], use_json_field=True, blank=True, null=True)
 
     content_panels = AbstractCMSPage.content_panels + [
         MultiFieldPanel([
@@ -90,7 +90,7 @@ class CarouselImage(Orderable):
         'bold', 'italic', 'ol', 'ul'
     ]
 
-    parent_pg = ParentalKey('cms.CMSPage', related_name='carousel_images')
+    parent_pg = ParentalKey('cmspage.CMSPage', related_name='carousel_images')
     # noinspection PyUnresolvedReferences
     carousel_image = models.ForeignKey('wagtailimages.Image', null=True, blank=True, on_delete=models.SET_NULL,
                                        related_name='+')

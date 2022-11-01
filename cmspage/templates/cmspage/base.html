@@ -3,20 +3,18 @@
 {% load static %}
 
 {% block metas %}
-    <meta name="twitter:image" content="{% static 'images/ywfa_logo.png' %}">
-  {% block description %}
-    <meta name="description" content="Providing advice about funerals when you need it most.">
-  {% endblock description %}
+  {% block meta-twitter-image %}
+    <meta name="twitter:image" content="{% static 'images/grey-pattern.png' %}">
+  {% endblock meta-twitter-image %}
+  {% block meta-description %}
+    <meta name="description" content="Some description of this site/page.">
+  {% endblock meta-description %}
 {% endblock metas %}
 
 {% block navigation %}
-  {% include 'cms/partials/_navigation.html' %}
+  {% include 'cmspage/partials/_navigation.html' %}
 {% endblock navigation %}
 
 {% block footer %}
-  {% include 'cms/partials/_footer.html' %}
+  {% include 'cmspage/partials/_footer.html' %}
 {% endblock footer %}
-
-{% block addendum %}
-  {% include 'shop/partials/_cart_item.html' %}
-{% endblock addendum %}
