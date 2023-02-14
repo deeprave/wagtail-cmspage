@@ -2,9 +2,9 @@
 from modelcluster.contrib.taggit import ClusterTaggableManager
 from modelcluster.fields import ParentalKey
 from taggit.models import TaggedItemBase, Tag as TaggitTag
-from wagtail.admin.edit_handlers import FieldPanel, MultiFieldPanel, InlinePanel
-from wagtail.core.fields import StreamField, RichTextField
-from wagtail.core.models import Page, Orderable
+from wagtail.admin.panels import FieldPanel, MultiFieldPanel, InlinePanel
+from wagtail.fields import StreamField, RichTextField
+from wagtail.models import Page, Orderable
 from wagtail.snippets.models import register_snippet
 from django.db import models
 from . import blocks as cmsblocks
@@ -55,30 +55,13 @@ class CMSPage(AbstractCMSPage):
         ('cards',           cmsblocks.CardsBlock()),
         ('image_and_text',  cmsblocks.ImageAndTextBlock()),
         ('cta',             cmsblocks.CallToActionBlock()),
-        ('table',           cmsblocks.CustomTableBlock()),
+        ('new_section',     cmsblocks.NewSectionBlock()),
         ('richtext',        cmsblocks.RichTextWithTitleBlock()),
         ('video',           cmsblocks.VideoBlock()),
-        ('testimonial',     cmsblocks.TestimonialChooserBlock(
-            help_text='Select testimonial'
-        )),
-        ('product',         cmsblocks.ProductChooserBlock(
-            help_text='Select product'
-        )),
-        ('large_image',     cmsblocks.LargeImageChooserBlock(
-            help_text='A large image - cropped to 1200x775',
-        )),
-        ('new_section',     cmsblocks.NewSectionBlock(
-            help_text='Insert a horizontal rule'
-        )),
+        ('large_image',     cmsblocks.LargeImageChooserBlock()),
+        # disabled, there is currently an issue with this
+        # ('table',           cmsblocks.CustomTableBlock()),
     ], use_json_field=True, blank=True, null=True)
-
-    content_panels = AbstractCMSPage.content_panels + [
-        MultiFieldPanel([
-                InlinePanel('carousel_images', max_num=12, min_num=0, label='Carousel Image')
-            ], heading='Carousel Images'
-        ),
-        FieldPanel('body')
-    ]
 
     class Meta:
         verbose_name = 'CMS Page'
@@ -109,3 +92,15 @@ class CarouselImage(Orderable):
         FieldPanel('carousel_attribution'),
         FieldPanel('carousel_interval')
     ]
+
+class CMSHomePage(CMSPage):
+    parent_page_types = ['wagtailcore.page', 'cmspage.CMSPage']
+
+    content_panels = AbstractCMSPage.content_panels + [
+        MultiFieldPanel([
+                InlinePanel('carousel_images', max_num=12, min_num=0, label='Carousel Image')
+            ], heading='Carousel Images'
+        ),
+        FieldPanel('body')
+    ]
+

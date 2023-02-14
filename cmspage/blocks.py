@@ -3,8 +3,8 @@ from django import forms
 from django.core.exceptions import ValidationError
 from django.forms.utils import ErrorList
 from wagtail.contrib.table_block.blocks import TableBlock
-from wagtail.core import blocks
-from wagtail.core.blocks import PageChooserBlock
+from wagtail import blocks
+from wagtail.blocks import PageChooserBlock
 from wagtail.embeds.blocks import EmbedBlock
 from wagtail.images.blocks import ImageChooserBlock
 from wagtail.snippets.blocks import SnippetChooserBlock
@@ -18,10 +18,8 @@ __all__ = (
     'CallToActionBlock',
     'CustomTableBlock',
     'RichTextWithTitleBlock',
-    'TestimonialChooserBlock',
     'LargeImageChooserBlock',
     'NewSectionBlock',
-    'ProductChooserBlock',
     'VideoBlock',
 )
 
@@ -145,15 +143,6 @@ class CallToActionBlock(blocks.StructBlock):
         label = "Call to Action"
 
 
-class CustomTableBlock(TableBlock):
-
-    class Meta:
-        template = 'blocks/custom_table_block.html'
-        label = 'Table'
-        icon = 'table'
-        help_text = 'Tabular data'
-
-
 class RichTextWithTitleBlock(blocks.StructBlock):
     title = blocks.CharBlock(blank=True, null=True, required=False, max_length=120,
                              help_text='Display title, optional (max len=120)')
@@ -164,17 +153,6 @@ class RichTextWithTitleBlock(blocks.StructBlock):
         template = 'blocks/simple_richtext_block.html'
         label = 'RichText with Title'
         icon = 'doc-empty-inverse'
-
-
-class TestimonialChooserBlock(SnippetChooserBlock):
-
-    def __init__(self, **kwargs):
-        super().__init__('testimonials.Testimonial', **kwargs)
-
-    class Meta:
-        template = 'blocks/testimonial_block.html'
-        icon = 'tick-inverse'
-        label = 'Testimonial'
 
 
 class VideoBlock(blocks.StructBlock):
@@ -188,17 +166,6 @@ class VideoBlock(blocks.StructBlock):
         template = 'blocks/video_block.html'
         icon = 'media'
         label = 'Embed Video'
-
-
-class ProductChooserBlock(SnippetChooserBlock):
-
-    def __init__(self, **kwargs):
-        super().__init__('shop.Product', **kwargs)
-
-    class Meta:
-        template = 'blocks/product_block.html'
-        icon = 'tick-inverse'
-        label = 'Product'
 
 
 class LargeImageChooserBlock(ImageChooserBlock):
@@ -215,3 +182,10 @@ class NewSectionBlock(blocks.StructBlock):
         label = 'Start new sectiom'
 
 
+# class CustomTableBlock(TableBlock):
+#
+#     class Meta:
+#         template = 'blocks/custom_table_block.html'
+#         label = 'Table'
+#         icon = 'table'
+#         help_text = 'Tabular data'
