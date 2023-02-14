@@ -59,8 +59,7 @@ class CMSPage(AbstractCMSPage):
         ('richtext',        cmsblocks.RichTextWithTitleBlock()),
         ('video',           cmsblocks.VideoBlock()),
         ('large_image',     cmsblocks.LargeImageChooserBlock()),
-        # disabled, there is currently an issue with this
-        # ('table',           cmsblocks.CustomTableBlock()),
+        ('table',           cmsblocks.CustomTableBlock()),
     ], use_json_field=True, blank=True, null=True)
 
     class Meta:

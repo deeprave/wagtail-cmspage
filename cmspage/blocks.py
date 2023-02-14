@@ -7,7 +7,6 @@ from wagtail import blocks
 from wagtail.blocks import PageChooserBlock
 from wagtail.embeds.blocks import EmbedBlock
 from wagtail.images.blocks import ImageChooserBlock
-from wagtail.snippets.blocks import SnippetChooserBlock
 
 
 __all__ = (
@@ -182,10 +181,10 @@ class NewSectionBlock(blocks.StructBlock):
         label = 'Start new sectiom'
 
 
-# class CustomTableBlock(TableBlock):
-#
-#     class Meta:
-#         template = 'blocks/custom_table_block.html'
-#         label = 'Table'
-#         icon = 'table'
-#         help_text = 'Tabular data'
+class CustomTableBlock(TableBlock):
+
+    class Meta:
+        template = 'blocks/custom_table_block.html'
+        label = 'Table'
+        icon = 'table'
+        help_text = 'Tabular data'
