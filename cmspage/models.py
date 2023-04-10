@@ -48,7 +48,7 @@ AbstractCMSPage.promote_panels = [
 
 
 class CMSPage(AbstractCMSPage):
-    parent_page_types = ['wagtailcore.page', 'cmspage.CMSPage']
+    parent_page_types = ['wagtailcore.page', 'cmspage.CMSPage', 'cmspage.CMSHomePage']
 
     body = StreamField([
         ('title',           cmsblocks.TitleBlock()),
@@ -65,6 +65,10 @@ class CMSPage(AbstractCMSPage):
     class Meta:
         verbose_name = 'CMS Page'
         verbose_name_plural = 'CMS Pages'
+
+    content_panels = AbstractCMSPage.content_panels + [
+        FieldPanel('body')
+    ]
 
 
 class CarouselImage(Orderable):
@@ -92,14 +96,14 @@ class CarouselImage(Orderable):
         FieldPanel('carousel_interval')
     ]
 
-class CMSHomePage(CMSPage):
-    parent_page_types = ['wagtailcore.page', 'cmspage.CMSPage']
 
-    content_panels = AbstractCMSPage.content_panels + [
+class CMSHomePage(CMSPage):
+    parent_page_types = ['wagtailcore.page', 'cmspage.CMSPage', 'cmspage.CMSHomePage']
+
+    content_panels = CMSPage.content_panels + [
         MultiFieldPanel([
                 InlinePanel('carousel_images', max_num=12, min_num=0, label='Carousel Image')
             ], heading='Carousel Images'
         ),
-        FieldPanel('body')
     ]
 
