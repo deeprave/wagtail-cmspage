@@ -100,10 +100,13 @@ class CarouselImage(Orderable):
 class CMSHomePage(CMSPage):
     parent_page_types = ['wagtailcore.page', 'cmspage.CMSPage', 'cmspage.CMSHomePage']
 
-    content_panels = CMSPage.content_panels + [
+    content_panels = [
         MultiFieldPanel([
                 InlinePanel('carousel_images', max_num=12, min_num=0, label='Carousel Image')
             ], heading='Carousel Images'
         ),
-    ]
+    ] + CMSPage.content_panels
 
+    class Meta:
+        verbose_name = 'CMS Home Page'
+        verbose_name_plural = 'CMS Home Pages'
