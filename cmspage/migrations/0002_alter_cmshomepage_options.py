@@ -4,14 +4,13 @@ from django.db import migrations
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('cmspage', '0001_initial'),
+        ("cmspage", "0001_initial"),
     ]
 
     operations = [
         migrations.AlterModelOptions(
-            name='cmshomepage',
-            options={'verbose_name': 'CMS Home Page', 'verbose_name_plural': 'CMS Home Pages'},
+            name="cmshomepage",
+            options={"verbose_name": "CMS Home Page", "verbose_name_plural": "CMS Home Pages"},
         ),
     ]
