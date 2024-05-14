@@ -55,11 +55,15 @@ class LinkValue(blocks.StructValue):
     def url(self) -> str:
         internal_page = self.get("internal_page")
         external_link = self.get("external_link")
-        return internal_page if internal_page else external_link if external_link else ""
+        return (
+            internal_page if internal_page else external_link if external_link else ""
+        )
 
 
 class Link(blocks.StructBlock):
-    link_text = blocks.CharBlock(required=False, blank=True, max_length=50, default="More details")
+    link_text = blocks.CharBlock(
+        required=False, blank=True, max_length=50, default="More details"
+    )
     internal_page = PageChooserBlock(required=False)
     external_link = blocks.URLBlock(required=False)
     required = True
@@ -73,7 +77,9 @@ class Link(blocks.StructBlock):
         internal_page = value.get("internal_page")
         external_link = value.get("external_link")
         error_message = "You must enter an external link OR select an internal page"
-        if (not internal_page and not external_link and self.required) or (internal_page and external_link):
+        if (not internal_page and not external_link and self.required) or (
+            internal_page and external_link
+        ):
             errors["internal_page"] = ErrorList([error_message])
             errors["external_link"] = ErrorList([error_message])
         if errors:
@@ -85,9 +91,19 @@ class Link(blocks.StructBlock):
 
 
 class Card(blocks.StructBlock):
-    title = blocks.CharBlock(blank=True, null=True, required=False, max_length=255, help_text="Bold title text for this card (len=255)")
-    text = blocks.RichTextBlock(blank=True, null=True, required=False, help_text="Optional text for this card")
-    image = ImageChooserBlock(required=False, help_text="Image - auto-cropped 570x370px")
+    title = blocks.CharBlock(
+        blank=True,
+        null=True,
+        required=False,
+        max_length=255,
+        help_text="Bold title text for this card (len=255)",
+    )
+    text = blocks.RichTextBlock(
+        blank=True, null=True, required=False, help_text="Optional text for this card"
+    )
+    image = ImageChooserBlock(
+        required=False, help_text="Image - auto-cropped 570x370px"
+    )
     link = Link(required=False, help_text="Enter a link or select a page")
 
 
@@ -126,8 +142,19 @@ class ImageAndTextBlock(blocks.StructBlock):
         default="standard",
         help_text="Layout - match with picture dimensions",
     )
-    title = blocks.CharBlock(required=False, blank=True, null=True, max_length=60, help_text="Max length of 60 characters.")
-    text = blocks.RichTextBlock(blank=True, required=False, features=RICHTEXTBLOCK_FEATURES, help_text="Description for this item")
+    title = blocks.CharBlock(
+        required=False,
+        blank=True,
+        null=True,
+        max_length=60,
+        help_text="Max length of 60 characters.",
+    )
+    text = blocks.RichTextBlock(
+        blank=True,
+        required=False,
+        features=RICHTEXTBLOCK_FEATURES,
+        help_text="Description for this item",
+    )
     link = Link(required=False, blank=True, null=True)
 
     class Meta:
@@ -137,9 +164,18 @@ class ImageAndTextBlock(blocks.StructBlock):
 
 
 class CallToActionBlock(blocks.StructBlock):
-    title = blocks.CharBlock(required=False, blank=True, null=True, max_length=60, help_text="Max length of 60 characters, optional")
+    title = blocks.CharBlock(
+        required=False,
+        blank=True,
+        null=True,
+        max_length=60,
+        help_text="Max length of 60 characters, optional",
+    )
     text = blocks.RichTextBlock(
-        required=False, blank=True, features=RICHTEXTBLOCK_FEATURES, help_text="Call to action text, optional (max=200)"
+        required=False,
+        blank=True,
+        features=RICHTEXTBLOCK_FEATURES,
+        help_text="Call to action text, optional (max=200)",
     )
     link = Link(required=False, blank=True, null=True)
 
@@ -150,8 +186,16 @@ class CallToActionBlock(blocks.StructBlock):
 
 
 class RichTextWithTitleBlock(blocks.StructBlock):
-    title = blocks.CharBlock(blank=True, null=True, required=False, max_length=120, help_text="Display title, optional (max len=120)")
-    content = blocks.RichTextBlock(features=RICHTEXTBLOCK_FEATURES, help_text="Rich text block, required")
+    title = blocks.CharBlock(
+        blank=True,
+        null=True,
+        required=False,
+        max_length=120,
+        help_text="Display title, optional (max len=120)",
+    )
+    content = blocks.RichTextBlock(
+        features=RICHTEXTBLOCK_FEATURES, help_text="Rich text block, required"
+    )
 
     class Meta:
         template = "blocks/simple_richtext_block.html"
@@ -160,10 +204,19 @@ class RichTextWithTitleBlock(blocks.StructBlock):
 
 
 class VideoBlock(blocks.StructBlock):
-    title = blocks.CharBlock(required=False, blank=True, null=True, max_length=60, help_text="Max length of 60 characters, optional")
+    title = blocks.CharBlock(
+        required=False,
+        blank=True,
+        null=True,
+        max_length=60,
+        help_text="Max length of 60 characters, optional",
+    )
     video = EmbedBlock()
     text = blocks.RichTextBlock(
-        required=False, blank=True, features=RICHTEXTBLOCK_FEATURES, help_text="Call to action text, optional (max=200)"
+        required=False,
+        blank=True,
+        features=RICHTEXTBLOCK_FEATURES,
+        help_text="Call to action text, optional (max=200)",
     )
 
     class Meta:

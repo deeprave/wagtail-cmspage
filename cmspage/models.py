@@ -29,7 +29,11 @@ class AbstractCMSPage(Page):
     Abstract base page for the CMS
     """
 
-    tags = ClusterTaggableManager(through="cmspage.PageTag", blank=True, help_text="Tags used to search for this page (optional)")
+    tags = ClusterTaggableManager(
+        through="cmspage.PageTag",
+        blank=True,
+        help_text="Tags used to search for this page (optional)",
+    )
     display_title = models.BooleanField(default=True)
 
     content_panels = [
@@ -42,7 +46,9 @@ class AbstractCMSPage(Page):
 
 
 AbstractCMSPage.promote_panels = [
-    MultiFieldPanel(Page.promote_panels + [FieldPanel("display_title")], "Common page configuration"),
+    MultiFieldPanel(
+        Page.promote_panels + [FieldPanel("display_title")], "Common page configuration"
+    ),
 ]
 
 
@@ -78,11 +84,34 @@ class CarouselImage(Orderable):
 
     parent_pg = ParentalKey("cmspage.CMSPage", related_name="carousel_images")
     # noinspection PyUnresolvedReferences
-    carousel_image = models.ForeignKey("wagtailimages.Image", null=True, blank=True, on_delete=models.SET_NULL, related_name="+")
-    carousel_title = models.CharField(blank=True, null=True, max_length=120, help_text="Display title, optional (max len=120)")
-    carousel_content = RichTextField(features=RICHTEXTBLOCK_FEATURES, null=True, blank=True)
-    carousel_attribution = models.CharField(blank=True, null=True, max_length=120, help_text="Display title, optional (max len=120)")
-    carousel_interval = models.IntegerField(blank=False, null=False, default=12000, help_text="Keep visible for time in milliseconds")
+    carousel_image = models.ForeignKey(
+        "wagtailimages.Image",
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL,
+        related_name="+",
+    )
+    carousel_title = models.CharField(
+        blank=True,
+        null=True,
+        max_length=120,
+        help_text="Display title, optional (max len=120)",
+    )
+    carousel_content = RichTextField(
+        features=RICHTEXTBLOCK_FEATURES, null=True, blank=True
+    )
+    carousel_attribution = models.CharField(
+        blank=True,
+        null=True,
+        max_length=120,
+        help_text="Display title, optional (max len=120)",
+    )
+    carousel_interval = models.IntegerField(
+        blank=False,
+        null=False,
+        default=12000,
+        help_text="Keep visible for time in milliseconds",
+    )
 
     panels = [
         FieldPanel("carousel_image"),
@@ -97,7 +126,14 @@ class CMSHomePage(CMSPage):
     parent_page_types = ["wagtailcore.page", "cmspage.CMSPage", "cmspage.CMSHomePage"]
 
     content_panels = [
-        MultiFieldPanel([InlinePanel("carousel_images", max_num=12, min_num=0, label="Carousel Image")], heading="Carousel Images"),
+        MultiFieldPanel(
+            [
+                InlinePanel(
+                    "carousel_images", max_num=12, min_num=0, label="Carousel Image"
+                )
+            ],
+            heading="Carousel Images",
+        ),
     ] + CMSPage.content_panels
 
     class Meta:

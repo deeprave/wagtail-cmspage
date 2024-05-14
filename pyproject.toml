@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "wagtail-cmspage"
-version = "2023.1.1"
+version = "2024.1.0"
 description = "Base extensible CMSPage type for Wagtail"
 authors = ["David Nugent <davidn@uniquode.io>"]
 license = "MIT"
@@ -11,14 +11,12 @@ packages = [
 
 [tool.poetry.dependencies]
 python = "^3.10"
-django = ">= 4.1"
-wagtail = ">= 4.2"
+django = ">=5.0"
+wagtail = ">=6.1"
 
 [tool.poetry.group.dev.dependencies]
 pre-commit = "^3.3.3"
-black = "^23.7.0"
-ruff = "^0.0.285"
-isort = "^5.12.0"
+ruff = "^0.4.4"
 
 [build-system]
 requires = ["poetry-core"]
