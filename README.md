@@ -7,7 +7,7 @@ At the core, CMSPage is a Wagtail page with a StreamField with orderable blocks 
 
 ## Quick start / Installation
 
-1. Once added to your virtual environmebnt, add `cmspage` to INSTALLED_APPS in your Django settings:
+1. Once added to your virtual environment, add `cmspage` to INSTALLED_APPS in your Django settings:
 ```python
     INSTALLED_APPS = [
         ...
