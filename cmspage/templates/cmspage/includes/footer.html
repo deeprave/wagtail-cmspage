@@ -1,4 +1,4 @@
-{% load wagtailcore_tags static menu_tags %}
+{% load wagtailcore_tags static cache %}
 
 <footer class="page-footer font-small">
   <div class="container-bottom text-center text-md-left">
@@ -8,13 +8,14 @@
         <h5 class="text-uppercase text-left">Links</h5>
           <nav>
             <ul class="nav mb-md-0">
-              {% main_menu template="cmspage/partials/_links.html" levels=1 %}
+{#                {% main_menu template="cmspage/includes/links.html" levels=1 %}#}
             </ul>
           </nav>
       </div>
 
-      {% with settings.settings.ContactSettings as contact %}
       <div class="col-md-4 mt-4 mt-md-0">
+        {% if settings.settings %}
+        {% with settings.settings.ContactSettings as contact %}
 
         {% if contact.contact_button_text and contact.contact_button_page %}
         <div class="text-center nowrap">
@@ -39,10 +40,12 @@
           </a>
         </div>
         {% endif %}
-      </div>
       {% endwith %}
+      {% endif %}
+      </div>
 
       <div class="col-md-5 mt-4 mt-md-0">
+        {% if settings.socialmediasettings %}
         {% with settings.settings.SocialMediaSettings as social %}
         <ul class="text-center socicon">
           {% if social.facebook %}<li data-toggle="tooltip" data-placement="top" data-delay="0" title="Facebook">
@@ -77,6 +80,7 @@
           </li>{% endif %}
         </ul>
         {% endwith %}
+        {% endif %}
         <div class="org-logo">
           <img src="{% static 'images/wbg.png' %}" class="wbg noshadow"
                alt="Proud member of the Whitehorse Business Group">
