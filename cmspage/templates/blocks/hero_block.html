@@ -1,0 +1,12 @@
+{% load wagtailimages_tags %}
+
+<div class="row mb-5 p-5 text-center">
+  <div class="col-sm-12">
+    <picture>
+      {% image self width-2400 format-webp as webp_image %}
+      <source srcset="{{ webp_image.url }}" type="image/webp">
+      {% image self width-2400 as original_image %}  {# Fallback to original #}
+      <img src="{{ original_image.url }}" alt="{{ original_image.alt }}" class="img-fluid">
+    </picture>
+  </div>
+</div>
