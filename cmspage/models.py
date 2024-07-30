@@ -325,6 +325,7 @@ class EventManager(models.Manager):
 
 
 class Event(models.Model):
+    event_date = models.DateField(db_index=True)
     """
     A class that represents an event.
 
