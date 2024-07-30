@@ -9,6 +9,14 @@ from cmspage.models import CMSPage
 @pytest.mark.parametrize(
     "title,expected",
     [
+        ("", False),  # Empty title
+        ("a" * 256, False),  # Very long title
+        ("Title with special characters !@#$%^&*()", True),  # Special characters
+    ]
+)
+@pytest.mark.parametrize(
+    "title,expected",
+    [
         pytest.param("Test Page", "Test Page", id="first-title"),
         pytest.param("Another Page", "Another Page", id="second-title"),
     ],
