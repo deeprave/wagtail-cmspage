@@ -24,6 +24,12 @@ _logger = logging.getLogger("cmspage")
 
 class CMSTemplateMixin:
     """
+    Mixin to provide CMS template resolution logic.
+
+    This mixin helps in determining the appropriate template to use
+    for rendering CMS pages based on various conditions and settings.
+    """
+    """
 
     CMSTemplateMixin class provides a set of utility methods for handling templates and includes
     in CMS-related functionality.
