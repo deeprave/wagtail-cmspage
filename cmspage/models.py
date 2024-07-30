@@ -1,7 +1,10 @@
 # -*- coding: utf-8 -*-
 from datetime import timedelta
+from typing import Optional
+
 from django.db import models
 from django.conf import settings
+from django.core.cache import cache
 from django.core.exceptions import ValidationError
 from django.utils import timezone
 from modelcluster.contrib.taggit import ClusterTaggableManager
@@ -55,6 +58,19 @@ class SiteVariables(models.Model):
 
     site = models.OneToOneField(Site, on_delete=models.CASCADE, related_name="variables")
     vars = models.JSONField(blank=True, null=True, default=dict)
+
+    @staticmethod
+    def get_cached_variables(site: Site) -> dict:
+        cached_data = cache.get(f"site_variables:{site.id}")
+        if not cached_data:
+            cached_data = SiteVariables.objects.filter(site=site).first() or {}
+            cache.set("site_variables", cached_data, timeout=300)
+        return cached_data
+
+    @staticmethod
+    def clear_cached_variables(site: Optional[Site] = None):
+        cache_key = f"site_variables:{site.id}" if site else "site_variables:*"
+        cache.delete(cache_key)
 
     class Meta:
         verbose_name = "Site Variables"
