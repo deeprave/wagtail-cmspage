@@ -1,5 +1,11 @@
 ## ChangeLog
 
+### 2024.3.1
+- Refactored the event model to consolidate date and time fields into a single DateTimeField.
+- Improved naming consistency across models and methods, switched to more precise ordering and filtering in SnippetViewSet
+- Removed unused form overrides, apparently not required.
+- Bumped project's version number to 2024.3.1.
+
 ## 2024.3.0
 - Add conditional caching
 - Add context processor tests
