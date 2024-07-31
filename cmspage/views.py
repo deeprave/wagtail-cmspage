@@ -1,5 +1,4 @@
 from wagtail.admin.panels import FieldPanel
-from wagtail.forms import forms
 from wagtail.snippets.views.snippets import SnippetViewSet
 
 from .models import CarouselImage, MenuLink, SiteVariables, Event
@@ -29,7 +28,7 @@ class MenuLinkViewSet(SnippetViewSet):
     menu_label = "Menu Links"
     menu_icon = "list-ul"
     menu_order = 300
-    list_display = ["menu_title", "menu_link", "menu_order", "menu_site"]
+    list_display = ["menu_site", "title", "menu_link", "menu_order"]
 
 
 class SiteVariablesViewSet(SnippetViewSet):
@@ -39,23 +38,23 @@ class SiteVariablesViewSet(SnippetViewSet):
     list_display = ("site",)
     list_filter = ("site",)  # Optional: Filter by site
 
-    def get_form_fields_for_edit(self):  # Override for custom form fields
-        return {
-            "vars": forms.JSONField(
-                widget=forms.JSONField, help_text="Enter site variables as JSON (e.g., {'key': 'value'})"
-            )
-        }
+    # def get_form_fields_for_edit(self):  # Override for custom form fields
+    #     return {
+    #         "vars": forms.JSONField(
+    #             widget=forms.JSONField, help_text='Enter site variables as JSON (e.g., {"key": "value"})'
+    #         )
+    #     }
 
 
 class EventSnippetViewSet(SnippetViewSet):
     model = Event
-    list_display = ["event_title", "event_date", "event_time", "event_hours"]
-    list_filter = ["event_canceled"]
+    list_display = ["event_datetime", "event_title", "event_duration"]
+    list_filter = ["event_cancelled"]
     search_fields = ["event_title", "event_description"]
-    ordering = ["event_date", "event_time"]
+    ordering = ["event_datetime"]
 
-    def get_queryset(self):
-        queryset = super().get_queryset()
-        if not self.request.GET.get("event_canceled", False):
-            queryset = queryset.filter(event_canceled=False)
+    def get_queryset(self, request):
+        queryset = super().get_queryset(request)
+        if request.GET.get("event_cancelled", False):
+            queryset = queryset.filter(event_cancelled=True)
         return queryset
