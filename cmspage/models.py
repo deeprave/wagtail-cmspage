@@ -414,9 +414,9 @@ class Event(models.Model):
         cache_key = f"future_events:{today}"
         cached_events = cache.get(cache_key)
         if cached_events is None:
-            cached_events = Event.objects.future_events()
+            cached_events = list(Event.objects.future_events())
             cache.set(cache_key, cached_events, 3600)
-        return Event.objects.future_events()
+        return cached_events
 
     def __str__(self):
         return f"Event {self.event_title} at {self.event_venue} on {self.event_date} at {self.event_time}"
