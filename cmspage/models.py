@@ -48,7 +48,7 @@ class SiteVariables(models.Model):
 
     Attributes:
         site (Site): The site associated with the variables.
-        Vars (dict): The dictionary of variables.
+        vars (dict): The dictionary of variables.
                      It is stored as a JSONField in the database.
 
     Meta:
@@ -180,8 +180,8 @@ class MenuLink(models.Model):
     Attributes:
         parent_pg (ParentalKey): A foreign key to the CMSPage model, to link to the page
         link_title (CharField): The title of the link.
-        Link_url (URLField): The URL of the link.
-        Link_order (IntegerField): The order of the link in the menu.
+        link_url (URLField): The URL of the link.
+        link_order (IntegerField): The order of the link in the menu.
 
     Methods:
         None
