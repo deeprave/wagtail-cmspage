@@ -9,7 +9,7 @@
 ## 2024.3.0
 - Add conditional caching
 - Add context processor tests
- Move all caching strategy to models to simplify context_processors
+ Move caching strategy to models to simplify context_processors
 - Combined context processors for navigation, events and site variables into a single processor
 
 ## 2024.2.0
