@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 from datetime import timedelta
-from typing import Optional
 
 from django.db import models
 from django.conf import settings
@@ -61,16 +60,17 @@ class SiteVariables(models.Model):
 
     @staticmethod
     def get_cached_variables(site: Site) -> dict:
-        cached_data = cache.get(f"site_variables:{site.id}")
-        if not cached_data:
-            cached_data = SiteVariables.objects.filter(site=site).first() or {}
-            cache.set("site_variables", cached_data, timeout=300)
-        return cached_data
+        cache_key = f"site_variables:{site.id}"
+        site_vars = cache.get(cache_key)
+        if not site_vars:
+            site_record = SiteVariables.objects.filter(site=site).first()
+            site_vars = site_record.vars if site_record else {}
+            cache.set(cache_key, site_vars, timeout=900)
+        return site_vars
 
     @staticmethod
-    def clear_cached_variables(site: Optional[Site] = None):
-        cache_key = f"site_variables:{site.id}" if site else "site_variables:*"
-        cache.delete(cache_key)
+    def clear_cached_variables(site: Site):
+        cache.delete(f"site_variables:{site.id}")
 
     class Meta:
         verbose_name = "Site Variables"
@@ -166,6 +166,11 @@ class MyPageChooser(AdminPageChooser):
     pass
 
 
+class MenuLinkManager(models.Manager):
+    def get_queryset(self):
+        return super().get_queryset().select_related("link_page", "link_document")
+
+
 class MenuLink(models.Model):
     """
     A class that represents a menu link.
@@ -220,10 +225,32 @@ class MenuLink(models.Model):
     def menu_site(self, obj=None):
         return f"{self.site.site_name[:32]}{' (default)' if self.site.is_default_site else ''}"
 
-    def menu_link(self, obj=None):
+    @property
+    def menu_link_title(self, obj=None):
         if self.link_page:
             return self.link_page.title
         return self.link_document.title if self.link_document else self.link_url
+
+    @property
+    def menu_link_type(self, obj=None):
+        if self.link_page:
+            return "Page"
+        return "Document" if self.link_document else "URL"
+
+    @property
+    def url(self):
+        if self.link_page:
+            return self.link_page.url
+        return self.link_document.url if self.link_document else self.link_url
+
+    @staticmethod
+    def get_cached_menu_links(site: Site, user_id: int):
+        cache_key = f"menu_links:{site.id}:{user_id}"
+        menu_links = cache.get(cache_key)
+        if menu_links is None:
+            menu_links = list(MenuLink.objects.filter(site=site).order_by("menu_order", "id"))
+            cache.set(cache_key, menu_links, 300)
+        return menu_links
 
     def clean(self):
         super().clean()
@@ -238,6 +265,8 @@ class MenuLink(models.Model):
             )
         elif self.link_page and not self.link_page.show_in_menus:
             raise ValidationError({"link_page": ValidationError(NOT_A_MENU_PAGE)})
+
+    objects = MenuLinkManager()
 
     class Meta:
         verbose_name = "Menu Link"
@@ -315,6 +344,20 @@ class CarouselImage(Orderable):
 
 
 class EventManager(models.Manager):
+    """
+    Summary:
+    - Provides methods to filter past and future events.
+
+    Explanation:
+    - This class provides methods to filter past and future events based on event date, time, and cancellation status.
+
+    Args:
+    - self: The EventManager instance.
+
+    Returns:
+    - QuerySet: A QuerySet of past or future events based on the filter criteria.
+    """
+
     def past_events(self):
         now = timezone.now()
         return self.filter(event_date__lt=now.date()) | self.filter(
@@ -341,33 +384,42 @@ class EventManager(models.Manager):
 
 
 class Event(models.Model):
-    event_date = models.DateField(db_index=True)
     """
     A class that represents an event.
 
     Attributes:
-        parent_pg (ParentalKey): A foreign key to the CMSPage model, to link to the page
-        event_title (CharField): The title of the event.
         event_date (DateField): The date of the event.
         event_time (TimeField): The time of the event.
-        event_location (CharField): The location of the event.
+        event_hours (PositiveIntegerField): The approximate duration of the event in hours.
+        event_title (CharField): The title of the event.
+        event_venue (CharField): The location of the event.
         event_description (RichTextField): The description of the event.
         event_canceled (BooleanField): A boolean field to indicate if the event is canceled.
 
-    Methods:
-        None
-
     """
 
-    event_title = models.CharField(max_length=120)
-    event_date = models.DateField("Date of Event")
+    event_date = models.DateField("Date of Event", db_index=True)
     event_time = models.TimeField("Time of Event")
     event_hours = models.PositiveIntegerField("Event Duration (hours)", default=1)
+    event_title = models.CharField(max_length=120)
     event_venue = models.TextField(max_length=120)
     event_description = RichTextField(features=["bold", "italic", "ol", "ul"])
     event_canceled = models.BooleanField(default=False)
 
     objects = EventManager()
+
+    @staticmethod
+    def get_cached_events(self):
+        today = timezone.now().date()
+        cache_key = f"future_events:{today}"
+        cached_events = cache.get(cache_key)
+        if cached_events is None:
+            cached_events = Event.objects.future_events()
+            cache.set(cache_key, cached_events, 3600)
+        return Event.objects.future_events()
+
+    def __str__(self):
+        return f"Event {self.event_title} at {self.event_venue} on {self.event_date} at {self.event_time}"
 
     class Meta:
         ordering = ["event_date", "event_time"]

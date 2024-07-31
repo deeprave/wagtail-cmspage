@@ -1,13 +1,13 @@
 import logging
 import os
 import json
-from functools import cache, lru_cache
 from itertools import combinations
 from typing import List, Iterable, Dict, Optional
 
 from django.conf import settings
 from django.template import engines, TemplateDoesNotExist
-from django.utils.functional import cached_property
+
+from .functional import conditional_lru_cache, conditional_cached_property
 
 CMSPAGE_TEMPLATE_STYLES = "CMSPAGE_TEMPLATE_STYLES"
 CMSPAGE_TEMPLATE_BASE = "CMSPAGE_TEMPLATE_BASE"
@@ -26,9 +26,10 @@ class CMSTemplateMixin:
     """
     Mixin to provide CMS template resolution logic.
 
-    This mixin helps in determining the appropriate template to use
+    This mixin helps to determine the appropriate template to use
     for rendering CMS pages based on various conditions and settings.
     """
+
     """
 
     CMSTemplateMixin class provides a set of utility methods for handling templates and includes
@@ -105,7 +106,7 @@ class CMSTemplateMixin:
         """
         Convert a string of comma/space separated names to a list,
         preserving the list if it is specified that way and returning
-        an emptylist on blank string or None.
+        an empty list on blank string or None.
 
         """
         if isinstance(names, (str, bytes, bytearray)):
@@ -122,7 +123,7 @@ class CMSTemplateMixin:
         """
         return ", ".join(names) if names else "None"
 
-    @cached_property
+    @conditional_cached_property
     def template_debug(self) -> bool:
         """
         Return the template debug flag
@@ -136,7 +137,7 @@ class CMSTemplateMixin:
             _logger.log(level, message, *args, **kwargs)
         return _logger
 
-    @cached_property
+    @conditional_cached_property
     def base_template(self) -> str:
         """
         Return the base template
@@ -152,12 +153,12 @@ class CMSTemplateMixin:
         self.log(f"Base template: {base_template}")
         return base_template
 
-    @cached_property
+    @conditional_cached_property
     def template_styles(self) -> List[str]:
         """
         Return the list of template styles available to support searching for templates.
         Styles assist in resolving where a template is sourced from and may represent
-        css style, company styling or other variations.
+        CSS style, company styling or other variations.
 
         """
         styles = getattr(settings, CMSPAGE_TEMPLATE_STYLES, None)
@@ -165,7 +166,7 @@ class CMSTemplateMixin:
         self.log(f"Template styles: {self.as_list(styles)}")
         return styles
 
-    @cached_property
+    @conditional_cached_property
     def base_template_path(self) -> str:
         """
         Return the template path
@@ -174,7 +175,7 @@ class CMSTemplateMixin:
         self.log(f"Base template path: {base_path}")
         return base_path
 
-    @cached_property
+    @conditional_cached_property
     def template_include_path(self) -> str:
         """
         Return the path to template includes
@@ -184,14 +185,13 @@ class CMSTemplateMixin:
         self.log(f"Include path: {include_path}")
         return include_path
 
-    @cached_property
+    @conditional_cached_property
     def include_names(self) -> List[str]:
         include_names = getattr(settings, CMSPAGE_TEMPLATE_INCLUDE_FILES, None) or self.template_include_names
         include_names = self.to_list(include_names)
         self.log(f"Include template names: {self.as_list(include_names)}")
         return include_names
 
-    @cache
     def get_include_templates(self) -> Dict[str, str]:
         def append_template_extension(name):
             return name if any(name.endswith(ext) for ext in self.template_extensions) else f"{name}.html"
@@ -209,7 +209,7 @@ class CMSTemplateMixin:
         }
         return include_templates
 
-    @lru_cache(maxsize=128)
+    # @conditional_lru_cache(maxsize=128)
     def include_templates(self) -> dict:
         """
         Return a dictionary of include templates
@@ -223,7 +223,7 @@ class CMSTemplateMixin:
         self.log(f"Resolved includes: {json.dumps(resolved_include_paths, indent=2)}")
         return resolved_include_paths
 
-    @lru_cache
+    @conditional_lru_cache
     def find_existing_template(self, template_path: str, *parts: Optional[str]) -> str | None:
         """
         Return an existing template path based on the additional path parts provided
@@ -240,12 +240,11 @@ class CMSTemplateMixin:
             [],
         )
         # Generate all template paths and add the original template path as fallback
-        templates = [f"{dirname}/{combination}/{filename}" for combination in combinations_parts] + [
-            template_path
-        ]
+        templates = [f"{dirname}/{combination}/{filename}" for combination in combinations_parts] + [template_path]
 
         for template_name in templates:
             for engine in engines.all():
+                # noinspection PyBroadException
                 try:
                     _ = engine.engine.find_template(template_name)
                     self.log(f"Resolved template: {template_name}")

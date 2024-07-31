@@ -4,19 +4,25 @@ from django.utils.text import slugify
 from django.http import HttpRequest
 from cmspage.models import CMSPage
 
+from cmspage.functional import set_functional_cache
+
+
+@pytest.fixture(scope="session", autouse=True)
+def disable_functional_cache():
+    set_functional_cache(False)
+    yield
+    set_functional_cache(True)
+
 
 @pytest.mark.django_db
 @pytest.mark.parametrize(
     "title,expected",
     [
-        ("", False),  # Empty title
-        ("a" * 256, False),  # Very long title
-        ("Title with special characters !@#$%^&*()", True),  # Special characters
-    ]
-)
-@pytest.mark.parametrize(
-    "title,expected",
-    [
+        pytest.param("", "", id="empty-title"),
+        pytest.param("a" * 256, "a" * 256, id="very-long-title"),
+        pytest.param(
+            "Title with special characters !@#$%^&*()", "Title with special characters !@#$%^&*()", id="special-chars"
+        ),
         pytest.param("Test Page", "Test Page", id="first-title"),
         pytest.param("Another Page", "Another Page", id="second-title"),
     ],
@@ -60,7 +66,19 @@ def test_get_template(rf, settings, template_styles, expected_template):
     [
         pytest.param(
             None,
-            ["header", "navigation", "messages", "logo", "carousel", "main", "footer", "links", "contact", "media"],
+            [
+                "title",
+                "header",
+                "navigation",
+                "messages",
+                "logo",
+                "carousel",
+                "main",
+                "footer",
+                "links",
+                "contact",
+                "media",
+            ],
             id="default-includes",
         ),
         pytest.param("custom1,custom2", ["custom1", "custom2"], id="comma-separated-includes"),
@@ -78,12 +96,6 @@ def test_include_templates(settings, include_names, expected_includes):
 
     # Assert
     assert list(includes.keys()) == expected_includes
-
-    # clear all the internal caches that are used to store the include template information
-    page.get_include_templates.cache_clear()
-    del page.base_template_path
-    del page.template_include_path
-    del page.include_names
 
 
 @pytest.mark.django_db
@@ -160,11 +172,6 @@ def test_base_template(settings, base_name, base_path, expected_path):
     # Assert
     assert base_template == expected_path
 
-    # clear all the internal caches that are used to store template information
-    del page.base_template
-    if hasattr(page, "base_template_path"):
-        del page.base_template_path
-
 
 @pytest.mark.django_db
 @pytest.mark.parametrize(
@@ -220,6 +227,3 @@ def test_cmspage_get_context(settings, title, base_name, expected_base, include_
     assert context["request"] == request
     assert context["base_template"] == expected_base
     assert context["include"] == expected_includes
-
-    page.get_include_templates.cache_clear()
-    del page.base_template
