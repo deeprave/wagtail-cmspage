@@ -5,6 +5,7 @@ from django.db import models
 from django.conf import settings
 from django.core.cache import cache
 from django.core.exceptions import ValidationError
+from django.core.validators import MinValueValidator
 from django.utils import timezone
 from modelcluster.contrib.taggit import ClusterTaggableManager
 from modelcluster.fields import ParentalKey
@@ -47,7 +48,7 @@ class SiteVariables(models.Model):
 
     Attributes:
         site (Site): The site associated with the variables.
-        vars (dict): The dictionary of variables.
+        Vars (dict): The dictionary of variables.
                      It is stored as a JSONField in the database.
 
     Meta:
@@ -179,8 +180,8 @@ class MenuLink(models.Model):
     Attributes:
         parent_pg (ParentalKey): A foreign key to the CMSPage model, to link to the page
         link_title (CharField): The title of the link.
-        link_url (URLField): The URL of the link.
-        link_order (IntegerField): The order of the link in the menu.
+        Link_url (URLField): The URL of the link.
+        Link_order (IntegerField): The order of the link in the menu.
 
     Methods:
         None
@@ -222,17 +223,20 @@ class MenuLink(models.Model):
         help_text="Set a custom URL if not linking to a page or document",
     )
 
-    def menu_site(self, obj=None):
+    def menu_site(self, _=None):
         return f"{self.site.site_name[:32]}{' (default)' if self.site.is_default_site else ''}"
 
+    def title(self):
+        return self.menu_title or self.menu_link_title
+
     @property
-    def menu_link_title(self, obj=None):
+    def menu_link_title(self, _=None):
         if self.link_page:
             return self.link_page.title
         return self.link_document.title if self.link_document else self.link_url
 
     @property
-    def menu_link_type(self, obj=None):
+    def menu_link_type(self, _=None):
         if self.link_page:
             return "Page"
         return "Document" if self.link_document else "URL"
@@ -291,12 +295,12 @@ class CarouselImage(Orderable):
 
     Attributes:
         RICHTEXTBLOCK_FEATURES (list): A list of rich text block features.
-        parent_pg (ParentalKey): A foreign key to the CMSPage model, to link to the page
+        Parent_pg (ParentalKey): A foreign key to the CMSPage model, to link to the page
         carousel_image (ForeignKey): A foreign key to each image.
-        carousel_title (CharField): The display title of the image.
-        carousel_content (RichTextField): Rich text content.
-        carousel_attribution (CharField): Attribution of the image.
-        carousel_interval (IntegerField): The interval of time the image is visible in milliseconds.
+        Carousel_title (CharField): The display title of the image.
+        Carousel_content (RichTextField): Rich text content.
+        Carousel_attribution (CharField): Attribution of the image.
+        Carousel_interval (IntegerField): The interval of time the image is visible in milliseconds.
 
     Methods:
         None
@@ -359,28 +363,18 @@ class EventManager(models.Manager):
     """
 
     def past_events(self):
-        now = timezone.now()
-        return self.filter(event_date__lt=now.date()) | self.filter(
-            event_date=now.date(),
-            event_time__lt=(now - timedelta(hours=models.F("event_hours"))).time(),
-            event_canceled=False,
-        )
+        return self.past_events_all().filter(event_cancelled=False)
 
     def past_events_all(self):
         now = timezone.now()
-        return self.filter(event_date__lt=now.date()) | self.filter(
-            event_date=now.date(), event_time__lt=(now - timedelta(hours=models.F("event_hours"))).time()
-        )
+        return self.filter(event_datetime__lt=now)
 
     def future_events(self):
-        now = timezone.now()
-        return self.filter(event_date__gt=now.date()) | self.filter(
-            event_date=now.date(), event_time__gt=now.time(), event_canceled=False
-        )
+        return self.future_events_all().filter(event_cancelled=False)
 
     def future_events_all(self):
-        now = timezone.now()
-        return self.filter(event_date__gt=now.date()) | self.filter(event_date=now.date(), event_time__gt=now.time())
+        now = timezone.now() - timedelta(hours=max(self.values_list("event_duration", flat=True)))
+        return self.filter(event_datetime__ge=now)
 
 
 class Event(models.Model):
@@ -388,28 +382,25 @@ class Event(models.Model):
     A class that represents an event.
 
     Attributes:
-        event_date (DateField): The date of the event.
-        event_time (TimeField): The time of the event.
-        event_hours (PositiveIntegerField): The approximate duration of the event in hours.
-        event_title (CharField): The title of the event.
-        event_venue (CharField): The location of the event.
-        event_description (RichTextField): The description of the event.
-        event_canceled (BooleanField): A boolean field to indicate if the event is canceled.
-
+        event_datetime (DateTimeField): The date and time of the event.
+        Event_duration (FloatField): The expected duration of the event in hours.
+        Event_title (CharField): The title of the event.
+        Event_venue (CharField): The location of the event.
+        Event_description (RichTextField): A long description of the event.
+        Event_cancelled (BooleanField): A boolean field to indicate if the event has been cancelled.
     """
 
-    event_date = models.DateField("Date of Event", db_index=True)
-    event_time = models.TimeField("Time of Event")
-    event_hours = models.PositiveIntegerField("Event Duration (hours)", default=1)
+    event_datetime = models.DateTimeField("Event Date Time", db_index=True)
+    event_duration = models.FloatField("Event Duration (hours)", default=1.0, validators=[MinValueValidator(0.0)])
     event_title = models.CharField(max_length=120)
     event_venue = models.TextField(max_length=120)
     event_description = RichTextField(features=["bold", "italic", "ol", "ul"])
-    event_canceled = models.BooleanField(default=False)
+    event_cancelled = models.BooleanField(default=False)
 
     objects = EventManager()
 
     @staticmethod
-    def get_cached_events(self):
+    def get_cached_events():
         today = timezone.now().date()
         cache_key = f"future_events:{today}"
         cached_events = cache.get(cache_key)
@@ -422,7 +413,7 @@ class Event(models.Model):
         return f"Event {self.event_title} at {self.event_venue} on {self.event_date} at {self.event_time}"
 
     class Meta:
-        ordering = ["event_date", "event_time"]
+        ordering = ["event_datetime"]
 
 
 class CMSPageBase(AbstractCMSPage):
