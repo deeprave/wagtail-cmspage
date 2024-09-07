@@ -4,6 +4,7 @@ import json
 from itertools import combinations
 from typing import List, Iterable, Dict, Optional
 
+from django.apps import apps
 from django.conf import settings
 from django.template import engines, TemplateDoesNotExist
 
@@ -14,10 +15,24 @@ CMSPAGE_TEMPLATE_BASE = "CMSPAGE_TEMPLATE_BASE"
 CMSPAGE_TEMPLATE_BASE_DIR = "CMSPAGE_TEMPLATE_BASE_DIR"
 CMSPAGE_TEMPLATE_INCLUDE_DIR = "CMSPAGE_TEMPLATE_INCLUDE_DIR"
 CMSPAGE_TEMPLATE_INCLUDE_FILES = "CMSPAGE_TEMPLATE_INCLUDE_FILES"
+CMSPAGE_TEMPLATE_INCLUDE_FILES_EXTRA = "CMSPAGE_TEMPLATE_INCLUDE_FILES_EXTRA"
 
 DEFAULT_TEMPLATE_EXTENSIONS = [".html", ".htm"]
-DEFAULT_BASE_TEMPLATE_NAME = "base.html"
-DEFAULT_TEMPLATE_INCLUDE_NAMES = "title header navigation messages logo carousel main footer links contact media"
+DEFAULT_BASE_TEMPLATE_NAME = "cmspage.html"
+DEFAULT_TEMPLATE_INCLUDE_NAMES = [
+    "title",
+    "header",
+    "navigation",
+    "navigation_item",
+    "messages",
+    "logo",
+    "carousel",
+    "main",
+    "footer",
+    "links",
+    "contact",
+    "media",
+]
 
 _logger = logging.getLogger("cmspage")
 
@@ -95,11 +110,15 @@ class CMSTemplateMixin:
     """
 
     default_base_template = DEFAULT_BASE_TEMPLATE_NAME
-    default_template_dir = None
     default_include_dir = None
     template_extensions = DEFAULT_TEMPLATE_EXTENSIONS
     template_include_names = DEFAULT_TEMPLATE_INCLUDE_NAMES
+    template_include_names_extra = None
     logging_level = logging.INFO
+
+    @property
+    def default_template_dir(self):
+        return apps.get_containing_app_config(self.__module__).name
 
     @staticmethod
     def to_list(names: str | List[str] | None) -> List[str]:
@@ -188,9 +207,12 @@ class CMSTemplateMixin:
     @conditional_cached_property
     def include_names(self) -> List[str]:
         include_names = getattr(settings, CMSPAGE_TEMPLATE_INCLUDE_FILES, None) or self.template_include_names
-        include_names = self.to_list(include_names)
+        include_names_extra = (
+            getattr(settings, CMSPAGE_TEMPLATE_INCLUDE_FILES_EXTRA, None) or self.template_include_names_extra
+        )
+        include_names = self.to_list(include_names) + self.to_list(include_names_extra)
         self.log(f"Include template names: {self.as_list(include_names)}")
-        return include_names
+        return list(include_names)
 
     def get_include_templates(self) -> Dict[str, str]:
         def append_template_extension(name):

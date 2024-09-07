@@ -1,7 +1,8 @@
 from wagtail.admin.panels import FieldPanel
+from wagtail.models import Site
 from wagtail.snippets.views.snippets import SnippetViewSet
 
-from .models import CarouselImage, MenuLink, SiteVariables, Event
+from .models import CarouselImage, MenuLink, SiteVariables
 
 
 class CarouselImageSnippetViewSet(SnippetViewSet):
@@ -28,7 +29,11 @@ class MenuLinkViewSet(SnippetViewSet):
     menu_label = "Menu Links"
     menu_icon = "list-ul"
     menu_order = 300
-    list_display = ["menu_site", "title", "menu_link", "menu_order"]
+    list_display = ["submenu", "title", "menu_link_type", "menu_order"]
+
+    def get_queryset(self, request):
+        site = Site.find_for_request(request)
+        return MenuLink.objects.get_ordered_queryset(site)
 
 
 class SiteVariablesViewSet(SnippetViewSet):
@@ -44,17 +49,3 @@ class SiteVariablesViewSet(SnippetViewSet):
     #             widget=forms.JSONField, help_text='Enter site variables as JSON (e.g., {"key": "value"})'
     #         )
     #     }
-
-
-class EventSnippetViewSet(SnippetViewSet):
-    model = Event
-    list_display = ["event_datetime", "event_title", "event_duration"]
-    list_filter = ["event_cancelled"]
-    search_fields = ["event_title", "event_description"]
-    ordering = ["event_datetime"]
-
-    def get_queryset(self, request):
-        queryset = super().get_queryset(request)
-        if request.GET.get("event_cancelled", False):
-            queryset = queryset.filter(event_cancelled=True)
-        return queryset
