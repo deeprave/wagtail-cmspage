@@ -3,8 +3,8 @@ from unittest.mock import Mock, patch
 from django.http import HttpRequest
 from django.contrib.auth import get_user_model
 from wagtail.models import Site
-from cmspage.context_processors import navigation, events, cmspage_context
-from cmspage.models import Event, MenuLink
+from cmspage.context_processors import navigation, cmspage_context
+from cmspage.models import MenuLink
 
 User = get_user_model()
 
@@ -28,13 +28,6 @@ def mock_request(mock_site):
 def mock_site_find_for_request(mock_site):
     with patch("wagtail.models.Site.find_for_request", return_value=mock_site):
         yield
-
-
-def mock_event():
-    event = Mock(spec=Event)
-    event.id = 1
-    event.event_title = "Event 1"
-    return event
 
 
 @pytest.mark.parametrize(
@@ -68,34 +61,7 @@ def test_navigation(
     assert result["navigation"] == expected_navigation
 
 
-@pytest.mark.parametrize(
-    "cached_events, expected_events",
-    [
-        ([mock_event()], [{"id": 1, "title": "Event 1"}]),
-        ([], []),
-    ],
-    ids=["with_events", "no_events"],
-)
-@patch("cmspage.context_processors.Event.get_cached_events")
-def test_events(mock_get_cached_events, mock_request, cached_events, expected_events, monkeypatch):
-    # Arrange
-    def mock_model_to_dict(event):
-        return {"id": event.id, "title": event.event_title}
-
-    # patch it within the module
-    monkeypatch.setattr("cmspage.context_processors.model_to_dict", mock_model_to_dict)
-
-    mock_get_cached_events.return_value = cached_events
-
-    # Act
-    result = events(mock_request)
-
-    # Assert
-    assert result["events"] == expected_events
-
-
 @patch("cmspage.context_processors.navigation")
-@patch("cmspage.context_processors.events")
 @patch("cmspage.context_processors.site_variables")
 def test_cmspage_context(mock_site_variables, mock_events, mock_navigation, mock_request):
     # Arrange
@@ -107,4 +73,4 @@ def test_cmspage_context(mock_site_variables, mock_events, mock_navigation, mock
     result = cmspage_context(mock_request)
 
     # Assert
-    assert result == {"navigation": "nav_data", "events": "event_data", "site": "site_data"}
+    assert result == {"navigation": "nav_data", "site": "site_data"}

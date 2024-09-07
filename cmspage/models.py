@@ -1,12 +1,8 @@
 # -*- coding: utf-8 -*-
-from datetime import timedelta
-
-from django.db import models
 from django.conf import settings
 from django.core.cache import cache
 from django.core.exceptions import ValidationError
-from django.core.validators import MinValueValidator
-from django.utils import timezone
+from django.db import models
 from modelcluster.contrib.taggit import ClusterTaggableManager
 from modelcluster.fields import ParentalKey
 from taggit.models import Tag as TaggitTag
@@ -14,22 +10,26 @@ from taggit.models import TaggedItemBase
 from wagtail.admin.panels import FieldPanel, FieldRowPanel, PageChooserPanel, MultiFieldPanel
 from wagtail.admin.widgets import AdminPageChooser
 from wagtail.fields import RichTextField, StreamField
+from wagtail.images import get_image_model
 from wagtail.models import Orderable, Page, Site
 from wagtail.snippets.models import register_snippet
-from wagtail.images import get_image_model
 
 from . import blocks as cmsblocks
 from .mixins import CMSTemplateMixin
 
 __all__ = (
     "CMSPage",
+    "CMSPageBase",
     "CMSHomePage",
     "SiteVariables",
+    "MenuLink",
+    "MenuLinkManager",
+    "CarouselImage",
 )
 
 
 class PageTag(TaggedItemBase):
-    content_object = ParentalKey("cmspage.CMSPage", on_delete=models.CASCADE, related_name="cmspage_tags")
+    content_object = ParentalKey("wagtailcore.Page", on_delete=models.CASCADE, related_name="cmspage_tags")
 
 
 @register_snippet
@@ -141,13 +141,8 @@ class AbstractCMSPage(Page, CMSTemplateMixin):
     ]
 
     promote_panels = [
-        MultiFieldPanel(
-            [
-                FieldPanel("seo_title"),
-                FieldPanel("seo_keywords"),
-            ],
-            heading="Search Engine Optimisation",
-        ),
+        FieldPanel("seo_title", heading="Seo title"),
+        FieldPanel("seo_keywords"),
     ] + Page.promote_panels
 
     class Meta:
@@ -168,8 +163,31 @@ class MyPageChooser(AdminPageChooser):
 
 
 class MenuLinkManager(models.Manager):
-    def get_queryset(self):
-        return super().get_queryset().select_related("link_page", "link_document")
+    def _get_ordered_menu_links(self, site, parent=None, menu_links=None, ordered_links=None):
+        if ordered_links is None:
+            ordered_links = []
+        if menu_links is None:
+            menu_links = list(self.get_queryset().filter(site=site).order_by("menu_order", "id"))
+
+        children = [link for link in menu_links if link.parent_id == parent]
+        for child in children:
+            ordered_links.append(child)
+            self._get_ordered_menu_links(site, child.id, menu_links, ordered_links)
+
+        return ordered_links
+
+    def get_ordered_queryset(self, site: Site):
+        # For each site, fetch the MenuLink records in the desired hierarchical order
+        final_ordered_links = self._get_ordered_menu_links(site)
+
+        # Extract IDs from the ordered links and construct an ordered queryset
+        ordered_ids = [link.id for link in final_ordered_links]
+        return (
+            super()
+            .get_queryset()
+            .filter(id__in=ordered_ids)
+            .order_by(models.Case(*[models.When(id=pk, then=pos) for pos, pk in enumerate(ordered_ids)]))
+        )
 
 
 class MenuLink(models.Model):
@@ -188,6 +206,8 @@ class MenuLink(models.Model):
 
     """
 
+    cache_enabled = False
+
     site = models.ForeignKey(
         Site,
         null=False,
@@ -197,8 +217,23 @@ class MenuLink(models.Model):
         default=getattr(settings, "SITE_ID", 1),
         help_text="Select the site to which the menu link applies",
     )
-    menu_order = models.IntegerField("Order", default=0)
-    menu_title = models.CharField("Menu Title", validators=[min_length_validator], max_length=32, default="Placeholder")
+    parent = models.ForeignKey(
+        "self",
+        to_field="id",
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL,
+        help_text="Select a parent link to add it to a sub-menu, or blank for a top-level menu item",
+    )
+    menu_order = models.IntegerField("Order", default=0, help_text="Specify the order in the menu")
+    menu_title = models.CharField(
+        "Menu Title",
+        validators=[min_length_validator],
+        max_length=32,
+        null=True,
+        blank=True,
+        help_text="Override the menu title",
+    )
     link_page = models.ForeignKey(
         "wagtailcore.Page",
         null=True,
@@ -224,8 +259,9 @@ class MenuLink(models.Model):
     )
 
     def menu_site(self, _=None):
-        return f"{self.site.site_name[:32]}{' (default)' if self.site.is_default_site else ''}"
+        return f"{self.site.site_name}{' (default)' if self.site.is_default_site else ''}"
 
+    @property
     def title(self):
         return self.menu_title or self.menu_link_title
 
@@ -242,17 +278,25 @@ class MenuLink(models.Model):
         return "Document" if self.link_document else "URL"
 
     @property
+    def menu_link_icon(self, _=None):
+        return "page" if self.link_page else "document" if self.link_document else "link"
+
+    @property
+    def submenu(self):
+        return self.parent or self
+
+    @property
     def url(self):
         if self.link_page:
             return self.link_page.url
         return self.link_document.url if self.link_document else self.link_url
 
-    @staticmethod
-    def get_cached_menu_links(site: Site, user_id: int):
+    @classmethod
+    def get_cached_menu_links(cls, site: Site, user_id: int):
         cache_key = f"menu_links:{site.id}:{user_id}"
-        menu_links = cache.get(cache_key)
-        if menu_links is None:
-            menu_links = list(MenuLink.objects.filter(site=site).order_by("menu_order", "id"))
+        menu_links = cls.cache_enabled and cache.get(cache_key)
+        if not menu_links:
+            menu_links = list(MenuLink.objects.get_ordered_queryset(site))
             cache.set(cache_key, menu_links, 300)
         return menu_links
 
@@ -272,20 +316,25 @@ class MenuLink(models.Model):
 
     objects = MenuLinkManager()
 
+    def __str__(self):
+        return self.title
+
     class Meta:
         verbose_name = "Menu Link"
         ordering = ["menu_order", "id"]
 
     panels = [
         FieldPanel("site"),
-        FieldRowPanel([FieldPanel("menu_title"), FieldPanel("menu_order")]),
-        FieldRowPanel(
+        FieldPanel("parent"),
+        MultiFieldPanel(
             [
                 PageChooserPanel("link_page"),
                 FieldPanel("link_document"),
-            ]
+                FieldPanel("link_url"),
+            ],
+            heading="Link To",
         ),
-        FieldPanel("link_url"),
+        FieldRowPanel([FieldPanel("menu_title"), FieldPanel("menu_order")]),
     ]
 
 
@@ -347,75 +396,6 @@ class CarouselImage(Orderable):
     ]
 
 
-class EventManager(models.Manager):
-    """
-    Summary:
-    - Provides methods to filter past and future events.
-
-    Explanation:
-    - This class provides methods to filter past and future events based on event date, time, and cancellation status.
-
-    Args:
-    - self: The EventManager instance.
-
-    Returns:
-    - QuerySet: A QuerySet of past or future events based on the filter criteria.
-    """
-
-    def past_events(self):
-        return self.past_events_all().filter(event_cancelled=False)
-
-    def past_events_all(self):
-        now = timezone.now()
-        return self.filter(event_datetime__lt=now)
-
-    def future_events(self):
-        return self.future_events_all().filter(event_cancelled=False)
-
-    def future_events_all(self):
-        now = timezone.now() - timedelta(hours=max(self.values_list("event_duration", flat=True)))
-        return self.filter(event_datetime__ge=now)
-
-
-class Event(models.Model):
-    """
-    A class that represents an event.
-
-    Attributes:
-        event_datetime (DateTimeField): The date and time of the event.
-        Event_duration (FloatField): The expected duration of the event in hours.
-        Event_title (CharField): The title of the event.
-        Event_venue (CharField): The location of the event.
-        Event_description (RichTextField): A long description of the event.
-        Event_cancelled (BooleanField): A boolean field to indicate if the event has been cancelled.
-    """
-
-    event_datetime = models.DateTimeField("Event Date Time", db_index=True)
-    event_duration = models.FloatField("Event Duration (hours)", default=1.0, validators=[MinValueValidator(0.0)])
-    event_title = models.CharField(max_length=120)
-    event_venue = models.TextField(max_length=120)
-    event_description = RichTextField(features=["bold", "italic", "ol", "ul"])
-    event_cancelled = models.BooleanField(default=False)
-
-    objects = EventManager()
-
-    @staticmethod
-    def get_cached_events():
-        today = timezone.now().date()
-        cache_key = f"future_events:{today}"
-        cached_events = cache.get(cache_key)
-        if cached_events is None:
-            cached_events = list(Event.objects.future_events())
-            cache.set(cache_key, cached_events, 3600)
-        return cached_events
-
-    def __str__(self):
-        return f"Event {self.event_title} at {self.event_venue} on {self.event_date} at {self.event_time}"
-
-    class Meta:
-        ordering = ["event_datetime"]
-
-
 class CMSPageBase(AbstractCMSPage):
     body_blocks = [
         # header
@@ -455,11 +435,16 @@ class CMSPage(CMSPageBase):
         verbose_name_plural = "CMS Pages"
 
 
-class CMSHomePage(CMSPage):
+class CMSHomePage(CMSPageBase):
     page_description = "This page type is only for a site home page."
     parent_page_types = ["wagtailcore.Page"]
     subpage_types = ["cmspage.CMSPage", "wagtailcore.Page"]
     max_count = 1
+
+    body_blocks = [
+        ("hero", cmsblocks.HeroImageBlock(label="Hero Image", max_num=1)),
+    ] + CMSPageBase.body_blocks
+    body = StreamField(body_blocks, blank=True, null=True)
 
     class Meta:
         verbose_name = "CMS Home Page"

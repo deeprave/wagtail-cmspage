@@ -27,9 +27,10 @@ class conditional_cached_property(cached_property):
     """
     Decorator that conditionally converts a method with a single self argument into a
     property cached on the instance.
+    The cache can be disabled.
 
     A cached property can be made out of an existing method:
-    (e.g. ``url = cached_property(get_absolute_url)``).
+    (e.g. ``url = conditional_cached_property(get_absolute_url)``).
     """
 
     def __get__(self, instance, cls=None):

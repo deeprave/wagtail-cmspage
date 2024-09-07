@@ -105,13 +105,13 @@ def test_include_templates(settings, include_names, expected_includes):
         pytest.param(
             None,
             None,
-            "cmspage/base.html",
+            "cmspage/cmspage.html",
             id="default-base",
         ),
         pytest.param(
-            "base.html",
+            "cmspage.html",
             None,
-            "cmspage/base.html",
+            "cmspage/cmspage.html",
             id="explicit-base",
         ),
         pytest.param(
@@ -127,18 +127,18 @@ def test_include_templates(settings, include_names, expected_includes):
             id="no-path-base",
         ),
         pytest.param(
-            "/layout/base.html",
+            "/layout/cmspage.html",
             None,
-            "layout/base.html",
+            "layout/cmspage.html",
             id="absolute-base",
         ),
         pytest.param(
             None,
             "pages",
-            "pages/base.html",
+            "pages/cmspage.html",
             id="pages-default-base",
         ),
-        pytest.param("base.html", "pages", "pages/base.html", id="pages-explicit-base"),
+        pytest.param("cmspage.html", "pages", "pages/cmspage.html", id="pages-explicit-base"),
         pytest.param(
             "index.html",
             "pages",
@@ -152,9 +152,9 @@ def test_include_templates(settings, include_names, expected_includes):
             id="pages-no-path-base",
         ),
         pytest.param(
-            "/layout/base.html",
+            "/layout/cmspage.html",
             "pages",
-            "layout/base.html",
+            "layout/cmspage.html",
             id="pages-absolute-base",
         ),
     ],
@@ -180,7 +180,7 @@ def test_base_template(settings, base_name, base_path, expected_path):
         pytest.param(
             "Test Page",
             None,
-            "cmspage/base.html",
+            "cmspage/cmspage.html",
             "header,main,footer",
             {
                 "header": "cmspage/includes/header.html",
@@ -191,8 +191,8 @@ def test_base_template(settings, base_name, base_path, expected_path):
         ),
         pytest.param(
             "Another Page",
-            "/base.html",
-            "base.html",
+            "/cmspage.html",
+            "cmspage.html",
             "header,navigation,footer",
             {
                 "header": "cmspage/includes/header.html",

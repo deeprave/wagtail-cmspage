@@ -1,0 +1,13 @@
+{# includes.navigation_item #}
+{% load wagtail %}
+<li>
+  <span class="icon {{ item.icon }}"></span>
+  <a href="{{ item.url }}">{{ item.title }}</a>
+  {% if item.children %}
+    <ol>
+      {% for child in item.children %}
+        {% include includes.navigation_item with item=child %}
+      {% endfor %}
+    </ol>
+  {% endif %}
+</li>
