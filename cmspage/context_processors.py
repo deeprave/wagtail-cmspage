@@ -1,3 +1,5 @@
+from collections import defaultdict
+import logging
 from typing import List
 
 from django.http import HttpRequest
@@ -7,35 +9,42 @@ from .models import SiteVariables, MenuLink
 
 __all__ = ("navigation", "site_variables", "cmspage_context")
 
+logger = logging.getLogger("cmspage.context_processors")
+
 
 def _nav_pages_for_site(site: Site, user_id: int) -> List[dict]:
     cached_menu_links = MenuLink.get_cached_menu_links(site, user_id)
 
-    links = [
-        {
+    tree = []
+    id_to_link = {}
+    unlinked = defaultdict(list)
+
+    for link in cached_menu_links:
+        node = {
             "id": link.id,
-            "parent_id": link.parent.id if link.parent else None,
             "title": link.menu_title or link.menu_link_title,
             "type": link.menu_link_type,
             "icon": link.menu_link_icon,
             "url": link.url,
             "children": [],
         }
-        for link in cached_menu_links
-    ]
+        id_to_link[link.id] = node
 
-    # build a map of links by id
-    id_to_link = {link["id"]: link for link in links}
+        if link.parent:
+            if parent := id_to_link.get(link.parent.id):
+                parent["children"].append(node)
+                continue
+            # Handle orphaned nodes or log an error
+            unlinked[link.parent].append(node)
+        else:
+            tree.append(node)
 
-    # use a list comprension to add parent nodes to the tree
-    tree = [id_to_link[link["id"]] for link in links if not link["parent_id"]]
-
-    # If each link has a parent, add it to the parent's children
-    for link in links:
-        parent_id = link["parent_id"]
-        if parent_id:  # and parent_id in id_to_link:
-            id_to_link[parent_id]["children"].append(link)
-
+    if unlinked:
+        for parent_id, children in unlinked.items():
+            if parent := id_to_link.get(parent_id):
+                parent["children"].extend(children)
+            else:
+                logger.error(f"Orphaned menu link(s): {children}")
     return tree
 
 
