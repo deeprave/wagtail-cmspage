@@ -70,6 +70,7 @@ def test_get_template(rf, settings, template_styles, expected_template):
                 "title",
                 "header",
                 "navigation",
+                "navigation_item",
                 "messages",
                 "logo",
                 "carousel",

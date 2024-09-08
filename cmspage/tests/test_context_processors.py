@@ -1,5 +1,7 @@
 import pytest
 from unittest.mock import Mock, patch
+
+from django.contrib.auth.models import AnonymousUser
 from django.http import HttpRequest
 from django.contrib.auth import get_user_model
 from wagtail.models import Site
@@ -30,43 +32,98 @@ def mock_site_find_for_request(mock_site):
         yield
 
 
+def mock_menulink(id, title, url, parent_id=None):
+    menulink = Mock(spec=MenuLink)
+    menulink.id = id
+    menulink.menu_title = title
+    menulink.menu_link_icon = "page"
+    menulink.menu_link_type = "Page"
+    menulink.url = url
+    menulink.parent = Mock(spec=MenuLink, id=parent_id) if parent_id else None
+    return menulink
+
+
 @pytest.mark.parametrize(
-    "user_authenticated, user_id, expected_navigation",
+    "user_authenticated, user_id, menulink_records, expected_navigation",
     [
-        (True, 1, [{"title": "Home", "type": "URL", "url": "/home"}]),
-        (False, 0, []),
+        (
+            False,
+            None,
+            [
+                mock_menulink(id=1, title="Home", url="/", parent_id=None),
+                mock_menulink(id=2, title="About", url="/about/", parent_id=None),
+                mock_menulink(id=4, title="Team", url="/about/team/", parent_id=2),
+                mock_menulink(id=5, title="History", url="/about/history/", parent_id=2),
+                mock_menulink(id=3, title="Contact", url="/contact/", parent_id=None),
+            ],
+            [
+                {"id": 1, "title": "Home", "icon": "page", "type": "Page", "url": "/", "children": []},
+                {
+                    "id": 2,
+                    "title": "About",
+                    "icon": "page",
+                    "type": "Page",
+                    "url": "/about/",
+                    "children": [
+                        {
+                            "id": 4,
+                            "title": "Team",
+                            "icon": "page",
+                            "type": "Page",
+                            "url": "/about/team/",
+                            "children": [],
+                        },
+                        {
+                            "id": 5,
+                            "title": "History",
+                            "icon": "page",
+                            "type": "Page",
+                            "url": "/about/history/",
+                            "children": [],
+                        },
+                    ],
+                },
+                {
+                    "id": 3,
+                    "title": "Contact",
+                    "icon": "page",
+                    "type": "Page",
+                    "url": "/contact/",
+                    "children": [],
+                },
+            ],
+        ),
+        (
+            True,
+            1,
+            [
+                mock_menulink(id=1, title="Home", url="/", parent_id=None),
+                mock_menulink(id=2, title="Dashboard", url="/dashboard/", parent_id=None),
+                mock_menulink(id=3, title="Logout", url="/logout/", parent_id=None),
+            ],
+            [
+                {"id": 1, "title": "Home", "icon": "page", "type": "Page", "url": "/", "children": []},
+                {"id": 2, "title": "Dashboard", "icon": "page", "type": "Page", "url": "/dashboard/", "children": []},
+                {"id": 3, "title": "Logout", "icon": "page", "type": "Page", "url": "/logout/", "children": []},
+            ],
+        ),
     ],
-    ids=["authenticated_user", "unauthenticated_user"],
+    ids=["anonymous_user", "authenticated_user"],
 )
-@patch("cmspage.context_processors.MenuLink.get_cached_menu_links")
-def test_navigation(
-    mock_get_cached_menu_links,
-    user_authenticated,
-    user_id,
-    expected_navigation,
-    mock_request,
-    mock_site,
-):
-    # Arrange
-    mock_request.user.is_authenticated = user_authenticated
-    mock_request.user.id = user_id
-    mock_get_cached_menu_links.return_value = (
-        [MenuLink(id=1, site=mock_site, menu_title="Home", link_url="/home")] if user_authenticated else []
-    )
+def test_navigation(user_authenticated, user_id, menulink_records, expected_navigation, rf):
+    request = rf.get("/")
+    request.user = User(id=user_id) if user_authenticated else AnonymousUser()
 
-    # Act
-    result = navigation(mock_request)
-
-    # Assert
-    assert result["navigation"] == expected_navigation
+    with patch("cmspage.context_processors.MenuLink.get_cached_menu_links", return_value=menulink_records):
+        result = navigation(request)
+        assert result["navigation"] == expected_navigation
 
 
 @patch("cmspage.context_processors.navigation")
 @patch("cmspage.context_processors.site_variables")
-def test_cmspage_context(mock_site_variables, mock_events, mock_navigation, mock_request):
+def test_cmspage_context(mock_site_variables, mock_navigation, mock_request):
     # Arrange
     mock_navigation.return_value = {"navigation": "nav_data"}
-    mock_events.return_value = {"events": "event_data"}
     mock_site_variables.return_value = {"site": "site_data"}
 
     # Act
