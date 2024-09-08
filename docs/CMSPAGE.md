@@ -10,7 +10,9 @@ Blocks in this StreamField can be ordered by the page author as desired.
 
 ### Module
 
-This module is installed in similar fashion to any python module, using a package manager such as [pip](https://packaging.python.org/en/latest/tutorials/installing-packages/), [poetry](https://python-poetry.org/docs/basic-usage/), [pipenv](https://pipenv-searchable.readthedocs.io/install.html#installing-packages-for-your-project), or `uv`, for example.
+This module is installed in similar fashion to any python module, using a package manager such
+as [pip](https://packaging.python.org/en/latest/tutorials/installing-packages/), [poetry](https://python-poetry.org/docs/basic-usage/), [pipenv](https://pipenv-searchable.readthedocs.io/install.html#installing-packages-for-your-project),
+or `uv`, for example.
 
 > ⚠️ As with any Django or Wagtail module - like any other python package - it is
 > best installed into a local virtual environment (poetry and pipenv will both
@@ -36,7 +38,8 @@ The `cmspage` body component contains fields that use `wagtail.images`,
 
 ### Page creation
 
-CMSPage is a `Page` model, and can be created in the Wagtail admin interface, or programmatically, as with any other Wagtail `Page` model.
+CMSPage is a `Page` model, and can be created in the Wagtail admin interface, or programmatically, as with any other
+Wagtail `Page` model.
 It delivers a few additional enhancements to the standard Wagtail `Page` model:
 
 - includes a `StreamField` with a large number of pre-defined custom `Blocks`.
@@ -53,25 +56,33 @@ It delivers a few additional enhancements to the standard Wagtail `Page` model:
 
 ```python
 from cmspage.models import CMSPageBase
+
 ...
+
+
 class MyCMSPage(CMSPageBase):
     body_blocks = [
-        ('heading', blocks.CharBlock(icon='title', classname='title')),
-        ('paragraph', blocks.RichTextBlock(icon='pilcrow', classname='paragraph')),
-        ('image', ImageChooserBlock(icon='image', classname='image')),
-        ('video', EmbedBlock(icon='media', classname='video')),
-        ('button', ButtonBlock(icon='link', classname='button')),
-    ] + CMSPageBase.body_blocks
+                      ('heading', blocks.CharBlock(icon='title', classname='title')),
+                      ('paragraph', blocks.RichTextBlock(icon='pilcrow', classname='paragraph')),
+                      ('image', ImageChooserBlock(icon='image', classname='image')),
+                      ('video', EmbedBlock(icon='media', classname='video')),
+                      ('button', ButtonBlock(icon='link', classname='button')),
+                  ] + CMSPageBase.body_blocks
     body = StreamField(body_blocks, blank=True)
     footnote = RichTextField(blank=True)
 ```
 
-Note that the `body_blocks` list is prepended with the blocks defined in the parent class, `CMSPageBase`.
+Note that in this example, the `body_blocks` list is prepended with the blocks defined in the parent class,
+`CMSPageBase`.
 This is to ensure that the parent blocks are included in the child class,
-so that child class can add additional blocks as required.
-Additional blocks can be added before or after the parent blocks.
+so that child class can simply add additional blocks as required without specifying the same or a subset of fields from
+the parent class.
+Using this method, additional blocks can be added either before or after the parent blocks, both, or completely override
+blocks in the parent class.
+The order in which blocks are added will determine the order in which they are displayed in the Wagtail admin interface.
+This approach maintains consistency across pages while enabling flexibility for specific needs.
 
-> Note that additional types of CMSPages you define need to use `CMSPageBase` as the parent class,
+> Note that additional types of CMSPages you define must use `CMSPageBase` as the parent class,
 > not `CMSPage`.
 > This is because Django doesn't allow fields to be overridden in child classes unless the
 > parent class is abstract (and `CMSPageBase` is indeed abstract).
@@ -90,7 +101,7 @@ However, CMSPage provides an alternative that allows templates to gracefully fal
 through the CMSTemplateMixin class.
 This mixin adds special handling through a number of Django settings that can vary this behaviour.
 
-### CMS_TEMPLATE_STYLES
+### CMSPAGE_TEMPLATE_STYLES
 
 This setting is a list of none, one or more strings that represent CSS frameworks or sites.
 
@@ -108,12 +119,13 @@ The default is an empty list, which adds no additional components to the default
   and if so, uses that by default.
   If it doesn't exist, then the template name falls back to the default.
 
-- If CMSPAGE_TEMPLATE_STYLES is in settings and set to `"mycompany bootstrap5"` or `["mycompany", "bootstrap5"]`, then the mixin checks for the following until it finds a template that exists:
+- If CMSPAGE_TEMPLATE_STYLES is in settings and set to `"mycompany bootstrap5"` or `["mycompany", "bootstrap5"]`, then
+  the mixin checks for the following until it finds a template that exists:
 
-  - `<appname>/mycompany/bootstrap5/<snake-case-model>.html`
-  - `<appname>/bootstrap5/<snake-case-model>.html`
-  - `<appname>/mycompany/<snake-case-model>.html`
-  - `<appname>/<snake-case-model>.html` (the default)
+    - `<appname>/mycompany/bootstrap5/<snake-case-model>.html`
+    - `<appname>/bootstrap5/<snake-case-model>.html`
+    - `<appname>/mycompany/<snake-case-model>.html`
+    - `<appname>/<snake-case-model>.html` (the default)
 
   Note that the longest path is checked first, so that the most specific matching template is always used.
 
@@ -151,35 +163,37 @@ By default, models deriving from `CMSPageBase` use the app name of the model.
 This setting allows this to be overridden so that the entire hierarchy of templates used
 is consistent, even across apps.
 
-
 ### CMSPAGE_TEMPLATE_INCLUDE_DIR
 
 This setting provides the directory that contains included template files.
 
-The default value is None, or blank, which means that the included templates are in the same directory as the main template.
+The default value is None, or blank, which means that the included templates are in the same directory as the main
+template.
 
 ### CMSPAGE_TEMPLATE_INCLUDE_FILES
 
 This setting is a list of template files that are used in cmspage templates.
 
 The default value is a list with the following contents:
+
 ```python
 [
-  "title",
-  "header",
-  "navigation",
-  "navigation_item",
-  "messages",
-  "logo",
-  "carousel",
-  "main",
-  "footer",
-  "links",
-  "contact",
-  "media",
+    "title",
+    "header",
+    "navigation",
+    "navigation_item",
+    "messages",
+    "logo",
+    "carousel",
+    "main",
+    "footer",
+    "links",
+    "contact",
+    "media",
 ]
 ```
-This setting may be either a list of strings or a space and/or comma-seprated string.
+
+This setting may be either a list of strings or a space and/or comma-separated string.
 
 ### CMSPAGE_TEMPLATE_INCLUDE_FILES_EXTRA
 
