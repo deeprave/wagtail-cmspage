@@ -1,11 +1,33 @@
 # CMSPAGE
 
+# CMSPAGE
+
+## Table of Contents
+- [Overview](#overview)
+- [Installation](#installation)
+  - [Module](#module)
+  - [Django settings](#django-settings)
+- [Usage \& API](#usage--api)
+  - [Page creation](#page-creation)
+  - [Multi-site and CSS framework support](#multisitecssframework)
+    - [CMSPAGE\_TEMPLATE\_STYLES](#cmspage_template_styles)
+    - [CMSPAGE\_TEMPLATE\_BASE](#cmspage_template_base)
+    - [CMSPAGE\_TEMPLATE\_BASE\_DIR](#cmspage_template_base_dir)
+    - [CMSPAGE\_TEMPLATE\_INCLUDE\_DIR](#cmspage_template_include_dir)
+    - [CMSPAGE\_TEMPLATE\_INCLUDE\_FILES](#cmspage_template_include_files)
+    - [CMSPAGE\_TEMPLATE\_INCLUDE\_FILES\_EXTRA](#cmspage_template_include_files_extra)
+- [Using include files](#using-include-files)
+
+<a name="overview"></a>
 ## Overview
 
 The `cmspage` app provides an opinionated extension to the Wagtail CMS,
 featuring a body `StreamField` with a number of custom Wagtail `Blocks`, or components.
 Blocks in this StreamField can be ordered by the page author as desired.
 
+
+
+<a name="installation"></a>
 ## Installation
 
 ### Module
@@ -18,6 +40,7 @@ or `uv`, for example.
 > best installed into a local virtual environment (poetry and pipenv will both
 > enforce this by default).
 
+<a name="django-settings"></a>
 ### Django settings
 
 Add the `cmspage` app to your Django project's `INSTALLED_APPS` setting:
@@ -34,8 +57,10 @@ INSTALLED_APPS = [
 The `cmspage` body component contains fields that use `wagtail.images`,
 `wagtail.embeds` and `wagtail.documents`, so these modules are also required in INSTALLED_APPS.
 
+<a name="usage--api"></a>
 ## Usage & API
 
+<a name="page-creation"></a>
 ### Page creation
 
 CMSPage is a `Page` model, and can be created in the Wagtail admin interface, or programmatically, as with any other
@@ -79,7 +104,7 @@ so that child class can simply add additional blocks as required without specify
 the parent class.
 Using this method, additional blocks can be added either before or after the parent blocks, both, or completely override
 blocks in the parent class.
-The order in which blocks are added will determine the order in which they are displayed in the Wagtail admin interface.
+The order in which blocks are added will determine the display order in the Wagtail admin interface.
 This approach maintains consistency across pages while enabling flexibility for specific needs.
 
 > Note that additional types of CMSPages you define must use `CMSPageBase` as the parent class,
@@ -87,6 +112,8 @@ This approach maintains consistency across pages while enabling flexibility for 
 > This is because Django doesn't allow fields to be overridden in child classes unless the
 > parent class is abstract (and `CMSPageBase` is indeed abstract).
 
+
+<a name="multisitecssframework"></a>
 ### Multi-site and CSS framework support
 
 Using a configurable template path, the CMSPage app supports multiple site and alternative
@@ -154,7 +181,7 @@ When using this setting, the base template is extended as follows:
 which, unless overridden, is effectively equivalent to using the string literal:
 
 ```html
-{% extends "cmspage/cmsbase.html" %}
+{% extends "cmspage/cmspage.html" %}
 ```
 
 ### CMSPAGE_TEMPLATE_BASE_DIR
@@ -177,7 +204,7 @@ This setting is a list of template files that are used in cmspage templates.
 The default value is a list with the following contents:
 
 ```python
-[
+CMSPAGE_TEMPLATE_INCLUDE_FILES = [
     "title",
     "header",
     "navigation",
@@ -197,7 +224,7 @@ This setting may be either a list of strings or a space and/or comma-separated s
 
 ### CMSPAGE_TEMPLATE_INCLUDE_FILES_EXTRA
 
-This setting is a list of additional include files that can used in cmspage templates.
+This setting is a list of additional include files that can be used as cmspage included templates.
 
 It is an empty list by default.
 
@@ -207,7 +234,8 @@ This is typically used to augment the default set of include files without havin
 
 Include files are used in the CMSPage templates using the standard Django syntax, {% include ... %}.
 Instead of using a string literal, the include tag uses a variable that is set in the context by the CMSTemplateMixin.
-Do not specify the extension of the template file; this is added by default.
+Don't specify the extension of the template file; this is added by default.
+
 For example:
 
 ```
