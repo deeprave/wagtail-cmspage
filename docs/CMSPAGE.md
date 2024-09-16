@@ -213,7 +213,6 @@ DEFAULT_TEMPLATE_INCLUDE_NAMES = [
     "navigation_left",
     "navigation_item_left",
     "messages",
-    "logo",
     "carousel",
     "main",
     "footer",
