@@ -1,23 +1,6 @@
 {% extends 'base.html' %}
-{% load static %}
 
-{% block metas %}
-  {% block meta-twitter-image %}
-    <meta name="twitter:image" content="{% static 'images/grey-pattern.png' %}">
-  {% endblock meta-twitter-image %}
-  {% block meta-description %}{% if page.seo_title %}
-    <meta name="description" content="{{ page.seo_title }}">
-  {% endif %}{% endblock meta-description %}
-{% endblock metas %}
+{% block navigation-top %}{% endblock navigation-top %}
+{% block header %}{% include include.header %}{% endblock header %}
 
-{#{% block navigation-left %}#}
-{#  {% include include.navigation %}#}
-{#{% endblock navigation-left %}#}
-
-{#{% block messages %}#}
-{#  {% include messages %}#}
-{#{% endblock messages %}#}
-
-{#{% block footer %}#}
-{#  {% smart_include footer %}#}
-{#{% endblock footer %}#}
+{#{% block navigation-left %}{% include include.navigation %}{% endblock navigation-left %}#}

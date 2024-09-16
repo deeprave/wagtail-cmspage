@@ -1,0 +1,30 @@
+    <div class="row page-heading py-1">
+      <div class="col-8 d-flex p-0">
+        {% include include.logo %}{% if page.display_title and page.title %}
+        <h1 class="inner-heading page-title mb-0 py-3">{{ page.title }}</h1>{% endif %}
+      </div>
+      <div class="col-4 p-3">
+        <div class="form-check form-switch float-end d-flex flex-row-reverse me-2">
+          <label for="darkModeSwitch">🌘</label>
+          <input class="form-check-input me-2" type="checkbox" id="darkModeSwitch">
+        </div>
+      </div>
+    </div>
+<script>
+  document.addEventListener('DOMContentLoaded', (_) => {
+    const htmlElement = document.documentElement
+    const switchElement = document.getElementById('darkModeSwitch')
+
+    let currentTheme = localStorage.getItem('bsTheme') || 'light'
+    switchElement.checked = currentTheme === 'dark'
+    htmlElement.setAttribute('data-bs-theme', currentTheme)
+    localStorage.setItem('bsTheme', currentTheme)
+
+    switchElement.addEventListener('change', function () {
+      currentTheme = (this.checked) ? 'dark' : 'light'
+      switchElement.checked = currentTheme === 'dark'
+      htmlElement.setAttribute('data-bs-theme', currentTheme)
+      localStorage.setItem('bsTheme', currentTheme)
+    })
+  })
+</script>

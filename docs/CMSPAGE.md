@@ -1,7 +1,5 @@
 # CMSPAGE
 
-# CMSPAGE
-
 ## Table of Contents
 - [Overview](#overview)
 - [Installation](#installation)
@@ -204,11 +202,16 @@ This setting is a list of template files that are used in cmspage templates.
 The default value is a list with the following contents:
 
 ```python
-CMSPAGE_TEMPLATE_INCLUDE_FILES = [
+DEFAULT_TEMPLATE_INCLUDE_NAMES = [
     "title",
     "header",
+    "logo",
     "navigation",
     "navigation_item",
+    "navigation_top",
+    "navigation_item_top",
+    "navigation_left",
+    "navigation_item_left",
     "messages",
     "logo",
     "carousel",
