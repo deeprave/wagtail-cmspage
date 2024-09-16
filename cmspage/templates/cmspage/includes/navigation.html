@@ -1,7 +1,16 @@
-# includes.navigation #}
-{% load static %}
-<nav>
-  <ol>{% for item in navigation %}
-    {% include includes.navigation_item with item=item %}
-  {% endfor %}</ol>
-</nav>
+{% load static wagtailadmin_tags %}
+{# include.navigation #}
+{# <!-- Left-side Menu --> #}
+<div class="col-12 col-lg-2 px-3 py-1 py-lg-3">
+  <button class="btn btn-primary d-lg-none float-start" type="button" data-bs-toggle="collapse"
+          data-bs-target="#leftMenu" aria-expanded="false" aria-controls="leftMenu" title="Toggle Menu">
+    {% with icon_path="images/icons/"|add:item.icon|add:".svg" %}
+      <img src="{% static icon_path %}" title="Navigation" class="menu-icon">
+    {% endwith %}
+  </button>
+  <nav class="collapse d-lg-block" id="leftMenu">
+    <ul class="nav menu-list">{% for item in navigation %}
+      {% include include.navigation_item with item=item level=1 %}
+    {% endfor %}</ul>
+  </nav>
+</div>

@@ -22,8 +22,13 @@ DEFAULT_BASE_TEMPLATE_NAME = "cmspage.html"
 DEFAULT_TEMPLATE_INCLUDE_NAMES = [
     "title",
     "header",
+    "logo",
     "navigation",
     "navigation_item",
+    "navigation_top",
+    "navigation_top_item",
+    "navigation_side",
+    "navigation_side_item",
     "messages",
     "logo",
     "carousel",
