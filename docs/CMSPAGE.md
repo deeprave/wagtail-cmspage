@@ -199,7 +199,7 @@ This setting provides the directory that contains included template files.
 The default value is None, or blank, which means that the included templates are in the same directory as the main
 template.
 
-<a name="cmspage_include_files_files"></a>
+<a name="cmspage_template_include_files"></a>
 ### CMSPAGE_TEMPLATE_INCLUDE_FILES
 
 This setting is a list of template files that are used in cmspage templates.
@@ -256,9 +256,9 @@ For example:
 <a name="menus"></a>
 # Menus
 
-The cmspage package supports user-definable menus, containing links to a any wagtail page, to an external link, or to a document.
+The cmspage package supports user-definable menus, containing links to any wagtail page, to an external link, or to a document.
 The default menu rendering template uses the "icon" attribute of the menu link, as determined by its type
-Icons can ber found in the static folder within the cmspage app, in the path `images/icons`.
+Icons can be found in the static folder within the cmspage app, in the path `images/icons`.
 
 Menus are managed in Wagtail's admin interface, appearing as "Menu Links" on the main Wagtail menu.
 MenuLinks are wagtail snippets.
