@@ -1,16 +1,45 @@
-{#{% for item in menu_items %}#}
-{#  {% if item.has_children_in_menu %}#}
-{#    <li class="nav-item {{ item.active_class }} dropdown" id="ddparent_{{ item.link_page.pk }}">#}
-{#      <a href="{{ item.href }}" class="nav-link dropdown-toggle" role="button" id="ddtoggle_{{ item.link_page.pk }}" data-toggle="dropdown" data-target="#ddparent_{{ item.link_page.pk }}" aria-expanded="false" aria-haspopup="true" aria-haspopup="true">#}
-{#        {{ item.text }}#}
-{#      </a>#}
-{#      {% sub_menu item template="cmspage/partials/_sub.html" %}#}
-{#    </li>#}
-{#  {% else %}#}
-{#    <li class="nav-item {{ item.active_class }}">#}
-{#      <a href="{{ item.href }}" class="nav-link"{% if item.active_class %} aria-current="page"{% endif %}>#}
-{#        {{ item.text }}#}
-{#      </a>#}
-{#    </li>#}
-{#  {% endif %}#}
-{#{% endfor %}#}
+{% load wagtailcore_tags %}
+<div class="col-10 px-3 pt-1 pt-lg-2">
+  {% for block in self.body %}
+    {% include_block block %}
+  {% endfor %}
+{#  <!-- Hero Section -->#}
+{#  <div class="hero bg-secondary text-white text-center p-3 shadow">#}
+{#    <h2>Hero Section</h2>#}
+{#    <p>Some hero text goes here.</p>#}
+{#  </div>#}
+{##}
+{#  <!-- Cards Section -->#}
+{#  <div class="row row-cols-1 row-cols-lg-3 row-cols-md-2 g-4 mt-2">#}
+{#    <div class="col">#}
+{#      <div class="card shadow">#}
+{#        <img src="https://via.placeholder.com/150" class="card-img-top" alt="...">#}
+{#        <div class="card-body">#}
+{#          <h5 class="card-title">Card title 1</h5>#}
+{#          <p class="card-text">Some quick example text to build on the card title and make up the bulk of the card's#}
+{#            content.</p>#}
+{#        </div>#}
+{#      </div>#}
+{#    </div>#}
+{#    <div class="col">#}
+{#      <div class="card shadow">#}
+{#        <img src="https://via.placeholder.com/150" class="card-img-top" alt="...">#}
+{#        <div class="card-body">#}
+{#          <h5 class="card-title">Card title 2</h5>#}
+{#          <p class="card-text">Some quick example text to build on the card title and make up the bulk of the card's#}
+{#            content.</p>#}
+{#        </div>#}
+{#      </div>#}
+{#    </div>#}
+{#    <div class="col">#}
+{#      <div class="card shadow">#}
+{#        <img src="https://via.placeholder.com/150" class="card-img-top" alt="...">#}
+{#        <div class="card-body">#}
+{#          <h5 class="card-title">Card title 3</h5>#}
+{#          <p class="card-text">Some quick example text to build on the card title and make up the bulk of the card's#}
+{#            content.</p>#}
+{#        </div>#}
+{#      </div>#}
+{#    </div>#}
+{#  </div>#}
+</div>

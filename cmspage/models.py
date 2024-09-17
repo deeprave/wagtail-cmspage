@@ -240,7 +240,7 @@ class MenuLink(models.Model):
         null=True,
         blank=True,
         on_delete=models.SET_NULL,
-        related_name="+",
+        related_name="menu_links",
         verbose_name="Select Page",
         help_text=(
             "Select an internal page to link (leave blank for custom URL or document)."
@@ -292,8 +292,8 @@ class MenuLink(models.Model):
         return "page" if self.link_page else "document" if self.link_document else "link"
 
     @property
-    def submenu(self):
-        return self.parent or self
+    def parent_link(self):
+        return self.parent or ""
 
     @property
     def url(self):
