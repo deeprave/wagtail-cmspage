@@ -2,9 +2,7 @@
 {# include.navigation_item #}
 <li class="menu-item">
   <a href="{{ item.url }}" class="menu-link level-{{ level }}">
-    {% with icon_path="images/icons/"|add:item.icon|add:".svg" %}
-      <img src="{% static icon_path %}" title=item.title class="menu-icon">
-    {% endwith %}
+      <img src="{% static item.icon %}" title=item.title class="menu-icon">
     {{ item.title }}
   </a>
   {% if item.children %}
