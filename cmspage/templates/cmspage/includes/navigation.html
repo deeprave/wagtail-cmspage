@@ -1,11 +1,11 @@
 {% load static wagtailadmin_tags %}
 {# include.navigation #}
 {# <!-- Left-side Menu --> #}
-<div class="col-2 px-3 py-1 py-lg-3">
+<div class="col-2 px-3 py-1">
   <div class="nav-container">
   <button class="btn btn-primary d-lg-none float-start" type="button" data-bs-toggle="collapse"
           data-bs-target="#leftMenu" aria-expanded="false" aria-controls="leftMenu" title="Toggle Menu">
-      <img src="{% static item.icon %}" title="Navigation" class="menu-icon">
+    Menu
   </button>
   <nav class="collapse d-lg-block" id="leftMenu">
     <ul class="nav menu-list">{% for item in navigation %}
