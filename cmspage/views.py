@@ -29,7 +29,7 @@ class MenuLinkViewSet(SnippetViewSet):
     menu_label = "Menu Links"
     menu_icon = "list-ul"
     menu_order = 300
-    list_display = ["submenu", "title", "menu_link_type", "menu_order"]
+    list_display = ["title", "parent_link", "menu_order", "menu_link_type"]
 
     def get_queryset(self, request):
         site = Site.find_for_request(request)
@@ -42,10 +42,3 @@ class SiteVariablesViewSet(SnippetViewSet):
     menu_icon = "cog"
     list_display = ("site",)
     list_filter = ("site",)  # Optional: Filter by site
-
-    # def get_form_fields_for_edit(self):  # Override for custom form fields
-    #     return {
-    #         "vars": forms.JSONField(
-    #             widget=forms.JSONField, help_text='Enter site variables as JSON (e.g., {"key": "value"})'
-    #         )
-    #     }
