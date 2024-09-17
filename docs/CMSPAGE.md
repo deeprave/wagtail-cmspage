@@ -126,6 +126,7 @@ However, CMSPage provides an alternative that allows templates to gracefully fal
 through the CMSTemplateMixin class.
 This mixin adds special handling through a number of Django settings that can vary this behaviour.
 
+<a name="cmspage_template_styles"></a>
 ### CMSPAGE_TEMPLATE_STYLES
 
 This setting is a list of none, one or more strings that represent CSS frameworks or sites.
@@ -162,6 +163,7 @@ with fallbacks to a default template where a company-specific template doesn't e
 Alternatively, it is possible to create versions of pages which can be used
 with different front-end CSS frameworks—such as "bootstrap5" or "tailwindcss".
 
+<a name="cmspage_template_base"></a>
 ### CMSPAGE_TEMPLATE_BASE
 
 This is the name of the base template that the CMSPage templates extend.
@@ -182,12 +184,14 @@ which, unless overridden, is effectively equivalent to using the string literal:
 {% extends "cmspage/cmspage.html" %}
 ```
 
+<a name="cmspage_template_base_dir"></a>
 ### CMSPAGE_TEMPLATE_BASE_DIR
 
 By default, models deriving from `CMSPageBase` use the app name of the model.
 This setting allows this to be overridden so that the entire hierarchy of templates used
 is consistent, even across apps.
 
+<a name="cmspage_template_include_dir"></a>
 ### CMSPAGE_TEMPLATE_INCLUDE_DIR
 
 This setting provides the directory that contains included template files.
@@ -195,6 +199,7 @@ This setting provides the directory that contains included template files.
 The default value is None, or blank, which means that the included templates are in the same directory as the main
 template.
 
+<a name="cmspage_include_files_files"></a>
 ### CMSPAGE_TEMPLATE_INCLUDE_FILES
 
 This setting is a list of template files that are used in cmspage templates.
@@ -224,6 +229,7 @@ DEFAULT_TEMPLATE_INCLUDE_NAMES = [
 
 This setting may be either a list of strings or a space and/or comma-separated string.
 
+<a name="cmspage_include_files_files_extra"></a>
 ### CMSPAGE_TEMPLATE_INCLUDE_FILES_EXTRA
 
 This setting is a list of additional include files that can be used as cmspage included templates.
@@ -246,3 +252,20 @@ For example:
 {% include include.main %}
 {% include include.footer %}
 ```
+
+<a name="menus"></a>
+# Menus
+
+The cmspage package supports user-definable menus, containing links to a any wagtail page, to an external link, or to a document.
+The default menu rendering template uses the "icon" attribute of the menu link, as determined by its type
+Icons can ber found in the static folder within the cmspage app, in the path `images/icons`.
+
+Menus are managed in Wagtail's admin interface, appearing as "Menu Links" on the main Wagtail menu.
+MenuLinks are wagtail snippets.
+MenuLinks are created per site, and link to an Wagtail Page model, a Wagtail document model or an external URL.
+When linking to an existing page, that page must have the "show in menus" item checked in order to be eligible. Menu Title is mandatory for external links, otherwise the menu title is taken from the linked page or document unless overridden by explicitly defining the title for the MenuLink.
+One, and only one, "Link To" item can be selected.
+
+Submenus are created by linking a MenuItem to a "parent" MenuLink.
+
+The "Order" field can be used to override the order in which links are displayed.

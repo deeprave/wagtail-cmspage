@@ -1,7 +1,9 @@
 from collections import defaultdict
 import logging
+from functools import cache
 from typing import List
 
+from django.conf import settings
 from django.http import HttpRequest
 from wagtail.models import Site
 
@@ -10,6 +12,17 @@ from .models import SiteVariables, MenuLink
 __all__ = ("navigation", "site_variables", "cmspage_context")
 
 logger = logging.getLogger("cmspage.context_processors")
+
+
+def _nav_icon_path(icon: str) -> str:
+
+    @cache
+    def _nav_icon_base():
+        return getattr(settings, "CMSPAGE_NAV_ICON_PATH", "images/icons")
+
+    if icon:
+        return f"{_nav_icon_base()}/{icon}.svg"
+    return ""
 
 
 def _nav_pages_for_site(site: Site, user_id: int) -> List[dict]:
@@ -24,7 +37,7 @@ def _nav_pages_for_site(site: Site, user_id: int) -> List[dict]:
             "id": link.id,
             "title": link.menu_title or link.menu_link_title,
             "type": link.menu_link_type,
-            "icon": link.menu_link_icon,
+            "icon": _nav_icon_path(link.menu_link_icon),
             "url": link.url,
             "children": [],
         }

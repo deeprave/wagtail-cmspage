@@ -151,6 +151,7 @@ class AbstractCMSPage(Page, CMSTemplateMixin):
 
 THERE_CAN_BE_ONLY_ONE = "Please select only one type of link: Page, Document or External Link."
 NOT_A_MENU_PAGE = "The selected page is not marked to show in menus."
+EXTERNAL_URL_REQUIRES_TITLE = "External URL requires a title."
 
 
 def min_length_validator(value):
@@ -206,7 +207,7 @@ class MenuLink(models.Model):
 
     """
 
-    cache_enabled = False
+    cache_enabled = not settings.DEBUG
 
     site = models.ForeignKey(
         Site,
@@ -241,7 +242,10 @@ class MenuLink(models.Model):
         on_delete=models.SET_NULL,
         related_name="+",
         verbose_name="Select Page",
-        help_text="Select an internal page to link (leave blank for custom URL or document)",
+        help_text=(
+            "Select an internal page to link (leave blank for custom URL or document)."
+            "Leave title blank to use this page's title"
+        ),
     )
     link_document = models.ForeignKey(
         "wagtaildocs.Document",
@@ -250,12 +254,18 @@ class MenuLink(models.Model):
         on_delete=models.SET_NULL,
         related_name="+",
         verbose_name="Select Document",
-        help_text="Select a document to link (leave blank for internal page or custom URL)",
+        help_text=(
+            "Select a document to link (leave blank for internal page or custom URL)."
+            "Leave title blank to use this document's title"
+        ),
     )
     link_url = models.URLField(
         "External Link",
         blank=True,
-        help_text="Set a custom URL if not linking to a page or document",
+        help_text=(
+            "Set a custom URL if not linking to a page or document."
+            "Title is required for this link type"
+        ),
     )
 
     def menu_site(self, _=None):
@@ -313,6 +323,8 @@ class MenuLink(models.Model):
             )
         elif self.link_page and not self.link_page.show_in_menus:
             raise ValidationError({"link_page": ValidationError(NOT_A_MENU_PAGE)})
+        elif self.link_url and not self.menu_title:
+            raise ValidationError({"link_url": ValidationError(EXTERNAL_URL_REQUIRES_TITLE)})
 
     objects = MenuLinkManager()
 
