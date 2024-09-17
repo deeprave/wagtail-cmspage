@@ -20,9 +20,7 @@ def _nav_icon_path(icon: str) -> str:
     def _nav_icon_base():
         return getattr(settings, "CMSPAGE_NAV_ICON_PATH", "images/icons")
 
-    if icon:
-        return f"{_nav_icon_base()}/{icon}.svg"
-    return ""
+    return f"{_nav_icon_base()}/{icon}.svg" if icon else ""
 
 
 def _nav_pages_for_site(site: Site, user_id: int) -> List[dict]:
