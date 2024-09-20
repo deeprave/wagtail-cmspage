@@ -1,25 +1,46 @@
 {% load wagtailcore_tags wagtailimages_tags %}
 
-<div class="row row-cols-1 row-cols-xl-3 row-cols-lg-2 g-3 mt-1">
+<style>
+    .card-img-top {
+        object-fit: cover;
+    }
+    .card-text {
+        margin-bottom: 0;
+    }
+</style>
+<div class="row row-cols-1 row-cols-xl-3 row-cols-lg-2 g-2 mt-1">
   {% for card in value.cards %}
-  <div class="col">
-    <div class="col card shadow rounded-3">
-      <div class="card-body p-0">
-        {% if card.link.url %}<a href="{{ card.link.url }}">{% endif %}
-        {% if card.image %}
-          <picture>
-            {% image card.image fill-570x370 as img %}
-            <img src="{{ img.url }}" class="card-img-top" alt="{{ img.alt }}">
-          </picture>
-        {% endif %}
-        <div class="p-2">
-          <h5 class="card-title">{{ card.title }}</h5>
-          {% if card.text %}<p class="card-text">{{ card.text|richtext }}</p>{% endif %}
-          {% if card.link.url %}<p class="card-text">{{ card.link.link_text }}</p>{% endif %}
+    <div class="col">
+      <div class="card shadow rounded-4 h-100 d-flex flex-column">
+        <div class="card-body p-0 d-flex flex-column flex-grow-1">
+          {% if card.link.link_url %}<a href="{{ card.link.link_url }}" class="text-decoration-none text-reset">{% endif %}
+          {% if card.image %}
+            <picture>
+              {% image card.image fill-570x370 as img %}
+              <img src="{{ img.url }}" class="card-img-top" alt="{{ img.alt }}">
+            </picture>
+          {% endif %}
+          <h5 class="card-title p-2">{{ card.title }}</h5>
+          {% if card.link.link_url %}</a>{% endif %}
+
+          <div class="p-2 flex-grow-1 d-flex flex-column">
+            {% if card.text %}
+              <p class="card-text flex-grow-1">{{ card.text|richtext }}</p>
+            {% endif %}
+            <div class="mt-auto">
+              {% if card.link.link_url %}
+                {% if card.link_title %}
+                  <a href="{{ card.link.link_url }}" class="text-reset text-decoration-none">
+                    <p class="card-text">{{ card.link.link_title }}</p>
+                  </a>
+                {% elif card.link.button_title %}
+                  <a href="{{ card.link.link_url }}" class="btn w-100 btn-primary">{{ card.link.button_title }}</a>
+                {% endif %}
+              {% endif %}
+            </div>
+          </div>
         </div>
-        {% if card.link.url %}</a>{% endif %}
       </div>
     </div>
-  </div>
   {% endfor %}
 </div>
