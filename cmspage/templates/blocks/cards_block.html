@@ -21,8 +21,6 @@
             </picture>
           {% endif %}
           <h5 class="card-title p-2">{{ card.title }}</h5>
-          {% if card.link.link_url %}</a>{% endif %}
-
           <div class="p-2 flex-grow-1 d-flex flex-column">
             {% if card.text %}
               <p class="card-text flex-grow-1">{{ card.text|richtext }}</p>
@@ -39,6 +37,7 @@
               {% endif %}
             </div>
           </div>
+          {% if card.link.link_url %}</a>{% endif %}
         </div>
       </div>
     </div>
