@@ -5,19 +5,19 @@
   <div class="col">
     <div class="col card shadow rounded-3">
       <div class="card-body p-0">
+        {% if card.link.url %}<a href="{{ card.link.url }}">{% endif %}
         {% if card.image %}
-          {% if card.link.url %}<a href="{{ card.link.url }}">{% endif %}
           <picture>
             {% image card.image fill-570x370 as img %}
             <img src="{{ img.url }}" class="card-img-top" alt="{{ img.alt }}">
           </picture>
         {% endif %}
         <div class="p-2">
-          {% if card.link.url %}</a>{% endif %}
           <h5 class="card-title">{{ card.title }}</h5>
           {% if card.text %}<p class="card-text">{{ card.text|richtext }}</p>{% endif %}
-          {% if card.link.url %}<a href="{{ card.link.url }}"><p class="card-text">{{ card.link.link_text }}</p></a>{% endif %}
+          {% if card.link.url %}<p class="card-text">{{ card.link.link_text }}</p>{% endif %}
         </div>
+        {% if card.link.url %}</a>{% endif %}
       </div>
     </div>
   </div>
