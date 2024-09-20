@@ -134,7 +134,7 @@ class Card(blocks.StructBlock):
     )
     text = blocks.RichTextBlock(blank=True, null=True, required=False, help_text="Optional text for this card")
     image = image_blocks.ImageChooserBlock(required=False, help_text="Image - auto-cropped 570x370px")
-    link = LinkBlock(required=False, help_text="Enter a link or select a page/document")
+    link = LinkBlock(required=False, help_text="Enter a link or select a page or document")
 
 
 class CardsBlock(blocks.StructBlock):
