@@ -103,7 +103,7 @@ class LinkBlock(blocks.StructBlock):
     button_title = blocks.CharBlock(
         required=False,
         max_length=255,
-        label="Title",
+        label="Button Title (use hyphen for special link button)",
     )
 
     def clean(self, value):
@@ -185,6 +185,7 @@ class ImageAndTextBlock(blocks.StructBlock):
         features=DEFAULT_RICHTEXTBLOCK_FEATURES,
         help_text="Description for this item",
     )
+    overlay = blocks.BooleanBlock(default=False, required=False, blank=True, help_text="Overlay text on image")
     link = LinkBlock(required=False, blank=True, null=True)
 
     class Meta:

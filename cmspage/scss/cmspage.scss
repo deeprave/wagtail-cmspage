@@ -1,0 +1,177 @@
+/*
+ SCSS Source for custom styles used in CMS Pages
+ */
+
+.alert {
+  padding: 0.25em 0.5em;
+  margin: 0 3em 0.25em;
+}
+
+.alert-error {
+  color: white;
+  background-color: #ff2020ff;
+}
+
+.alert-warning {
+  color: black;
+  background-color: #ffff20ff;
+}
+
+.alert-success {
+  color: white;
+  background-color: #20ff208f;
+}
+
+.alert-info {
+  color: black;
+  background-color: #20ffff8f;
+}
+
+.alert-debug {
+  color: black;
+  background-color: #d7d7d78f;
+}
+
+.hellohoney {
+  font-family: hellohoney, cursive, sans-serif;
+}
+
+.alexbrush {
+  font-family: alexbrush, cursive, sans-serif;
+}
+
+.page-title {
+  font-size: 2.0em;
+  width: fit-content;
+  font-kerning: normal;
+}
+
+.hero {
+  background-image: url('https://via.placeholder.com/1200x375');
+  background-size: cover;
+  background-position: center;
+}
+
+.menu-list {
+  font-size: 1.25em;
+  display: block;
+  list-style-type: none;
+  margin: 0;
+
+  .menu-item {
+    padding: 0;
+    margin: 0;
+    white-space: nowrap;
+  }
+
+  .menu-link {
+    display: block;
+    padding: 0.10em 1em 0 0;
+    text-decoration: none;
+    color: var(--menu-text-color);
+    //background-color: var(--menu-bg-color);
+    border-radius: 0.20em;
+    //margin: 0.25em 0;
+
+    .menu-icon {
+      display: inline-block;
+      margin-left: 0.4em;
+      height: 0.75em;
+      align-self: start;
+      vertical-align: baseline;
+    }
+
+    &:hover {
+      background-color: var(--menu-hover-bg-color);
+      color: var(--menu-hover-text-color);
+    }
+
+    // Add left padding for each indent level
+    &.level-1 {
+      padding-left: 0;
+    }
+
+    &.level-2 {
+      padding-left: 1em;
+    }
+
+    &.level-3 {
+      padding-left: 2em;
+    }
+
+    &.level-4 {
+      padding-left: 3em;
+    }
+  }
+}
+
+.header-logo {
+  width: 60px;
+  height: auto;
+}
+
+.inner-heading {
+  font-weight: bolder;
+  color: var(--heading-color);
+  margin: 0.5em 0;
+  text-align: end;
+}
+
+// Text & Image blocks
+.heading-hr {
+  margin: 0.5em 0;
+  box-shadow: 1 1 4px var(--heading-color);
+}
+
+$breakpoint-lg: 992;
+
+@media (min-width: $breakpoint-lg) {
+  .collapsing-button-width {
+    width: 50%;
+  }
+}
+
+.collapsing-button-width {
+  width: 100%;
+  color: var(--heading-color);
+}
+
+.overlay-text {}
+.overlay-adjust {}
+
+@media (min-width: $breakpoint-lg) {
+  .overlay-text {
+    position: absolute;
+    text-shadow: -1px -1px 0 var(--bs-body-bg),
+    1px -1px 0 var(--bs-body-bg),
+    -1px 1px 0 var(--bs-body-bg),
+    1px 1px 0 var(--bs-body-bg);
+  }
+  .overlay-adjust {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 100%;
+    height: 100%;
+    transform: translate(-50%, -50%);
+  }
+}
+.overlay-text-left {
+  @extend .overlay-text;
+  padding-left: 25%;
+}
+.overlay-text-right {
+  @extend .overlay-text;
+  padding-right: 25%;
+}
+.overlay-top {
+  @extend .overlay-text;
+  @extend .overlay-adjust;
+}
+
+// generic right-pointing link arrow
+.link-elongated-arrow {
+  font-size: 1.5em;
+  display: inline-block;
+  text-align: end;
+}
