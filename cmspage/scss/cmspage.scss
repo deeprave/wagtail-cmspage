@@ -1,6 +1,7 @@
 /*
  SCSS Source for custom styles used in CMS Pages
  */
+@import 'partials/variables';
 
 .alert {
   padding: 0.25em 0.5em;
@@ -53,25 +54,23 @@
 }
 
 .menu-list {
-  font-size: 1.25em;
-  display: block;
-  list-style-type: none;
   margin: 0;
+  padding: 0;
 
   .menu-item {
-    padding: 0;
+    //display: block; /* Ensure each menu item is a block element */
     margin: 0;
+    padding: 0;
     white-space: nowrap;
   }
 
   .menu-link {
-    display: block;
-    padding: 0.10em 1em 0 0;
+    display: block; /* Ensure links within each menu item are block elements */
+    padding: 0.10em 1em 0 1em;
     text-decoration: none;
     color: var(--menu-text-color);
-    //background-color: var(--menu-bg-color);
     border-radius: 0.20em;
-    //margin: 0.25em 0;
+    background: transparent;
 
     .menu-icon {
       display: inline-block;
@@ -87,27 +86,34 @@
     }
 
     // Add left padding for each indent level
-    &.level-1 {
+    &.level-0 {
       padding-left: 0;
     }
 
+    &.level-1 {
+      padding-left: 1.25em;
+    }
+
     &.level-2 {
-      padding-left: 1em;
+      padding-left: 2.50em;
     }
 
     &.level-3 {
-      padding-left: 2em;
-    }
-
-    &.level-4 {
-      padding-left: 3em;
+      padding-left: 3.75em;
     }
   }
 }
 
+.nav {
+  display: block;
+  font-size: 1.3em;
+  list-style-type: none;
+}
+
 .header-logo {
-  width: 60px;
-  height: auto;
+  height: 80px;
+  width: auto;
+  margin: 0;
 }
 
 .inner-heading {
@@ -123,7 +129,16 @@
   box-shadow: 1 1 4px var(--heading-color);
 }
 
-$breakpoint-lg: 992;
+@media (min-width: $breakpoint-lg) {
+  .collapsing-button-width {
+    width: 50%;
+  }
+}
+
+.collapsing-button-width {
+  width: 100%;
+  color: var(--heading-color);
+}
 
 @media (min-width: $breakpoint-lg) {
   .collapsing-button-width {
@@ -136,18 +151,34 @@ $breakpoint-lg: 992;
   color: var(--heading-color);
 }
 
-.overlay-text {}
-.overlay-adjust {}
+.overlay-text-left {}
+.overlay-text-right {}
+.overlay-top {}
 
 @media (min-width: $breakpoint-lg) {
-  .overlay-text {
-    position: absolute;
+  .overlay-shadow {
     text-shadow: -1px -1px 0 var(--bs-body-bg),
     1px -1px 0 var(--bs-body-bg),
     -1px 1px 0 var(--bs-body-bg),
     1px 1px 0 var(--bs-body-bg);
   }
-  .overlay-adjust {
+
+  .overlay-text-right {
+    @extend .overlay-shadow;
+    position: absolute;
+    padding-left: 35%;
+    padding-right: 1em;
+  }
+
+  .overlay-text-left {
+    @extend .overlay-shadow;
+    position: absolute;
+    padding-right: 35%;
+    padding-left: 1em;
+  }
+
+  .overlay-top {
+    @extend .overlay-shadow;
     position: absolute;
     top: 50%;
     left: 50%;
@@ -156,22 +187,24 @@ $breakpoint-lg: 992;
     transform: translate(-50%, -50%);
   }
 }
-.overlay-text-left {
-  @extend .overlay-text;
-  padding-left: 25%;
-}
-.overlay-text-right {
-  @extend .overlay-text;
-  padding-right: 25%;
-}
-.overlay-top {
-  @extend .overlay-text;
-  @extend .overlay-adjust;
-}
 
 // generic right-pointing link arrow
 .link-elongated-arrow {
   font-size: 1.5em;
   display: inline-block;
   text-align: end;
+}
+
+// menu
+#leftMenu {
+  background-color: transparent;
+  padding-left: 0.5em;
+}
+
+/* When the menu is collapsed and shown, apply the new background color */
+#leftMenu.collapse.show {
+  position: absolute;
+  top: 0;
+  left: 0;
+  background-color: var(--bs-secondary-bg);
 }

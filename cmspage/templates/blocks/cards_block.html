@@ -8,9 +8,9 @@
         margin-bottom: 0;
     }
 </style>
-<div class="row row-cols-1 row-cols-xl-3 row-cols-lg-2 g-2 mt-1">
+<div class="row row-cols-1 row-cols-xl-3 row-cols-lg-2 g-2 mt-1 {{ value. }}">
   {% for card in value.cards %}
-    <div class="col">
+    <div class="col m-2">
       <div class="card shadow rounded-4 h-100 d-flex flex-column">
         <div class="card-body p-0 d-flex flex-column flex-grow-1">
           {% if card.link.link_url %}<a href="{{ card.link.link_url }}" class="text-decoration-none text-reset">{% endif %}
