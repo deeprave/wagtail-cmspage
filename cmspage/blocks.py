@@ -126,15 +126,14 @@ class LinkValue(blocks.StructValue):
     Generates a URL and Title for blocks with multiple link choices.
     """
 
-    def _attr_value(self, *attrs):
-        for attr_name in attrs:
-            # Moved get logic to separate method
-            if value := getattr(self, attr_name, None):
-                return value.title if isinstance(value, LinkValue) else value
-
     @property
     def link_title(self):
-        return self._attr_value("title", "button_title", "page_link", "doc_link", "extra_link")
+        if not (title := self.get("title")):
+            if not (title := self.get("button_title")):
+                if not (title := self.get("page_link")):
+                    if not (title := self.get("doc_link")):
+                        title = self.get("extra_link").title
+        return title
 
     @property
     def link_url(self):
@@ -150,7 +149,7 @@ ONE_LINK_ERROR_MESSAGE = "You must select a page or document, or enter an extern
 INVALID_LINK_ERROR_MESSAGE = "Invalid link. Please select a page or document, or enter a valid URL."
 
 
-class LinkBlock(StructBlockBG):
+class LinkBlock(blocks.StructBlock):
     """
     Common attributes for creating a link within the CMS.
     """

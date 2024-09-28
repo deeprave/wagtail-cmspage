@@ -31,8 +31,8 @@
                   <a href="{{ card.link.link_url }}" class="text-decoration-none">
                     <p>{{ card.link.link_title }}</p>
                   </a>
-                {% elif card.link.button_title %}
-                  <a href="{{ card.link.link_url }}" class="btn w-100 btn-primary">{{ card.link.button_title }}</a>
+                {% elif card.link.link_title %}
+                  <a href="{{ card.link.link_url }}" class="btn w-100 btn-secondary">{{ card.link.link_title }}</a>
                 {% endif %}
               {% endif %}
             </div>

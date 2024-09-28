@@ -1,14 +1,16 @@
 {% load wagtailcore_tags %}
-  <div class="row">
-    <div class="col-md-10 offset-md-1">
-      <div class="cta text-center">
-        {% if value.title %}<h2 class="cta-title">{{ value.title }}</h2>{% endif %}
-        {% if value.text %}<p class="cta-text">{{ value.text|richtext }}</p>{% endif %}
-        {% if value.link.url and value.link.link_text %}
-          <a href="{{ value.link.url }}" class="btn btn-primary btn-lg" style="padding-left: 3rem; padding-right: 3rem;">
-            {{ value.link.link_text }}
-          </a>
-        {% endif %}
-      </div>
+<div class="row m-0 p-2">
+  <div class="col-auto {{ value.background }} {{ value.opacity }}">
+    <div class="text-center m-2 p-2 shadow rounded-4 bg-warning-subtle">
+      {% if value.title %}<h2 class="block-title">{{ value.title }}</h2>{% endif %}
+      {% if value.text %}<p class="block-text">{{ value.text|richtext }}</p>{% endif %}
+      <!-- link_url = {{ value.link.link_url }} -->
+      <!-- link_text = {{ value.link.link_text }} -->
+      {% if value.link.link_url %}
+        <a href="{{ value.link.link_url }}" class="btn btn-outline-danger btn-lg w-100" >
+          {{ value.link.link_title }}
+        </a>
+      {% endif %}
     </div>
   </div>
+</div>
