@@ -1,9 +1,10 @@
 {% load wagtailcore_tags %}
-  <div class="row">
-    <div class="col-md-10 offset-md-1 richtext">
-      {% if value.title %}<h2 class="richtext-title display-4">{{ value.title }}</h2>{% endif %}
-      <div class="richtext-text">
-        {{ value.content|richtext }}
-      </div>
+
+<div class="row m-2 p-3 {{ value.background }} {{ value.opacity }}">
+  <div class="col-md-10 offset-md-1 richtext">
+    {% if value.title %}<h3 class="block-title text-center display-5">{{ value.title }}</h3>{% endif %}
+    <div class="block-text text-start text-lg-center richtext-text">
+      {{ value.content|richtext }}
     </div>
   </div>
+</div>
