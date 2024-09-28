@@ -214,7 +214,7 @@ class CardsBlock(StructBlockBG):
     class Meta:
         template = "blocks/cards_block.html"
         icon = "image"
-        label = "Cards"
+        label = "Set of Cards"
 
 
 class RadioSelectBlock(blocks.ChoiceBlock):
