@@ -1,16 +1,16 @@
 {% load static wagtailadmin_tags %}
 {# include.navigation #}
 {# <!-- Left-side Menu --> #}
-<div class="col-3 px-2 py-2">
-    <div class="dropdown">
-      <button class="btn btn-primary d-lg-none float-start mb-5" type="button" data-bs-toggle="collapse"
+<div class="col-auto col-md-2 position-relative">
+    <div class="dropdown px-2 py-2">
+      <button class="btn bg-white d-md-none float-start mb-5" type="button" data-bs-toggle="collapse"
               data-bs-target="#leftMenu" aria-expanded="false" aria-controls="leftMenu" title="Toggle Menu">
-        Menu
+        <i class="fas fa-bars"></i>
       </button>
     </div>
-    <nav class="dropdown-menu border-0 collapse d-lg-block" id="leftMenu"">
+    <nav class="dropdown-menu border-0 collapse d-md-block" id="leftMenu">
       <ul class="nav menu-list">{% for item in navigation %}
-        {% include include.navigation_item with item=item level=1 %}
+        {% include include.navigation_item with item=item level=0 %}
       {% endfor %}</ul>
     </nav>
 </div>

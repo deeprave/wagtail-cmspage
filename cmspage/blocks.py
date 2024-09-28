@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 from django import forms
 from django.core.exceptions import ValidationError
+from django.db import models
 from django.forms.utils import ErrorList
 from modelcluster.fields import ParentalManyToManyField
 from wagtail import blocks
@@ -21,6 +22,9 @@ __all__ = (
     "HeroImageBlock",
     "NewSectionBlock",
     "VideoBlock",
+    "Backgrounds",
+    "Opacities",
+    "BlockBackgroundMeta",
 )
 
 DEFAULT_RICHTEXTBLOCK_FEATURES = [
@@ -43,7 +47,71 @@ DEFAULT_RICHTEXTBLOCK_FEATURES = [
 ]
 
 
-class TitleBlock(blocks.StructBlock):
+class Backgrounds(models.TextChoices):
+    NONE = "bg-transparent", "Transparent"
+    PAGE = "bg-body", "Page"
+    LIGHT = "bg-light", "Light"
+    DARK = "bg-dark", "Dark"
+    WHITE = "bg-white", "White"
+    BLACK = "bg-black", "Dark"
+    PRIMARY = "bg-primary", "Primary"
+    SECONDARY = "bg-secondary", "Secondary"
+    SUCCESS = "bg-success", "Success"
+    WARNING = "bg-warning", "Warning"
+    INFO = "bg-info", "Info"
+    DANGER = "bg-danger", "Danger"
+
+
+class Opacities(models.TextChoices):
+    OPACITY_FULL = "bg-opacity-100", "100%"
+    OPACITY_75 = "bg-opacity-75", "75%"
+    OPACITY_50 = "bg-opacity-50", "50%"
+    OPACITY_25 = "bg-opacity-25", "25%"
+    GRADIENT = "bg-gradient", "Gradient"
+
+
+class BlockBackgroundMeta(blocks.DeclarativeSubBlocksMetaclass):
+    def __new__(cls, name, bases, attrs):
+        attrs["background"] = blocks.ChoiceBlock(
+            choices=Backgrounds.choices,
+            default=Backgrounds.NONE,
+            help_text="Background type or color",
+        )
+        attrs["opacity"] = blocks.ChoiceBlock(
+            choices=Opacities.choices,
+            default=Opacities.OPACITY_FULL,
+            help_text="Background opacity",
+        )
+        return super().__new__(cls, name, bases, attrs)
+
+
+class StructBlockBG(blocks.StructBlock, metaclass=BlockBackgroundMeta):
+
+    class Meta:
+        abstract = True
+
+
+class ImageChooserBlockBG(blocks.StructBlock, metaclass=BlockBackgroundMeta):
+    image = image_blocks.ImageChooserBlock()
+
+    class Meta:
+        abstract = True
+
+
+class StaticBlockBG(blocks.StaticBlock, metaclass=BlockBackgroundMeta):
+
+    class Meta:
+        abstract = True
+
+
+class TableBlockBG(blocks.StaticBlock, metaclass=BlockBackgroundMeta):
+    table = table_blocks.TableBlock()
+
+    class Meta:
+        abstract = True
+
+
+class TitleBlock(StructBlockBG):
     text = blocks.CharBlock(required=True, help_text="Title text to display")
 
     class Meta:
@@ -82,7 +150,7 @@ ONE_LINK_ERROR_MESSAGE = "You must select a page or document, or enter an extern
 INVALID_LINK_ERROR_MESSAGE = "Invalid link. Please select a page or document, or enter a valid URL."
 
 
-class LinkBlock(blocks.StructBlock):
+class LinkBlock(StructBlockBG):
     """
     Common attributes for creating a link within the CMS.
     """
@@ -130,14 +198,17 @@ class Card(blocks.StructBlock):
         null=True,
         required=False,
         max_length=255,
+        label="Card Title",
         help_text="Bold title text for this card (len=255)",
     )
-    text = blocks.RichTextBlock(blank=True, null=True, required=False, help_text="Optional text for this card")
-    image = image_blocks.ImageChooserBlock(required=False, help_text="Image - auto-cropped 570x370px")
-    link = LinkBlock(required=False, help_text="Enter a link or select a page or document")
+    text = blocks.RichTextBlock(
+        blank=True, null=True, required=False, label="Card Text", help_text="Optional text for this card"
+    )
+    image = image_blocks.ImageChooserBlock(required=False, label="Card Image", help_text="Image (resized)")
+    link = LinkBlock(required=False, label="Card Link", help_text="Enter a page or document, or an external link")
 
 
-class CardsBlock(blocks.StructBlock):
+class CardsBlock(StructBlockBG):
     cards = blocks.ListBlock(Card())
 
     class Meta:
@@ -152,7 +223,7 @@ class RadioSelectBlock(blocks.ChoiceBlock):
         self.field.widget = forms.RadioSelect(choices=self.field.widget.choices)
 
 
-class ImageAndTextBlock(blocks.StructBlock):
+class ImageAndTextBlock(StructBlockBG):
     image = image_blocks.ImageChooserBlock(blank=True, null=True)
     image_alignment = RadioSelectBlock(
         choices=(
@@ -194,7 +265,7 @@ class ImageAndTextBlock(blocks.StructBlock):
         label = "Image & Text"
 
 
-class CallToActionBlock(blocks.StructBlock):
+class CallToActionBlock(StructBlockBG):
     title = blocks.CharBlock(
         required=False,
         blank=True,
@@ -216,7 +287,7 @@ class CallToActionBlock(blocks.StructBlock):
         label = "Call to Action"
 
 
-class RichTextWithTitleBlock(blocks.StructBlock):
+class RichTextWithTitleBlock(StructBlockBG):
     title = blocks.CharBlock(
         blank=True,
         null=True,
@@ -232,7 +303,7 @@ class RichTextWithTitleBlock(blocks.StructBlock):
         icon = "doc-empty-inverse"
 
 
-class VideoBlock(blocks.StructBlock):
+class VideoBlock(StructBlockBG):
     title = blocks.CharBlock(
         required=False,
         blank=True,
@@ -254,24 +325,24 @@ class VideoBlock(blocks.StructBlock):
         label = "Embed Video"
 
 
-class HeroImageBlock(image_blocks.ImageChooserBlock):
+class HeroImageBlock(ImageChooserBlockBG):
     class Meta:
         template = "blocks/hero_block.html"
 
 
-class LargeImageBlock(image_blocks.ImageChooserBlock):
+class LargeImageBlock(ImageChooserBlockBG):
     class Meta:
         template = "blocks/large_image_block.html"
 
 
-class NewSectionBlock(blocks.StaticBlock):
+class NewSectionBlock(StaticBlockBG):
     class Meta:
         template = "blocks/new_section.html"
         icon = "horizontalrule"
         label = "Start new section"
 
 
-class CustomTableBlock(table_blocks.TableBlock):
+class CustomTableBlock(TableBlockBG):
     class Meta:
         template = "blocks/custom_table_block.html"
         label = "Table"
@@ -279,7 +350,7 @@ class CustomTableBlock(table_blocks.TableBlock):
         help_text = "Tabular data"
 
 
-class CarouselImageBlock(blocks.StructBlock):
+class CarouselImageBlock(StructBlockBG):
     carousel = ParentalManyToManyField("cmspage.CarouselImage", blank=True)
 
     class Meta:

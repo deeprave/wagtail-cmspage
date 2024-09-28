@@ -1,4 +1,6 @@
 # -*- coding: utf-8 -*-
+import os
+
 from django.conf import settings
 from django.core.cache import cache
 from django.core.exceptions import ValidationError
@@ -11,11 +13,13 @@ from wagtail.admin.panels import FieldPanel, FieldRowPanel, PageChooserPanel, Mu
 from wagtail.admin.widgets import AdminPageChooser
 from wagtail.fields import RichTextField, StreamField
 from wagtail.images import get_image_model
+from wagtail.images.models import Image as WagtailImage
 from wagtail.models import Orderable, Page, Site
 from wagtail.snippets.models import register_snippet
+from PIL import Image as WillowImage
 
-from . import blocks as cmsblocks
 from .mixins import CMSTemplateMixin
+from . import blocks as cmsblocks
 
 __all__ = (
     "CMSPage",
@@ -77,6 +81,30 @@ class SiteVariables(models.Model):
         verbose_name = "Site Variables"
 
 
+# This is optional but to activate this feature, you need to add the following to your settings.py
+# in order to take advantage of converting images to WebP format when imported instead of when rendering the page.
+# WAGTAILIMAGES_IMAGE_MODEL = 'cmspage.CMSPageImage'
+
+class CMSPageImage(WagtailImage):
+    def save(self, *args, **kwargs):
+        # Call the original save method to save the image first
+        super().save(*args, **kwargs)
+
+        # Get the original image path
+        original_image_path = self.file.path
+
+        # Open the original image using PIL
+        with WillowImage.open(original_image_path) as image:
+            # Define the new path for the WebP image
+            webp_image_path = f"{os.path.splitext(original_image_path)[0]}.webp"
+            # Save the image in WebP format
+            image.save(webp_image_path, "WEBP")
+
+        # Optionally, update the file field to the new WebP path, if required
+        self.file.name = f"{os.path.splitext(self.file.name)[0]}.webp"
+        super().save(*args, **kwargs)  # Save again to update the file name
+
+
 class AbstractCMSPage(Page, CMSTemplateMixin):
     """
     The `AbstractCMSPage` class handles the overall configurations for all Content Management System (CMS) pages.
@@ -122,7 +150,6 @@ class AbstractCMSPage(Page, CMSTemplateMixin):
     )
     display_title = models.BooleanField(default=True, help_text="Display the page title on the page")
     display_tags = models.BooleanField(default=False, help_text="Display the page tags on the page")
-
     seo_keywords = models.CharField(max_length=255, blank=True, help_text="SEO Keywords")
 
     content_panels = [
@@ -189,6 +216,13 @@ class MenuLinkManager(models.Manager):
             .filter(id__in=ordered_ids)
             .order_by(models.Case(*[models.When(id=pk, then=pos) for pos, pk in enumerate(ordered_ids)]))
         )
+
+
+class MenuLinkIcons(models.TextChoices):
+    NONE = "", "None"
+    PAGE = "page", "Page"
+    DOCUMENT = "document", "Document"
+    LINK = "link", "Link"
 
 
 class MenuLink(models.Model):
@@ -262,10 +296,14 @@ class MenuLink(models.Model):
     link_url = models.URLField(
         "External Link",
         blank=True,
-        help_text=(
-            "Set a custom URL if not linking to a page or document."
-            "Title is required for this link type"
-        ),
+        help_text=("Set a custom URL if not linking to a page or document." "Title is required for this link type"),
+    )
+    menu_icon = models.CharField(
+        "Icon",
+        choices=MenuLinkIcons.choices,
+        default=MenuLinkIcons.NONE,
+        max_length=16,
+        help_text="Select an icon to display next to the link",
     )
 
     def menu_site(self, _=None):
@@ -289,7 +327,7 @@ class MenuLink(models.Model):
 
     @property
     def menu_link_icon(self, _=None):
-        return "page" if self.link_page else "document" if self.link_document else "link"
+        return self.menu_icon
 
     @property
     def parent_link(self):
@@ -346,7 +384,9 @@ class MenuLink(models.Model):
             ],
             heading="Link To",
         ),
-        FieldRowPanel([FieldPanel("menu_title"), FieldPanel("menu_order")]),
+        MultiFieldPanel(
+            [FieldPanel("menu_title"), FieldRowPanel([FieldPanel("menu_icon"), FieldPanel("menu_order")])],
+        ),
     ]
 
 
@@ -368,7 +408,7 @@ class CarouselImage(Orderable):
 
     """
 
-    RICHTEXTBLOCK_FEATURES = ["bold", "italic", "ol", "ul"]
+    RICHTEXTBLOCK_FEATURES = ["bold", "italic", "ol", "ul", "usefont"]
 
     parent_pg = ParentalKey("cmspage.CMSPage", related_name="carousel_images")
     # noinspection PyUnresolvedReferences

@@ -1,98 +1,96 @@
 {% load static wagtailcore_tags wagtailimages_tags %}
 
-<style>
-</style>
-
 {% if self.image_alignment == "full" %}
-  <div class="row m-2 position-relative text-center">
-    <picture>
-      {% if self.image_size == "portrait" %}
-        {% image self.image height-768 format-webp as webp_image %}
-        <source srcset="{{ webp_image.url }}" type="image/webp">
-        {% image self.image height-768 as the_image %}
-        <img src="{{ the_image.url }}" alt="{{ the_image.alt }}" class="img-fluid">
-      {% elif self.image_size == "landscape" %}
-        {% image self.image width-1104 format-webp as webp_image %}
-        <source srcset="{{ webp_image.url }}" type="image/webp">
-        {% image self.image width-1104 as the_image %}
-        <img src="{{ the_image.url }}" alt="{{ the_image.alt }}" class="img-fluid">
-      {% else %}
-        {% image self.image original format-webp as webp_image %}
-        <source srcset="{{ webp_image.url }}" type="image/webp">
-        {% image self.image original as the_image %}
-        <img src="{{ the_image.url }}" alt="{{ the_image.alt }}" class="img-fluid">
-      {% endif %}
-    </picture>
-    <div class="{% if self.overlay %} overlay-top{% endif %} block-text">
-      {% if self.title %}
-        <div class="block-title text-center">
-          <h2>{{ self.title }}</h2>
-        </div>
-      {% endif %}
-      {% if self.text %}
-        <p>{{ self.text }}</p>
-      {% endif %}
-    </div>
-  </div>
-
-{% else %}
-
-
-<div class="row {% if self.image_alignment == "right" %}flex-row-reverse {% endif %}m-2 position-relative">
-  <div class="col-auto text-left">
-    <picture>
-      {% if self.image_size == "portrait" %}
-        {% image self.image height-768 format-webp as webp_image %}
-        <source srcset="{{ webp_image.url }}" type="image/webp">
-        {% image self.image height-768 as the_image %}
-        <img src="{{ the_image.url }}" alt="{{ the_image.alt }}" class="img-fluid">
-      {% elif self.image_size == "landscape" %}
-        {% image self.image width-1104 format-webp as webp_image %}
-        <source srcset="{{ webp_image.url }}" type="image/webp">
-        {% image self.image width-1104 as the_image %}
-        <img src="{{ the_image.url }}" alt="{{ the_image.alt }}" class="img-fluid">
-      {% else %}
-        {% image self.image original format-webp as webp_image %}
-        <source srcset="{{ webp_image.url }}" type="image/webp">
-        {% image self.image original as the_image %}
-        <img src="{{ the_image.url }}" alt="{{ the_image.alt }}" class="img-fluid">
-      {% endif %}
-    </picture>
-  </div>
-{% if self.image_alignment == "left" %}
-  <div class="col{% if self.overlay %} overlay-text-left{% endif %} block-text text-end">
-{% else %}
-  <div class="col{% if self.overlay %} overlay-text-right{% endif %} block-text text-start">
-{% endif %}
-    {% if self.title %}
-      {% if self.image_alignment == "right" %}<div class="block-title">{% else %}<div class="block-title">{% endif %}
-        <h2 class="block-title">{{ self.title }}</h2>
-      </div>
+<div class="row m-2 p-3 position-relative text-center {{ self.background }} {{ self.opacity }}">
+  <picture>
+    {% if self.image_size == "portrait" %}
+      {% image self.image fill-540x960-c50 format-webp as webp_image %}
+      <source srcset="{{ webp_image.url }}" type="image/webp">
+      {% image self.image fill-540x960-c50 as the_image %}
+      <img src="{{ the_image.url }}" alt="{{ the_image.alt }}" class="img-fluid">
+    {% elif self.image_size == "landscape" %}
+      {% image self.image fill-960x540-c50 format-webp as webp_image %}
+      <source srcset="{{ webp_image.url }}" type="image/webp">
+      {% image self.image fill-960x540-c50 as the_image %}
+      <img src="{{ the_image.url }}" alt="{{ the_image.alt }}" class="img-fluid">
+    {% else %}
+      {% image self.image original format-webp as webp_image %}
+      <source srcset="{{ webp_image.url }}" type="image/webp">
+      {% image self.image original as the_image %}
+      <img src="{{ the_image.url }}" alt="{{ the_image.alt }}" class="img-fluid">
     {% endif %}
-    {% if self.text %}
-      <p>{{ self.text }}</p>
-    {% endif %}
+  </picture>
+  <div class="{% if self.overlay %} overlay-top{% endif %} py-3 block-text">
+    <div class="block-title text-center">
+    {% if self.title %}<h2>{{ self.title }}</h2></div>{% endif %}
+    {% if self.text %}<p class="block-text">{{ self.text }}</p>{% endif %}
   </div>
 </div>
-
+{% if self.link.link_url %}
+  <div class="row m-2 p-3">
+    {% if self.link.button_title and self.link.button_title != '-' %}
+      <div class="col text-end">
+        <a href="{{ self.link.link_url }}" class="btn btn-outline-primary btn-lg collapsing-button-width">
+          {{ self.link.button_title }}
+        </a>
+      </div>
+    {% else %}
+      <div class="col text-end">
+        <a href="{{ self.link.link_url }}" class="btn btn-outline-primary btn-lg collapsing-button-width link-elongated-arrow border-0">
+          &#10132;
+        </a>
+      </div>
+    {% endif %}
+  </div>
 {% endif %}
 
-{% if self.link.link_url %}
-<div class="row mt-2">
-  {% if self.link.button_title and self.link.button_title != '-' %}
-  <div class="col text-end">
-    <a href="{{ self.link.link_url }}" class="btn btn-outline-primary btn-lg collapsing-button-width">
-      {{ self.link.button_title }}
-    </a>
+{% else %}
+<!-- {{ self.image_alignment }} -->
+<div class="row m-2 p-3 {% if self.image_alignment == "right" %}flex-row-reverse {% endif %}position-relative {{ self.background }} {{ self.opacity }}">
+  <div class="col-auto{% if self.image_alignment == "right" %} text-end{% else %} text-start{% endif %}">
+    <picture>
+      {% if self.image_size == "portrait" %}
+        {% image self.image fill-540x960-c50 format-webp as webp_image %}
+        <source srcset="{{ webp_image.url }}" type="image/webp">
+        {% image self.image fill-540x960-c50 as the_image %}
+        <img src="{{ the_image.url }}" alt="{{ the_image.alt }}" class="img-fluid">
+      {% elif self.image_size == "landscape" %}
+        {% image self.image fill-960x540-c50 format-webp as webp_image %}
+        <source srcset="{{ webp_image.url }}" type="image/webp">
+        {% image self.image fill-960x540-c50 as the_image %}
+        <img src="{{ the_image.url }}" alt="{{ the_image.alt }}" class="img-fluid">
+      {% else %}
+        {% image self.image original format-webp as webp_image %}
+        <source srcset="{{ webp_image.url }}" type="image/webp">
+        {% image self.image original as the_image %}
+        <img src="{{ the_image.url }}" alt="{{ the_image.alt }}" class="img-fluid">
+      {% endif %}
+    </picture>
   </div>
-  {% else %}
-  <div class="col text-end">
-    <a href="{{ self.link.link_url }}" class="btn btn-outline-primary btn-lg collapsing-button-width link-elongated-arrow border-0">
-      &#10132;
-    </a>
+
+  <div class="col{% if self.image_alignment == "left" %}{% if self.overlay %} overlay-text-right{% endif %} text-end{% else %}{% if self.overlay %} overlay-text-left{% endif %} text-start{% endif %} py-5 block-text">
+    <div class="block-title">
+    {% if self.title %}<h2 class="block-title">{{ self.title }}</h2>{% endif %}
+    </div>
+    {% if self.text %}<p class="block-text">{{ self.text }}</p>{% endif %}
   </div>
+  {% if self.link.link_url %}
+    <div class="row m-2 p-3">
+      {% if self.link.button_title and self.link.button_title != '-' %}
+        <div class="col text-end">
+          <a href="{{ self.link.link_url }}" class="btn btn-outline-primary btn-lg collapsing-button-width">
+            {{ self.link.button_title }}
+          </a>
+        </div>
+      {% else %}
+        <div class="col text-end">
+          <a href="{{ self.link.link_url }}" class="btn btn-outline-primary btn-lg collapsing-button-width link-elongated-arrow border-0">
+            &#10132;
+          </a>
+        </div>
+      {% endif %}
+    </div>
   {% endif %}
 </div>
 {% endif %}
-
 <div class="row mb-4"></div>

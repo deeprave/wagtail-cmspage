@@ -1,14 +1,15 @@
 {% if page.display_title %}
-<div class="row page-heading py-1">
-    <div class="col-11 d-flex p-0">
+  <div class="row page-heading d-none d-sm-block">
+    <div class="col-12 d-flex m-0 p-0">
       {% include include.logo %}{% if page.title %}
       <h1 class="inner-heading page-title mb-0 py-3">{{ page.title }}</h1>{% endif %}
     </div>
-    <div class="col-1 p-3">
-      <div class="form-check form-switch float-end d-flex flex-row-reverse me-2">
-        <label for="darkModeSwitch">🌘</label>
-        <input class="form-check-input me-2" type="checkbox" id="darkModeSwitch">
-      </div>
+  </div>
+{% endif %}
+  <div class="d-inline position-absolute" style="top: 2px; right: 4px;">
+    <div class="form-check form-switch">
+      <label for="darkModeSwitch">🌘</label>
+      <input class="form-check-input me-2" type="checkbox" id="darkModeSwitch">
     </div>
   </div>
 <script>
@@ -29,4 +30,3 @@
     })
   })
 </script>
-{% endif %}
