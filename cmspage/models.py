@@ -19,6 +19,7 @@ from wagtail.snippets.models import register_snippet
 from PIL import Image as WillowImage
 
 from .mixins import CMSTemplateMixin
+from .choice_icon import IconChoices
 from . import blocks as cmsblocks
 
 __all__ = (
@@ -84,6 +85,7 @@ class SiteVariables(models.Model):
 # This is optional but to activate this feature, you need to add the following to your settings.py
 # in order to take advantage of converting images to WebP format when imported instead of when rendering the page.
 # WAGTAILIMAGES_IMAGE_MODEL = 'cmspage.CMSPageImage'
+
 
 class CMSPageImage(WagtailImage):
     def save(self, *args, **kwargs):
@@ -218,11 +220,21 @@ class MenuLinkManager(models.Manager):
         )
 
 
-class MenuLinkIcons(models.TextChoices):
-    NONE = "", "None"
-    PAGE = "page", "Page"
-    DOCUMENT = "document", "Document"
-    LINK = "link", "Link"
+class IconColorChoices(models.TextChoices):
+    BODY = "text-body", "Normal"
+    WHITE = "text-white", "White"
+    BLACK = "text-black", "Dark"
+    PRIMARY = "text-primary", "Primary"
+    SECONDARY = "text-secondary", "Secondary"
+    SUCCESS = "text-success", "Success"
+    WARNING = "text-warning", "Warning"
+    INFO = "text-info", "Info"
+    DANGER = "text-danger", "Danger"
+    LIGHT = "text-light", "Light"
+    DARK = "text-dark", "Dark"
+    MUTED = "text-muted", "Muted"
+    BLACK50 = "text-black-50", "Black 50% opacity"
+    WHITE50 = "text-white-50", "White 50% opacity"
 
 
 class MenuLink(models.Model):
@@ -300,10 +312,19 @@ class MenuLink(models.Model):
     )
     menu_icon = models.CharField(
         "Icon",
-        choices=MenuLinkIcons.choices,
-        default=MenuLinkIcons.NONE,
-        max_length=16,
+        choices=IconChoices.choices,
+        default=IconChoices.NONE,
+        max_length=64,
+        blank=True,
         help_text="Select an icon to display next to the link",
+    )
+    menu_icon_color = models.CharField(
+        "Icon Color",
+        choices=IconColorChoices.choices,
+        default=IconColorChoices.BODY,
+        max_length=16,
+        blank=True,
+        help_text="Specify a theme color for the icon",
     )
 
     def menu_site(self, _=None):
@@ -385,7 +406,10 @@ class MenuLink(models.Model):
             heading="Link To",
         ),
         MultiFieldPanel(
-            [FieldPanel("menu_title"), FieldRowPanel([FieldPanel("menu_icon"), FieldPanel("menu_order")])],
+            [
+                FieldPanel("menu_title"),
+                FieldRowPanel([FieldPanel("menu_icon"), FieldPanel("menu_icon_color"), FieldPanel("menu_order")]),
+            ],
         ),
     ]
 

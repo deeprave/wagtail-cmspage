@@ -75,10 +75,14 @@
 
     .menu-icon {
       display: inline-block;
-      margin-left: 0.4em;
-      height: 0.75em;
-      align-self: start;
-      vertical-align: baseline;
+      height: 0.9em;
+      vertical-align: top;
+
+      svg {
+        color: inherit;
+        height: 100%;
+        width: auto;
+      }
     }
 
     &:hover {
@@ -92,22 +96,22 @@
     }
 
     &.level-1 {
-      padding-left: 1.25em;
+      padding-left: 0.75em;
     }
 
     &.level-2 {
-      padding-left: 2.50em;
+      padding-left: 1.5em;
     }
 
     &.level-3 {
-      padding-left: 3.75em;
+      padding-left: 2.25em;
     }
   }
 }
 
 .nav {
   display: block;
-  font-size: 1.3em;
+  font-size: 1.15em;
   list-style-type: none;
 }
 
@@ -152,9 +156,14 @@
   color: var(--heading-color);
 }
 
-.overlay-text-left {}
-.overlay-text-right {}
-.overlay-top {}
+.overlay-text-left {
+}
+
+.overlay-text-right {
+}
+
+.overlay-top {
+}
 
 @media (min-width: $breakpoint-lg) {
   .overlay-shadow {
@@ -202,10 +211,24 @@
   padding-left: 0.5em;
 }
 
+#leftMenuButton {
+  position: absolute;
+  float: left;
+}
+
 /* When the menu is collapsed and shown, apply the new background color */
 #leftMenu.collapse.show {
   position: absolute;
   top: 0;
   left: 0;
-  background-color: var(--bs-secondary-bg);
+  width: 100%;
+  background-color: var(--bs-tertiary-bg);
+}
+
+.container-fluid {
+  margin: 0;
+  padding: 0;
+}
+.page-heading {
+
 }

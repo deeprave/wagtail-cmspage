@@ -1,11 +1,11 @@
 {% load wagtailimages_tags %}
 
-<div class="row mb-3 p-2 text-center shadow {{ self.background }} {{ self.opacity }}">
-  <div class="col-sm-12">
+<div class="row mb-5 px-5 text-center shadow {{ self.background }} {{ self.opacity }}">
+  <div class="col">
     <picture>
-      {% image self.image fill-800x400 format-webp as webp_image %}
+      {% image self.image fill-600x300 format-webp as webp_image %}
       <source srcset="{{ webp_image.url }}" type="image/webp">
-      {% image self.image fill-800x400 as original_image %}  {# Fallback to original #}
+      {% image self.image fill-600x300 as original_image %}
       <img src="{{ original_image.url }}" alt="{{ original_image.alt }}" class="img-fluid">
     </picture>
   </div>

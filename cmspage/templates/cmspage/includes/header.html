@@ -1,32 +1,38 @@
-{% if page.display_title %}
-  <div class="row page-heading d-none d-sm-block">
-    <div class="col-12 d-flex m-0 p-0">
-      {% include include.logo %}{% if page.title %}
-      <h1 class="inner-heading page-title mb-0 py-3">{{ page.title }}</h1>{% endif %}
+<div class="row page-heading align-items-center">
+  <div class="col-auto d-flex px-3 mb-2">
+  {% if page.display_title %}<span class="d-inline-block d-none d-sm-block">
+    {% include include.logo %}
+    {% if page.title %}<h1 class="inner-heading page-title my-3 d-sm-inline-block">{{ page.title }}</h1>{% endif %}
+  </span>{% endif %}
+  </div>
+  <div class="col ms-auto">
+    <div class="form-check form-switch align-self-end float-end">
+      <label class="form-check-label me-2" for="darkModeSwitch" style="cursor: pointer">
+        <span id="themeGlyph">🌘</span>
+      </label>
+      <input class="form-check-input" type="checkbox" id="darkModeSwitch">
     </div>
   </div>
-{% endif %}
-  <div class="d-inline position-absolute" style="top: 2px; right: 4px;">
-    <div class="form-check form-switch">
-      <label for="darkModeSwitch">🌘</label>
-      <input class="form-check-input me-2" type="checkbox" id="darkModeSwitch">
-    </div>
-  </div>
+</div>
 <script>
   document.addEventListener('DOMContentLoaded', (_) => {
     const htmlElement = document.documentElement
     const switchElement = document.getElementById('darkModeSwitch')
+    const themeGlyph = document.getElementById('themeGlyph')
 
-    let currentTheme = localStorage.getItem('bsTheme') || 'light'
-    switchElement.checked = currentTheme === 'dark'
-    htmlElement.setAttribute('data-bs-theme', currentTheme)
-    localStorage.setItem('bsTheme', currentTheme)
-
-    switchElement.addEventListener('change', function () {
-      currentTheme = (this.checked) ? 'dark' : 'light'
+    function updateTheme(theme)  {
       switchElement.checked = currentTheme === 'dark'
       htmlElement.setAttribute('data-bs-theme', currentTheme)
       localStorage.setItem('bsTheme', currentTheme)
+      themeGlyph.textContent = theme === 'dark' ? '🌖' : '🌘'
+    }
+
+    let currentTheme = localStorage.getItem('bsTheme') || 'light'
+    updateTheme(currentTheme)
+
+    switchElement.addEventListener('change', function () {
+      currentTheme = (this.checked) ? 'dark' : 'light'
+      updateTheme(currentTheme)
     })
   })
 </script>

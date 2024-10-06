@@ -1,9 +1,9 @@
 {% load static wagtailadmin_tags %}
 {# include.navigation_item #}
 <li class="menu-item">
-  <a href="{{ item.url }}" class="menu-link level-{{ level }}">{% if item.icon %}
-      <img src="{% static item.icon %}" title=item.title class="menu-icon">
-    {% endif %}{{ item.title }}
+  <a href="{{ item.url }}" class="menu-link level-{{ level }}">{% if item.icon %}<strong>{{ item.title }}</strong>
+    <div class="{{ item.icon_color }} menu-icon img-responsive">{% include item.icon %}</div>
+  {% else %}{{ item.title }}{% endif %}
   </a>
   {% if item.children %}
     <ul class="list-unstyled">{% for child in item.children %}

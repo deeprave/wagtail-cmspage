@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 from django import forms
 from django.core.exceptions import ValidationError
-from django.db import models
 from django.forms.utils import ErrorList
 from modelcluster.fields import ParentalManyToManyField
 from wagtail import blocks
@@ -9,6 +8,8 @@ from wagtail.documents import blocks as document_blocks
 from wagtail.images import blocks as image_blocks
 from wagtail.embeds import blocks as embed_blocks
 from wagtail.contrib.table_block import blocks as table_blocks
+
+from .choice_bg import BlockBackgroundMeta
 
 __all__ = (
     "LinkBlock",
@@ -22,9 +23,6 @@ __all__ = (
     "HeroImageBlock",
     "NewSectionBlock",
     "VideoBlock",
-    "Backgrounds",
-    "Opacities",
-    "BlockBackgroundMeta",
 )
 
 DEFAULT_RICHTEXTBLOCK_FEATURES = [
@@ -45,44 +43,6 @@ DEFAULT_RICHTEXTBLOCK_FEATURES = [
     "subscript",
     "strikethrough",
 ]
-
-
-class Backgrounds(models.TextChoices):
-    NONE = "bg-transparent", "Transparent"
-    PAGE = "bg-body", "Page"
-    LIGHT = "bg-light", "Light"
-    DARK = "bg-dark", "Dark"
-    WHITE = "bg-white", "White"
-    BLACK = "bg-black", "Dark"
-    PRIMARY = "bg-primary", "Primary"
-    SECONDARY = "bg-secondary", "Secondary"
-    SUCCESS = "bg-success", "Success"
-    WARNING = "bg-warning", "Warning"
-    INFO = "bg-info", "Info"
-    DANGER = "bg-danger", "Danger"
-
-
-class Opacities(models.TextChoices):
-    OPACITY_FULL = "bg-opacity-100", "100%"
-    OPACITY_75 = "bg-opacity-75", "75%"
-    OPACITY_50 = "bg-opacity-50", "50%"
-    OPACITY_25 = "bg-opacity-25", "25%"
-    GRADIENT = "bg-gradient", "Gradient"
-
-
-class BlockBackgroundMeta(blocks.DeclarativeSubBlocksMetaclass):
-    def __new__(cls, name, bases, attrs):
-        attrs["background"] = blocks.ChoiceBlock(
-            choices=Backgrounds.choices,
-            default=Backgrounds.NONE,
-            help_text="Background type or color",
-        )
-        attrs["opacity"] = blocks.ChoiceBlock(
-            choices=Opacities.choices,
-            default=Opacities.OPACITY_FULL,
-            help_text="Background opacity",
-        )
-        return super().__new__(cls, name, bases, attrs)
 
 
 class StructBlockBG(blocks.StructBlock, metaclass=BlockBackgroundMeta):
