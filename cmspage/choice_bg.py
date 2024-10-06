@@ -3,7 +3,6 @@
 # Metaclass for adding background and opacity fields to blocks
 
 from django.db import models
-from wagtail import blocks
 
 
 class Backgrounds(models.TextChoices):
@@ -27,18 +26,3 @@ class Opacities(models.TextChoices):
     OPACITY_50 = "bg-opacity-50", "50%"
     OPACITY_25 = "bg-opacity-25", "25%"
     GRADIENT = "bg-gradient", "Gradient"
-
-
-class BlockBackgroundMeta(blocks.DeclarativeSubBlocksMetaclass):
-    def __new__(cls, name, bases, attrs):
-        attrs["background"] = blocks.ChoiceBlock(
-            choices=Backgrounds.choices,
-            default=Backgrounds.NONE,
-            help_text="Background type or color",
-        )
-        attrs["opacity"] = blocks.ChoiceBlock(
-            choices=Opacities.choices,
-            default=Opacities.OPACITY_FULL,
-            help_text="Background opacity",
-        )
-        return super().__new__(cls, name, bases, attrs)
