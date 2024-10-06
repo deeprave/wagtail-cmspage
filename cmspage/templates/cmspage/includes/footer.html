@@ -1,94 +1,94 @@
-{% load wagtailcore_tags static cache %}
-
-<footer class="page-footer font-small">
-  <div class="container-bottom text-center text-md-left">
-    <div class="row">
-
-      <div class="col-md-3">
-        <h5 class="text-uppercase text-left">Links</h5>
-          <nav>
-            <ul class="nav mb-md-0">
+{#{% load wagtailcore_tags static cache %}#}
+{##}
+{#<footer class="page-footer font-small">#}
+{#  <div class="container-bottom text-center text-md-left">#}
+{#    <div class="row">#}
+{##}
+{#      <div class="col-md-3">#}
+{#        <h5 class="text-uppercase text-left">Links</h5>#}
+{#          <nav>#}
+{#            <ul class="nav mb-md-0">#}
 {#                {% main_menu template="cmspage/includes/links.html" levels=1 %}#}
-            </ul>
-          </nav>
-      </div>
-
-      <div class="col-md-4 mt-4 mt-md-0">
-        {% if settings.settings %}
-        {% with settings.settings.ContactSettings as contact %}
-
-        {% if contact.contact_button_text and contact.contact_button_page %}
-        <div class="text-center nowrap">
-          <a href="{% pageurl contact.contact_button_page %}" class="btn btn-outline-primary btn-lg contact">
-              {{ contact.contact_button_text }}
-          </a>
-        </div>
-        {% endif %}
-
-        {% if contact.call_button_text and contact.call_button_number %}
-        <div class="text-center nowrap">
-          <a href="tel:{{ contact.call_button_number }}" class="btn btn-outline-primary btn-lg contact contact-call">
-              {{ contact.call_button_text }}
-          </a>
-        </div>
-        {% endif %}
-
-        {% if contact.book_button_text and contact.book_button_link %}
-        <div class="text-center nowrap">
-          <a href="{{ contact.book_button_link }}" class="btn btn-outline-primary btn-lg contact contact-book">
-              {{ contact.book_button_text }}
-          </a>
-        </div>
-        {% endif %}
-      {% endwith %}
-      {% endif %}
-      </div>
-
-      <div class="col-md-5 mt-4 mt-md-0">
-        {% if settings.socialmediasettings %}
-        {% with settings.settings.SocialMediaSettings as social %}
-        <ul class="text-center socicon">
-          {% if social.facebook %}<li data-toggle="tooltip" data-placement="top" data-delay="0" title="Facebook">
-            <a href="{{ social.facebook }}" target="_blank">
-              <i class="socicon-facebook"></i>
-            </a>
-          </li>{% endif %}
-          {% if social.linkedin %}<li data-toggle="tooltip" data-placement="top" title="LinkedIn">
-            <a href="{{ social.linkedin }}" target="_blank">
-              <i class="socicon-linkedin"></i>
-            </a>
-          </li>{% endif %}
-          {% if social.twitter %}<li data-toggle="tooltip" data-placement="top" title="Twitter">
-            <a href="{{ social.twitter }}" target="_blank">
-              <i class="socicon-twitter"></i>
-            </a>
-          </li>{% endif %}
-          {% if social.youtube %}<li data-toggle="tooltip" data-placement="top" title="YouTube">
-            <a href="{{ social.youtube }}" target="_blank">
-              <i class="socicon-youtube"></i>
-            </a>
-          </li>{% endif %}
-          {% if social.instagram %}<li data-toggle="tooltip" data-placement="top" title="Instagram">
-            <a href="{{ social.instagram }}" target="_blank">
-              <i class="socicon-instagram"></i>
-            </a>
-          </li>{% endif %}
-          {% if social.snapchat %}<li data-toggle="tooltip" data-placement="top" title="Snapchat">
-            <a href="{{ social.snapchat }}" target="_blank">
-              <i class="socicon-snapchat"></i>
-            </a>
-          </li>{% endif %}
-        </ul>
-        {% endwith %}
-        {% endif %}
-        <div class="org-logo">
-          <img src="{% static 'images/wbg.png' %}" class="wbg noshadow"
-               alt="Proud member of the Whitehorse Business Group">
-          <img src="{% static 'images/vcci.png' %}" class="vcci noshadow"
-               alt="Proud member of the Victorian Chamber of Commerce and Industry">
-        </div>
-      </div>
-
-    </div>
-  </div>
-</footer>
+{#            </ul>#}
+{#          </nav>#}
+{#      </div>#}
+{##}
+{#      <div class="col-md-4 mt-4 mt-md-0">#}
+{#        {% if settings.settings %}#}
+{#        {% with settings.settings.ContactSettings as contact %}#}
+{##}
+{#        {% if contact.contact_button_text and contact.contact_button_page %}#}
+{#        <div class="text-center nowrap">#}
+{#          <a href="{% pageurl contact.contact_button_page %}" class="btn btn-outline-primary btn-lg contact">#}
+{#              {{ contact.contact_button_text }}#}
+{#          </a>#}
+{#        </div>#}
+{#        {% endif %}#}
+{##}
+{#        {% if contact.call_button_text and contact.call_button_number %}#}
+{#        <div class="text-center nowrap">#}
+{#          <a href="tel:{{ contact.call_button_number }}" class="btn btn-outline-primary btn-lg contact contact-call">#}
+{#              {{ contact.call_button_text }}#}
+{#          </a>#}
+{#        </div>#}
+{#        {% endif %}#}
+{##}
+{#        {% if contact.book_button_text and contact.book_button_link %}#}
+{#        <div class="text-center nowrap">#}
+{#          <a href="{{ contact.book_button_link }}" class="btn btn-outline-primary btn-lg contact contact-book">#}
+{#              {{ contact.book_button_text }}#}
+{#          </a>#}
+{#        </div>#}
+{#        {% endif %}#}
+{#      {% endwith %}#}
+{#      {% endif %}#}
+{#      </div>#}
+{##}
+{#      <div class="col-md-5 mt-4 mt-md-0">#}
+{#        {% if settings.socialmediasettings %}#}
+{#        {% with settings.settings.SocialMediaSettings as social %}#}
+{#        <ul class="text-center socicon">#}
+{#          {% if social.facebook %}<li data-toggle="tooltip" data-placement="top" data-delay="0" title="Facebook">#}
+{#            <a href="{{ social.facebook }}" target="_blank">#}
+{#              <i class="socicon-facebook"></i>#}
+{#            </a>#}
+{#          </li>{% endif %}#}
+{#          {% if social.linkedin %}<li data-toggle="tooltip" data-placement="top" title="LinkedIn">#}
+{#            <a href="{{ social.linkedin }}" target="_blank">#}
+{#              <i class="socicon-linkedin"></i>#}
+{#            </a>#}
+{#          </li>{% endif %}#}
+{#          {% if social.twitter %}<li data-toggle="tooltip" data-placement="top" title="Twitter">#}
+{#            <a href="{{ social.twitter }}" target="_blank">#}
+{#              <i class="socicon-twitter"></i>#}
+{#            </a>#}
+{#          </li>{% endif %}#}
+{#          {% if social.youtube %}<li data-toggle="tooltip" data-placement="top" title="YouTube">#}
+{#            <a href="{{ social.youtube }}" target="_blank">#}
+{#              <i class="socicon-youtube"></i>#}
+{#            </a>#}
+{#          </li>{% endif %}#}
+{#          {% if social.instagram %}<li data-toggle="tooltip" data-placement="top" title="Instagram">#}
+{#            <a href="{{ social.instagram }}" target="_blank">#}
+{#              <i class="socicon-instagram"></i>#}
+{#            </a>#}
+{#          </li>{% endif %}#}
+{#          {% if social.snapchat %}<li data-toggle="tooltip" data-placement="top" title="Snapchat">#}
+{#            <a href="{{ social.snapchat }}" target="_blank">#}
+{#              <i class="socicon-snapchat"></i>#}
+{#            </a>#}
+{#          </li>{% endif %}#}
+{#        </ul>#}
+{#        {% endwith %}#}
+{#        {% endif %}#}
+{#        <div class="org-logo">#}
+{#          <img src="{% static 'images/wbg.png' %}" class="wbg noshadow"#}
+{#               alt="Proud member of the Whitehorse Business Group">#}
+{#          <img src="{% static 'images/vcci.png' %}" class="vcci noshadow"#}
+{#               alt="Proud member of the Victorian Chamber of Commerce and Industry">#}
+{#        </div>#}
+{#      </div>#}
+{##}
+{#    </div>#}
+{#  </div>#}
+{#</footer>#}
