@@ -335,7 +335,7 @@ class VideoBlock(blocks.StructBlock):
         max_length=60,
         help_text="Max length of 60 characters, optional",
     )
-    video = embed_blocks.EmbedBlock(max_with=1200, help_text="Video URL")
+    video = embed_blocks.EmbedBlock(max_width=1200, help_text="Video URL")
     text = blocks.RichTextBlock(
         required=False,
         blank=True,
