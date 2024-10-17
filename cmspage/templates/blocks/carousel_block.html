@@ -1,0 +1,62 @@
+{% load wagtailcore_tags wagtailimages_tags %}
+
+<div class="row text-center {{ self.inset }} {{ value.bg.background }} {{ value.bg.opacity }}">
+  <div id="carouselBlock" class="carousel slide" data-bs-ride="carousel"
+       data-bs-interval="{% if block.value.carousel|length > 1 %}{{ value.carousel_interval }}{% else %}0{% endif %}">
+
+    <!-- Indicators -->
+    <div class="carousel-indicators">
+      {% for image in value.carousel %}
+        <button type="button" data-bs-target="#carouselBlock"
+                data-bs-slide-to="{{ forloop.counter0 }}" {% if forloop.first %}class="active"{% endif %}
+                aria-current="true" aria-label="Slide {{ forloop.counter }}"></button>
+      {% endfor %}
+    </div>
+
+    <!-- Wrapper for slides -->
+    <div class="carousel-inner">
+      {% for image in value.carousel %}
+        <div class="carousel-item {% if forloop.first %}active{% endif %}">
+          <picture>
+            {% image image.carousel_image fill-800x450-c75 format-webp as webp_image %}
+            <source srcset="{{ webp_image.url }}" type="image/webp">
+            {% image image.carousel_image fill-800x450-c75 as the_image %}
+            <img src="{{ the_image.url }}" alt="{{ the_image.alt }}" class="d-block w-100">
+          </picture>
+          <div class="carousel-caption d-none d-md-block">
+            <div class="overlay-grid px-4">
+              {% if image.carousel_title %}<p class="h5 inline-heading text-white">{{ image.carousel_title }}</p>{% endif %}
+              {% if image.carousel_content %}<p class="block-text text-white">{{ image.carousel_content|richtext }}</p>{% endif %}
+              {% if image.carousel_attribution %}<p class="block-text text-white fst-italic text-end">- {{ image.carousel_attribution }}</p>{% endif %}
+            </div>
+          </div>
+        </div>
+      {% endfor %}
+    </div>
+
+    <!-- Controls -->
+    <button class="carousel-control-prev" type="button" data-bs-target="#carouselBlock" data-bs-slide="prev">
+      <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+      <span class="visually-hidden">Previous</span>
+    </button>
+    <button class="carousel-control-next" type="button" data-bs-target="#carouselBlock" data-bs-slide="next">
+      <span class="carousel-control-next-icon" aria-hidden="true"></span>
+      <span class="visually-hidden">Next</span>
+    </button>
+  </div>
+</div>
+<style>
+    .overlay-grid {
+        display: grid;
+        line-height: 1.1em;
+        grid-template-columns: 1fr;
+        gap: 5px;
+        position: relative;
+        bottom: -20%;
+        background: rgba(0, 0, 0, 0.10);
+        backdrop-filter: blur(2px);
+    }
+    .overlay-grid p {
+        margin: 0;
+    }
+</style>

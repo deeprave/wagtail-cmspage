@@ -75,8 +75,10 @@
 
     .menu-icon {
       display: inline-block;
-      height: 0.9em;
-      vertical-align: top;
+      height: 1.20em;
+      vertical-align: super;
+      font-size: smaller;
+      padding-bottom: 0.2em;
 
       svg {
         color: inherit;
@@ -231,4 +233,52 @@
 }
 .page-heading {
 
+}
+
+.height-0 {
+  display: block;
+  height: 0;
+}
+
+.height-1 {
+  display: block;
+  height: 1.0rem;
+}
+
+.height-2 {
+  display: block;
+  height: 2.0rem;
+}
+
+.height-3 {
+  display: block;
+  height: 3.0rem;
+}
+
+.height-4 {
+  display: block;
+  height: 4.0rem;
+}
+
+.height-5 {
+  display: block;
+  height: 5.0rem;
+}
+
+
+.richtext-text {
+  line-height: 1.2em;
+}
+
+.block-text, .card-text {
+  line-height: 1.2em;
+}
+
+.block-text-large {
+  @extend .block-text;
+  font-size: 1.75rem;
+}
+
+.title-text-light {
+  color: var(--heading-color);
 }

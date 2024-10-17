@@ -1,16 +1,29 @@
 {% load wagtailcore_tags %}
-<div class="row m-0 p-2">
-  <div class="col-auto {{ value.background }} {{ value.opacity }}">
-    <div class="text-center m-2 p-2 shadow rounded-4 bg-warning-subtle">
-      {% if value.title %}<h2 class="block-title">{{ value.title }}</h2>{% endif %}
-      {% if value.text %}<p class="block-text">{{ value.text|richtext }}</p>{% endif %}
-      <!-- link_url = {{ value.link.link_url }} -->
-      <!-- link_text = {{ value.link.link_text }} -->
-      {% if value.link.link_url %}
-        <a href="{{ value.link.link_url }}" class="btn btn-outline-danger btn-lg w-100" >
-          {{ value.link.link_title }}
-        </a>
-      {% endif %}
+<div class="row">
+  <div class="col {{ self.inset }} {{ self.bg.background }} {{ self.bg.opacity }} mb-1">
+    <div class="text-center shadow rounded-4 {{ self.palette }}">
+      {% if value.link.link_url %}<a href="{{ value.link.link_url }}" class="text-decoration-none text-reset">{% endif %}
+      {% if value.title %}<h3 class="block-title display-3 fw-bolder text-bg-dark title-text-light">{{ value.title }}</h3>{% endif %}
+      <div class="block-text-large richtext-text p-2 px-3">
+        {% if value.text %}<p class="block-text-large">{{ value.text|richtext }}</p>{% endif %}
+      </div>
+      <div class="row m-2 p-3">
+        <a href="{{ self.link.link_url }}" class="text-decoration-none">
+          {% if self.link.button_title and self.link.button_title != '-' %}
+            <div class="col text-end">
+              <div class="btn btn-outline-primary btn-lg collapsing-button-width">
+                {{ self.link.button_title }}
+              </div>
+            </div>
+          {% else %}
+            <div class="col text-end">
+              <div class="btn btn-outline-primary btn-lg collapsing-button-width link-elongated-arrow border-0">
+                &#10132;
+              </div>
+            </div>
+          {% endif %}
+        {% if value.link.link_url %}</a>{% endif %}
+      </div>
     </div>
   </div>
 </div>

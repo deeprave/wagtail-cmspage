@@ -11,10 +11,10 @@ from taggit.models import Tag as TaggitTag
 from taggit.models import TaggedItemBase
 from wagtail.admin.panels import FieldPanel, FieldRowPanel, PageChooserPanel, MultiFieldPanel
 from wagtail.admin.widgets import AdminPageChooser
-from wagtail.fields import RichTextField, StreamField
-from wagtail.images import get_image_model
+from wagtail.embeds import blocks as embed_blocks
+from wagtail.fields import StreamField
 from wagtail.images.models import Image as WagtailImage
-from wagtail.models import Orderable, Page, Site
+from wagtail.models import Page, Site
 from wagtail.snippets.models import register_snippet
 from PIL import Image as WillowImage
 
@@ -29,7 +29,6 @@ __all__ = (
     "SiteVariables",
     "MenuLink",
     "MenuLinkManager",
-    "CarouselImage",
 )
 
 
@@ -243,10 +242,10 @@ class MenuLink(models.Model):
     This is a standard django module that can be managed in the admin interface.
 
     Attributes:
-        parent_pg (ParentalKey): A foreign key to the CMSPage model, to link to the page
-        link_title (CharField): The title of the link.
+        parent (ParentalKey): A foreign key to the CMSPage model, to link to the page
+        menu_title (CharField): The title of the link.
+        menu_order (IntegerField): The order of the link in the menu.
         link_url (URLField): The URL of the link.
-        link_order (IntegerField): The order of the link in the menu.
 
     Methods:
         None
@@ -414,64 +413,6 @@ class MenuLink(models.Model):
     ]
 
 
-class CarouselImage(Orderable):
-    """
-    A class that represents an image in a carousel.
-
-    Attributes:
-        RICHTEXTBLOCK_FEATURES (list): A list of rich text block features.
-        Parent_pg (ParentalKey): A foreign key to the CMSPage model, to link to the page
-        carousel_image (ForeignKey): A foreign key to each image.
-        Carousel_title (CharField): The display title of the image.
-        Carousel_content (RichTextField): Rich text content.
-        Carousel_attribution (CharField): Attribution of the image.
-        Carousel_interval (IntegerField): The interval of time the image is visible in milliseconds.
-
-    Methods:
-        None
-
-    """
-
-    RICHTEXTBLOCK_FEATURES = ["bold", "italic", "ol", "ul", "usefont"]
-
-    parent_pg = ParentalKey("cmspage.CMSPage", related_name="carousel_images")
-    # noinspection PyUnresolvedReferences
-    carousel_image = models.ForeignKey(
-        get_image_model(),
-        null=True,
-        blank=True,
-        on_delete=models.SET_NULL,
-        related_name="+",
-    )
-    carousel_title = models.CharField(
-        blank=True,
-        null=True,
-        max_length=120,
-        help_text="Display title, optional (max len=120)",
-    )
-    carousel_content = RichTextField(features=RICHTEXTBLOCK_FEATURES, null=True, blank=True)
-    carousel_attribution = models.CharField(
-        blank=True,
-        null=True,
-        max_length=120,
-        help_text="Display title, optional (max len=120)",
-    )
-    carousel_interval = models.IntegerField(
-        blank=False,
-        null=False,
-        default=12000,
-        help_text="Keep visible for time in milliseconds",
-    )
-
-    panels = [
-        FieldPanel("carousel_image"),
-        FieldPanel("carousel_title"),
-        FieldPanel("carousel_content"),
-        FieldPanel("carousel_attribution"),
-        FieldPanel("carousel_interval"),
-    ]
-
-
 class CMSPageBase(AbstractCMSPage):
     body_blocks = [
         # header
@@ -482,7 +423,7 @@ class CMSPageBase(AbstractCMSPage):
         ("image_and_text", cmsblocks.ImageAndTextBlock()),
         ("cta", cmsblocks.CallToActionBlock()),
         ("richtext", cmsblocks.RichTextWithTitleBlock()),
-        ("video", cmsblocks.VideoBlock()),
+        ("video", embed_blocks.EmbedBlock(max_with=1200, help_text="Video URL")),
         ("large_image", cmsblocks.LargeImageBlock()),
         ("table", cmsblocks.CustomTableBlock()),
         # utilities
