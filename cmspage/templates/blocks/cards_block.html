@@ -8,38 +8,46 @@
         margin-bottom: 0;
     }
 </style>
-<div class="row g-4 gy-5 mx-2 p-2 pb-4  mx-lg-2 mt-1 mt-lg-1 mb-3 mb-lg-3 {{ value.background }} {{ value.opacity }}">
+<div class="row g-0 g-sm-1 g-md-2 g-lg-3 me-1 {{ value.bg.background }} {{ value.bg.opacity }}">
   {% for card in value.cards %}
-    <div class="col-12 g-2 col-lg-6 col-xl-{% if value.cards|length == 3 %}4{% elif value.cards|length == 4 %}3{% else %}6{% endif %} {{ card.background }} {{ card.opacity }}">
-      <div class="card shadow rounded-4 h-100 bg-tertiary">
-        <div class="card-body d-flex flex-column p-0">
-          {% if card.link.link_url %}<a href="{{ card.link.link_url }}" class="text-decoration-none text-reset">{% endif %}
-          {% if card.image %}
-            <picture>
-              {% image card.image fill-570x370 as img %}
-              <img src="{{ img.url }}" class="card-img-top" alt="{{ img.alt }}">
-            </picture>
+  <div class="col-12 col-lg-6 col-xl-{{ colspread }} {{ card.palette }}">
+    <div class="card shadow rounded-3 h-100 bg-tertiary">
+      <div class="card-header p-1 m-0">
+        <h3 class="card-block-title p-1 mb-0 text-center display-4">{{ card.title }}</h3>
+      </div>
+      <div class="card-body d-flex flex-column p-1">
+        {% if card.link.link_url %}<a href="{{ card.link.link_url }}" class="text-decoration-none text-reset">{% endif %}
+        {% if card.image %}
+          <picture>
+            {% image card.image fill-570x370 format-webp as webp_image %}
+            <source srcset="{{ webp_image.url }}" type="image/webp">
+            {% image card.image fill-570x370 as img %}
+            <img src="{{ img.url }}" alt="{{ img.alt }}" class="card-img-top">
+          </picture>
+        {% endif %}
+        <div class="px-2 py-1 card-block-text d-flex flex-column text-center flex-grow-1 mt-auto">
+          {% if card.text %}
+            <p class="flex-grow-1">{{ card.text|richtext }}</p>
           {% endif %}
-          <h3 class="card-block-title p-2 mb-0">{{ card.title }}</h3>
-          <div class="p-3 card-block-text d-flex flex-column flex-grow-1">
-            {% if card.text %}
-              <p class="flex-grow-1">{{ card.text|richtext }}</p>
-            {% endif %}
-            <div class="mt-auto">
-              {% if card.link.link_url %}
-                {% if card.link_title %}
-                  <a href="{{ card.link.link_url }}" class="text-decoration-none">
-                    <p>{{ card.link.link_title }}</p>
-                  </a>
-                {% elif card.link.link_title %}
-                  <a href="{{ card.link.link_url }}" class="btn w-100 btn-secondary">{{ card.link.link_title }}</a>
-                {% endif %}
+          <div class="mt-auto text-center text-md-end">
+            {% if card.link.link_url %}
+              <a href="{{ card.link.link_url }}" class="text-decoration-none">
+              {% if card.link.link_title == '-' %}
+                <div class="inline-block link-arrow text-dark">{% include "icons/right-pointing-arrow-icon.svg" %}</div>
+              {% elif card.link.link_title %}
+                <div class="col text-end">
+                  <div class="btn btn-outline-primary btn-lg collapsing-button-width link-elongated-arrow border-0">
+                    &#10132;
+                  </div>
+                </div>
               {% endif %}
-            </div>
+              </a>
+            {% endif %}
           </div>
-          {% if card.link.link_url %}</a>{% endif %}
         </div>
+        {% if card.link.link_url %}</a>{% endif %}
       </div>
     </div>
+  </div>
   {% endfor %}
 </div>

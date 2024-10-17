@@ -6,9 +6,7 @@ from wagtail.forms import forms
 from wagtail.rich_text import LinkHandler
 from wagtail.snippets.models import register_snippet
 
-from .views import CarouselImageSnippetViewSet, MenuLinkViewSet, SiteVariablesViewSet
-
-register_snippet(CarouselImageSnippetViewSet)
+from .views import MenuLinkViewSet, SiteVariablesViewSet
 
 register_snippet(MenuLinkViewSet)
 

@@ -1,7 +1,7 @@
 {% load wagtailimages_tags %}
 
-<div class="row mb-3 m-2 p-2 text-center {{ self.background }} {{ self.opacity }}">
-  <div class="col-sm-12 p-2">
+<div class="row mb-2 text-center {{ self.inset }} {{ self.bg.background }} {{ self.bg.opacity }}">
+  <div class="col">
     <picture>
       {% image self.image fill-1200x775-c75 format-webp as webp_image %}
       <source srcset="{{ webp_image.url }}" type="image/webp">

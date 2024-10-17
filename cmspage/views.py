@@ -1,25 +1,7 @@
-from wagtail.admin.panels import FieldPanel
 from wagtail.models import Site
 from wagtail.snippets.views.snippets import SnippetViewSet
 
-from .models import CarouselImage, MenuLink, SiteVariables
-
-
-class CarouselImageSnippetViewSet(SnippetViewSet):
-    model = CarouselImage
-    icon = "image"
-    add_to_admin_menu = True
-    menu_label = "Carousel Images"
-    menu_icon = "image"
-    menu_order = 400
-    list_display = ["parent_pg", "carousel_title", "carousel_image"]
-    search_fields = ("parent_pg", "carousel_title", "carousel_image")
-
-    panels = [
-        FieldPanel("parent_pg"),
-        FieldPanel("carousel_title"),
-        FieldPanel("carousel_image"),
-    ]
+from .models import MenuLink, SiteVariables
 
 
 class MenuLinkViewSet(SnippetViewSet):
