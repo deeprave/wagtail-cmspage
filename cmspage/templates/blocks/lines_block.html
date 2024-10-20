@@ -1,0 +1,34 @@
+{% load wagtailcore_tags %}
+<style>
+    .inherit-color {
+        color: inherit !important;
+        background-color: inherit !important;
+    }
+</style>
+{% if self.dropdown %}{# aka accordion #}
+  <div class="row accordion {{ self.inset }} {{ self.palette }}" id="{{ uid }}">
+    {% if self.subtitle %}
+      <div class="col-12 text-center">
+        <h2 class="h2 inner-heading text-center fw-bold">{{ self.subtitle }}</h2>
+      </div>
+    {% endif %}
+    {% for line in self.lines %}
+      <div class="col-12 p-0 accordion-item inherit-color">
+        {% include_block line with counter=forloop.counter|stringformat:"s" number=self.number dropdown=self.dropdown uid=uid %}
+      </div>
+    {% endfor %}
+  </div>
+{% else %}
+<div class="row {{ self.inset }} {{ self.palette }}">
+  {% if self.subtitle %}
+  <div class="col-12 text-center">
+    <h2 class="h1 block-title text-center fw-bold">{{ self.subtitle }}</h2>
+  </div>
+  {% endif %}
+  {% for line in self.lines %}
+    <div class="col-12 p-0">
+    {% include_block line with counter=forloop.counter number=self.number dropdown=self.dropdown uid=self.uid %}
+    </div>
+  {% endfor %}
+</div>
+{% endif %}

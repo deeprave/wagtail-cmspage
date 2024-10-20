@@ -1,0 +1,46 @@
+{% load wagtailcore_tags %}
+{% if dropdown %}
+{% with lineid=uid|add:counter %}
+<div class="accordion-header" id="{{ lineid }}">
+  <button class="accordion-button inherit-color" type="button" data-bs-toggle="collapse" data-bs-target="#{{ lineid }}-collapse"
+          aria-expanded="{% if counter == "1" %}true{% else %}false{% endif %}" aria-controls="{{ lineid }}-collapse">
+  {% if number %}
+    <span class="col-1 text-center">
+      <span class="d-inline-block block-text-large text-end">{{ counter }}</span>
+    </span>
+  {% endif %}
+    <span class="col-auto fw-bold block-text-large text-start">
+      <span class="h4 block-text-large">{{ self.heading }}</span>
+    </span>
+  </button>
+</div>
+{% if self.content %}
+  <div id="{{ lineid }}-collapse" class="row accordion-collapse collapse {% if counter == "1" %}show {% endif %}text-start"
+       aria-labelledby="{{ lineid }}" data-bs-parent="#{{ uid }}">
+    <div class="row accordion-body">
+      <div class="col {% if number %}offset-1 {% endif %}block-text">
+        <p>{{ self.content|richtext }}</p>
+      </div>
+    </div>
+  </div>
+{% endif %}
+{% endwith %}
+{% else %}
+  <div class="row">
+    {% if number %}
+    <div class="col-1 text-center">
+      <div class="block-text-large text-end">{{ counter }}</div>
+    </div>
+    {% endif %}
+    <div class="col-auto fw-bold block-text-large text-start">
+      <div class="h4 block-text-large">{{ self.heading }}</div>
+    </div>
+  </div>
+  {% if self.content %}
+  <div class="row text-start">
+    <div class="col {% if number %}offset-1 {% endif %}block-text">
+      <p>{{ self.content|richtext }}</p>
+    </div>
+  </div>
+{% endif %}
+{% endif %}

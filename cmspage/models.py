@@ -429,6 +429,7 @@ class CMSPageBase(AbstractCMSPage):
         # utilities
         ("carousel", cmsblocks.CarouselImageBlock()),
         ("new_section", cmsblocks.NewSectionBlock()),
+        ("lines", cmsblocks.LinesBlock()),
     ]
 
     body = StreamField(body_blocks, blank=True, null=True)
