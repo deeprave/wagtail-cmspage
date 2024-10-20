@@ -8,7 +8,6 @@ from wagtail import blocks
 from wagtail.blocks import ListBlock
 from wagtail.documents import blocks as document_blocks
 from wagtail.images import blocks as image_blocks
-from wagtail.embeds import blocks as embed_blocks
 from wagtail.contrib.table_block import blocks as table_blocks
 from wagtail.images.blocks import ImageChooserBlock
 
@@ -24,8 +23,10 @@ __all__ = (
     "RichTextWithTitleBlock",
     "LargeImageBlock",
     "HeroImageBlock",
+    "AbstractLinesBlock",
+    "LinesBlock",
+    "LineItemBlock",
     "NewSectionBlock",
-    "VideoBlock",
     "BackgroundBlock",
 )
 
@@ -299,7 +300,7 @@ class CallToActionBlock(blocks.StructBlock):
 
     class Meta:
         template = "blocks/call_to_action_block.html"
-        icon = "plus"
+        icon = "warning"
         label = "Call to Action"
 
 
@@ -321,38 +322,6 @@ class RichTextWithTitleBlock(blocks.StructBlock):
         template = "blocks/simple_richtext_block.html"
         label = "RichText with Title"
         icon = "doc-empty-inverse"
-
-
-class VideoBlock(blocks.StructBlock):
-    bg = BackgroundBlock()
-    inset = blocks.ChoiceBlock(
-        choices=Insets.choices, default=Insets.SMALL, help_text="Padding around the block"
-    )
-    title = blocks.CharBlock(
-        required=False,
-        blank=True,
-        null=True,
-        max_length=60,
-        help_text="Max length of 60 characters, optional",
-    )
-    video = embed_blocks.EmbedBlock(max_width=1200, help_text="Video URL")
-    text = blocks.RichTextBlock(
-        required=False,
-        blank=True,
-        features=DEFAULT_RICHTEXTBLOCK_FEATURES,
-        help_text="Call to action text, optional (max=200)",
-    )
-
-    def get_context(self, value, parent_context=None):
-        context = super().get_context(value, parent_context)
-        context["video_class"] = "img-fluid"
-        return context
-
-    class Meta:
-        template = "blocks/video_block.html"
-        icon = "media"
-        label = "Embed Video"
-
 
 class HeroImageBlock(blocks.StructBlock):
     bg = BackgroundBlock()
@@ -384,7 +353,7 @@ class NewSectionBlock(blocks.StructBlock):
 
     class Meta:
         template = "blocks/new_section.html"
-        icon = "horizontalrule"
+        icon = "collapse-down"
         label = "Vertical space"
 
 
@@ -439,3 +408,42 @@ class CarouselImageBlock(blocks.StructBlock):
         template = "blocks/carousel_block.html"
         icon = "image"
         label = "Carousel"
+
+
+class LineItemBlock(blocks.StructBlock):
+    heading = blocks.CharBlock(required=True, max_length=120, help_text="Line text (max len=120)")
+    content = blocks.RichTextBlock(required=False, features=DEFAULT_RICHTEXTBLOCK_FEATURES, help_text="Dropdown text block, optional")
+
+    class Meta:
+        template = "blocks/lineitem_block.html"
+        icon = "arrow-down"
+        label = "Line Content"
+
+
+class AbstractLinesBlock(blocks.StructBlock):
+    palette = blocks.ChoiceBlock(
+        choices=Palette.choices, default=Palette.WARNING, help_text="LineBlock palette"
+    )
+    inset = blocks.ChoiceBlock(
+        choices=Insets.choices, default=Insets.SMALL, help_text="Padding around the block"
+    )
+    subtitle = blocks.CharBlock(required=False, help_text="Lines Title (optional)")
+    number = blocks.BooleanBlock(required=False, default=False, help_text="Add number to lines")
+    dropdown = blocks.BooleanBlock(required=False, default=False, help_text="Dropdown text (accordian)")
+
+    def get_context(self, value, parent_context=None):
+        context = super().get_context(value, parent_context)
+        context["uid"] = f"{id(self)}L"
+        return context
+
+    class Meta:
+        abstract = True
+
+
+class LinesBlock(AbstractLinesBlock):
+    lines = blocks.ListBlock(LineItemBlock())
+
+    class Meta:
+        template = "blocks/lines_block.html"
+        icon = "bars"
+        label = "List of Lines"
