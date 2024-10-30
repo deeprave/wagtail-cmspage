@@ -250,11 +250,17 @@ class ImageAndTextMixin:
         blank=True,
         required=False,
         features=DEFAULT_RICHTEXTBLOCK_FEATURES,
-        help_text="Description for this item",
     )
 
 class SmallImageAndTextBlock(ImageAndTextMixin, blocks.StructBlock):
-    image_alignment = RadioSelectBlock(...)
+    image_alignment = RadioSelectBlock(
+        choices=(
+            ("left", "Image to the left"),
+            ("right", "Image to the right"),
+        ),
+        default="left",
+        help_text="Image left - text right, or image right - text left.",
+    )
 
     class Meta:
         template = "blocks/small_image_and_text_block.html"
@@ -263,8 +269,16 @@ class SmallImageAndTextBlock(ImageAndTextMixin, blocks.StructBlock):
 
 
 class ImageAndTextBlock(ImageAndTextMixin, blocks.StructBlock):
-    overlay = blocks.BooleanBlock(...)
-    link = LinkBlock(...)
+    image_alignment = RadioSelectBlock(
+        choices=(
+            ("full", "Full width centered"),
+            ("left", "Image to the left"),
+            ("right", "Image to the right"),
+        ),
+        default="full",
+        help_text="Full image - text below, Image left - text right, or image right - text left.",
+    )
+    overlay = blocks.BooleanBlock(default=False, required=False, blank=True, help_text="Overlay text on image")
 
     class Meta:
         template = "blocks/image_and_text_block.html"
