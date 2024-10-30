@@ -2,7 +2,6 @@
 
 from django import forms
 from django.core.exceptions import ValidationError
-from django.db import models
 from django.forms.utils import ErrorList
 from wagtail import blocks
 from wagtail.blocks import ListBlock
@@ -11,34 +10,45 @@ from wagtail.images import blocks as image_blocks
 from wagtail.contrib.table_block import blocks as table_blocks
 from wagtail.images.blocks import ImageChooserBlock
 
-from .themes import Backgrounds, Palette, Opacities
+from .themes import Backgrounds, Palette, Opacities, Heights, Insets, SocialIcon
 
 __all__ = (
-    "LinkBlock",
-    "CardsBlock",
-    "RadioSelectBlock",
-    "ImageAndTextBlock",
-    "CallToActionBlock",
-    "CustomTableBlock",
-    "RichTextWithTitleBlock",
-    "LargeImageBlock",
-    "HeroImageBlock",
     "AbstractLinesBlock",
-    "LinesBlock",
-    "LineItemBlock",
-    "NewSectionBlock",
     "BackgroundBlock",
+    "CallToActionBlock",
+    "CardsBlock",
+    "CarouselImageBlock",
+    "CarouselImageStructBlock",
+    "CopyrightBlock",
+    "CustomTableBlock",
+    "HeroImageBlock",
+    "ImageAndTextBlock",
+    "LargeImageBlock",
+    "LineItemBlock",
+    "LinesBlock",
+    "LinkBlock",
+    "LinksBlock",
+    "NewSectionBlock",
+    "RadioSelectBlock",
+    "RichTextWithTitleBlock",
+    "SmallImageAndTextBlock",
+    "SocialLinkBlock",
+    "SocialsBlock",
+    "TitleBlock",
 )
 
 DEFAULT_RICHTEXTBLOCK_FEATURES = [
     "h2",
     "h3",
     "h4",
+    "h5",
+    "h6",
     "bold",
     "italic",
     "ol",
     "ul",
     "hr",
+    "link",
     "document-link",
     "image",
     "embed",
@@ -58,34 +68,9 @@ class BackgroundBlock(blocks.StructBlock):
     opacity = blocks.ChoiceBlock(
         choices=Opacities.choices, default=Opacities.OPACITY_FULL, help_text="Background opacity"
     )
-
-class Heights(models.TextChoices):
-    SMALLEST = "height-0", "None"
-    SMALL = "height-1 py-1", "Small"
-    MEDIUM = "height-2 py-2", "Medium"
-    LARGE = "height-3 py-3", "Large"
-    LARGER = "height-4 py-4", "Larger"
-    LARGEST = "height-5 py-5", "Largest"
-
-
-class Insets(models.TextChoices):
-    SMALLEST = "p-0", "None"
-    SMALL = "p-1", "Small"
-    MEDIUM = "p-2", "Medium"
-    LARGE = "p-3", "Large"
-    LARGER = "p-4", "Larger"
-    LARGEST = "p-5", "Largest"
-
-
-class Meta:
-    label = "Background"
-    form_template = "blocks/background_block.html"
-
     class Meta:
         label = "Background"
-        template = "blocks/background_block.html"
-        form_template = "blocks/background_block_form.html"
-        form_classname = "struct-block"
+        form_template = "blocks/background_block.html"
 
 
 class TitleBlock(blocks.StructBlock):
@@ -170,6 +155,29 @@ class LinkBlock(blocks.StructBlock):
 
     class Meta:
         value_class = LinkValue
+
+
+class LinksBlock(blocks.StructBlock):
+    palette = blocks.ChoiceBlock(
+        choices=Palette.choices, default=Palette.WARNING, help_text="Cards palette"
+    )
+    inset = blocks.ChoiceBlock(
+        choices=Insets.choices, default=Insets.SMALL, help_text="Padding around the block"
+    )
+    title = blocks.CharBlock(
+        required=False,
+        blank=True,
+        null=True,
+        max_length=255,
+        label="links Title",
+        help_text="Bold title text for this set of links (len=255)",
+    )
+    links = blocks.ListBlock(LinkBlock())
+
+    class Meta:
+        template = "blocks/links_block.html"
+        icon = "link"
+        label = "Set of Links"
 
 
 class Card(blocks.StructBlock):
@@ -274,6 +282,40 @@ class ImageAndTextBlock(blocks.StructBlock):
         icon = "image"
         label = "Image & Text"
 
+class SmallImageAndTextBlock(blocks.StructBlock):
+    palette = blocks.ChoiceBlock(
+        choices=Palette.choices, default=Palette.WARNING, help_text="CTA palette"
+    )
+    inset = blocks.ChoiceBlock(
+        choices=Insets.choices, default=Insets.SMALL, help_text="Padding around the block"
+    )
+    image = image_blocks.ImageChooserBlock(blank=True, null=True)
+    image_alignment = RadioSelectBlock(
+        choices=(
+            ("left", "Image to the left"),
+            ("right", "Image to the right"),
+        ),
+        default="left",
+        help_text="Image left - text right, or image right - text left.",
+    )
+    title = blocks.CharBlock(
+        required=False,
+        blank=True,
+        null=True,
+        max_length=60,
+        help_text="Max length of 60 characters.",
+    )
+    text = blocks.RichTextBlock(
+        blank=True,
+        required=False,
+        features=DEFAULT_RICHTEXTBLOCK_FEATURES,
+        help_text="Description for this item",
+    )
+
+    class Meta:
+        template = "blocks/small_image_and_text_block.html"
+        icon = "image"
+        label = "Image & Text"
 
 class CallToActionBlock(blocks.StructBlock):
     bg = BackgroundBlock()
@@ -447,3 +489,58 @@ class LinesBlock(AbstractLinesBlock):
         template = "blocks/lines_block.html"
         icon = "bars"
         label = "List of Lines"
+
+
+class CopyrightBlock(blocks.StructBlock):
+    palette = blocks.ChoiceBlock(
+        choices=Palette.choices, default=Palette.WARNING, help_text="LineBlock palette"
+    )
+    inset = blocks.ChoiceBlock(
+        choices=Insets.choices, default=Insets.SMALL, help_text="Padding around the block"
+    )
+    copyright = blocks.CharBlock(required=True, help_text="Copyright notice to display in the footer")
+
+    def clean(self, value):
+        cr = value.get("copyright")
+        if "(c)" in cr:
+            cr.replace("(c)", "©")
+        value["copyright"] = cr
+        return super().clean(value)
+
+    class Meta:
+        template = "blocks/copyright_block.html"
+        icon = "success"
+        label = "Copyright Notice"
+
+
+URI_PATTERN = (
+    r"^(?:[a-zA-Z][a-zA-Z0-9+.-]*:/{0,3}[a-zA-Z0-9.-]+(?:/?|[/?]\S*)"
+    r"|mailto:[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,})$"
+)
+
+class SocialLinkBlock(blocks.StructBlock):
+    name = blocks.CharBlock(required=True, max_length=120, help_text="Social media name")
+    url = blocks.RegexBlock(URI_PATTERN, required=True, help_text="Social media URL")
+    icon = blocks.ChoiceBlock(
+        choices=SocialIcon.choices, default=SocialIcon.EMAIL, help_text="Social media icon"
+    )
+
+    class Meta:
+        template = "blocks/social_link_block.html"
+        icon = "link"
+        label = "Social Link"
+
+
+class SocialsBlock(blocks.StructBlock):
+    palette = blocks.ChoiceBlock(
+        choices=Palette.choices, default=Palette.WARNING, help_text="LineBlock palette"
+    )
+    inset = blocks.ChoiceBlock(
+        choices=Insets.choices, default=Insets.SMALL, help_text="Padding around the block"
+    )
+    links = blocks.ListBlock(SocialLinkBlock())
+
+    class Meta:
+        template = "blocks/socials_block.html"
+        icon = "site"
+        label = "Social Links"

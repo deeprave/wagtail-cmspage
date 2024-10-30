@@ -282,3 +282,14 @@
 .title-text-light {
   color: var(--heading-color);
 }
+
+.social-icon {
+  display: flex;
+  justify-content: center;
+  height: 2.5em;
+
+  svg {
+    height: 100%;
+    width: auto;
+  }
+}

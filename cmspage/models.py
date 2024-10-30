@@ -26,6 +26,7 @@ __all__ = (
     "CMSPage",
     "CMSPageBase",
     "CMSHomePage",
+    "CMSFooterPage",
     "SiteVariables",
     "MenuLink",
     "MenuLinkManager",
@@ -434,6 +435,11 @@ class CMSPageBase(AbstractCMSPage):
 
     body = StreamField(body_blocks, blank=True, null=True)
 
+    def get_context(self, request, *args, **kwargs):
+        context = super().get_context(request, *args, **kwargs)
+        context["page_footer"] = CMSFooterPage.objects.first()
+        return context
+
     class Meta:
         abstract = True
 
@@ -453,10 +459,31 @@ class CMSPage(CMSPageBase):
         verbose_name_plural = "CMS Pages"
 
 
+class CMSFooterPage(AbstractCMSPage):
+    page_description = "This page type is for the site footer."
+    max_count = 1
+
+    footer_blocks = [
+        ("info", cmsblocks.SmallImageAndTextBlock()),
+        ("copy", cmsblocks.CopyrightBlock(label="Copyright", classnames="text-center text-muted text-small")),
+        ("links", cmsblocks.LinksBlock()),
+        ("social", cmsblocks.SocialsBlock()),
+    ]
+    footer = StreamField(footer_blocks, blank=False, null=False)
+
+    content_panels = AbstractCMSPage.content_panels + [
+        FieldPanel("footer"),
+    ]
+
+    class Meta:
+        verbose_name = "CMS Footer Page"
+        verbose_name_plural = "CMS Footer Pages"
+
+
 class CMSHomePage(CMSPageBase):
     page_description = "This page type is only for a site home page."
     parent_page_types = ["wagtailcore.Page"]
-    subpage_types = ["cmspage.CMSPage", "wagtailcore.Page"]
+    subpage_types = ["cmspage.CMSPage", "wagtailcore.Page", "cmspage.CMSFooterPage"]
     max_count = 1
 
     body_blocks = [
