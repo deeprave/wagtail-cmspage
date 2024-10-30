@@ -22,7 +22,6 @@ __all__ = (
     "CopyrightBlock",
     "CustomTableBlock",
     "HeroImageBlock",
-    "ImageAndTextBlock",
     "LargeImageBlock",
     "LineItemBlock",
     "LinesBlock",
@@ -31,6 +30,7 @@ __all__ = (
     "NewSectionBlock",
     "RadioSelectBlock",
     "RichTextWithTitleBlock",
+    "ImageAndTextBlock",
     "SmallImageAndTextBlock",
     "SocialLinkBlock",
     "SocialsBlock",
@@ -78,7 +78,7 @@ class TitleBlock(blocks.StructBlock):
     inset = blocks.ChoiceBlock(
         choices=Insets.choices, default=Insets.SMALL, help_text="Padding around the block"
     )
-    text = blocks.CharBlock(required=True, help_text="Title text to display")
+    text = blocks.CharBlock(help_text="Title text to display")
 
     class Meta:
         template = "blocks/title_block.html"
@@ -237,52 +237,7 @@ class RadioSelectBlock(blocks.ChoiceBlock):
         self.field.widget = forms.RadioSelect(choices=self.field.widget.choices)
 
 
-class ImageAndTextBlock(blocks.StructBlock):
-    bg = BackgroundBlock()
-    inset = blocks.ChoiceBlock(
-        choices=Insets.choices, default=Insets.SMALL, help_text="Padding around the block"
-    )
-    image = image_blocks.ImageChooserBlock(blank=True, null=True)
-    image_alignment = RadioSelectBlock(
-        choices=(
-            ("full", "Full width centered"),
-            ("left", "Image to the left"),
-            ("right", "Image to the right"),
-        ),
-        default="full",
-        help_text="Full image - text below, Image left - text right, or image right - text left.",
-    )
-    image_size = RadioSelectBlock(
-        choices=(
-            ("standard", "Standard 786x552"),
-            ("landscape", "Landscape 786x1104"),
-            ("portrait", "Portrait 786x300"),
-        ),
-        default="standard",
-        help_text="Layout - match with picture dimensions",
-    )
-    title = blocks.CharBlock(
-        required=False,
-        blank=True,
-        null=True,
-        max_length=60,
-        help_text="Max length of 60 characters.",
-    )
-    text = blocks.RichTextBlock(
-        blank=True,
-        required=False,
-        features=DEFAULT_RICHTEXTBLOCK_FEATURES,
-        help_text="Description for this item",
-    )
-    overlay = blocks.BooleanBlock(default=False, required=False, blank=True, help_text="Overlay text on image")
-    link = LinkBlock(required=False, blank=True, null=True)
-
-    class Meta:
-        template = "blocks/image_and_text_block.html"
-        icon = "image"
-        label = "Image & Text"
-
-class SmallImageAndTextBlock(blocks.StructBlock):
+class ImageAndTextMixin:
     palette = blocks.ChoiceBlock(
         choices=Palette.choices, default=Palette.WARNING, help_text="CTA palette"
     )
@@ -290,21 +245,7 @@ class SmallImageAndTextBlock(blocks.StructBlock):
         choices=Insets.choices, default=Insets.SMALL, help_text="Padding around the block"
     )
     image = image_blocks.ImageChooserBlock(blank=True, null=True)
-    image_alignment = RadioSelectBlock(
-        choices=(
-            ("left", "Image to the left"),
-            ("right", "Image to the right"),
-        ),
-        default="left",
-        help_text="Image left - text right, or image right - text left.",
-    )
-    title = blocks.CharBlock(
-        required=False,
-        blank=True,
-        null=True,
-        max_length=60,
-        help_text="Max length of 60 characters.",
-    )
+    title = blocks.CharBlock(max_length=60, required=False, blank=True, null=True)
     text = blocks.RichTextBlock(
         blank=True,
         required=False,
@@ -312,10 +253,24 @@ class SmallImageAndTextBlock(blocks.StructBlock):
         help_text="Description for this item",
     )
 
+class SmallImageAndTextBlock(ImageAndTextMixin, blocks.StructBlock):
+    image_alignment = RadioSelectBlock(...)
+
     class Meta:
         template = "blocks/small_image_and_text_block.html"
         icon = "image"
         label = "Image & Text"
+
+
+class ImageAndTextBlock(ImageAndTextMixin, blocks.StructBlock):
+    overlay = blocks.BooleanBlock(...)
+    link = LinkBlock(...)
+
+    class Meta:
+        template = "blocks/image_and_text_block.html"
+        icon = "image"
+        label = "Image & Text"
+
 
 class CallToActionBlock(blocks.StructBlock):
     bg = BackgroundBlock()
@@ -422,7 +377,6 @@ class CarouselImageStructBlock(blocks.StructBlock):
         carousel_title (CharField): The display title of the image.
         carousel_content (RichTextField): Rich text content.
         carousel_attribution (CharField): Attribution of the image.
-        carousel_interval (IntegerField): The interval of time the image is visible in milliseconds.
 
     Methods:
         None
@@ -432,7 +386,7 @@ class CarouselImageStructBlock(blocks.StructBlock):
     RICHTEXTBLOCK_FEATURES = ["bold", "italic", "ol", "ul", "usefont"]
 
     # noinspection PyUnresolvedReferences
-    carousel_image = ImageChooserBlock(required=True)
+    carousel_image = ImageChooserBlock()
     carousel_title = blocks.CharBlock(required=False, max_length=120, help_text="Display title, optional (max len=120)")
     carousel_content = blocks.RichTextBlock(required=False, features=RICHTEXTBLOCK_FEATURES, max_length=256, help_text="Short description")
     carousel_attribution = blocks.CharBlock(required=False, max_length=80, help_text="Attribution, optional (max len=80)")
@@ -443,7 +397,7 @@ class CarouselImageBlock(blocks.StructBlock):
     inset = blocks.ChoiceBlock(
         choices=Insets.choices, default=Insets.SMALL, help_text="Padding around the block"
     )
-    carousel_interval = blocks.IntegerBlock(required=True, default=12000, help_text="Keep visible for time in milliseconds",)
+    carousel_interval = blocks.IntegerBlock(default=12000, help_text="Keep visible for time in milliseconds",)
     carousel = ListBlock(CarouselImageStructBlock())
 
     class Meta:
@@ -453,11 +407,11 @@ class CarouselImageBlock(blocks.StructBlock):
 
 
 class LineItemBlock(blocks.StructBlock):
-    heading = blocks.CharBlock(required=True, max_length=120, help_text="Line text (max len=120)")
+    heading = blocks.CharBlock(max_length=120, help_text="Line text (max len=120)")
     content = blocks.RichTextBlock(required=False, features=DEFAULT_RICHTEXTBLOCK_FEATURES, help_text="Dropdown text block, optional")
 
     class Meta:
-        template = "blocks/lineitem_block.html"
+        template = "blocks/ålineitem_block.html"
         icon = "arrow-down"
         label = "Line Content"
 
@@ -498,7 +452,7 @@ class CopyrightBlock(blocks.StructBlock):
     inset = blocks.ChoiceBlock(
         choices=Insets.choices, default=Insets.SMALL, help_text="Padding around the block"
     )
-    copyright = blocks.CharBlock(required=True, help_text="Copyright notice to display in the footer")
+    copyright = blocks.CharBlock(help_text="Copyright notice to display in the footer")
 
     def clean(self, value):
         cr = value.get("copyright")
@@ -519,8 +473,8 @@ URI_PATTERN = (
 )
 
 class SocialLinkBlock(blocks.StructBlock):
-    name = blocks.CharBlock(required=True, max_length=120, help_text="Social media name")
-    url = blocks.RegexBlock(URI_PATTERN, required=True, help_text="Social media URL")
+    name = blocks.CharBlock(max_length=120, help_text="Social media name")
+    url = blocks.RegexBlock(URI_PATTERN, help_text="Social media URL")
     icon = blocks.ChoiceBlock(
         choices=SocialIcon.choices, default=SocialIcon.EMAIL, help_text="Social media icon"
     )
