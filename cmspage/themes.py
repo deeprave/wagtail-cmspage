@@ -41,3 +41,48 @@ class Opacities(models.TextChoices):
     OPACITY_50 = "bg-opacity-50", "50%"
     OPACITY_25 = "bg-opacity-25", "25%"
     OPACITY_10 = "bg-opacity-10", "10%"
+
+
+class Heights(models.TextChoices):
+    SMALLEST = "height-0", "None"
+    SMALL = "height-1 py-1", "Small"
+    MEDIUM = "height-2 py-2", "Medium"
+    LARGE = "height-3 py-3", "Large"
+    LARGER = "height-4 py-4", "Larger"
+    LARGEST = "height-5 py-5", "Largest"
+
+
+class Insets(models.TextChoices):
+    SMALLEST = "p-0", "None"
+    SMALL = "p-1", "Small"
+    MEDIUM = "p-2", "Medium"
+    LARGE = "p-3", "Large"
+    LARGER = "p-4", "Larger"
+    LARGEST = "p-5", "Largest"
+
+
+class SocialIcon(models.TextChoices):
+    DISCORD = "discord", "Discord"
+    EMAIL = "envelope", "Email"
+    FACEBOOK = "facebook", "Facebook"
+    GITHUB = "github", "GitHub"
+    INSTAGRAM = "instagram", "Instagram"
+    LINKEDIN = "linkedin", "LinkedIn"
+    MEDIUM = "medium", "Medium"
+    MESSENGER = "facebook-messenger", "Messenger"
+    PINTEREST = "pinterest", "Pinterest"
+    REDDIT = "reddit", "Reddit"
+    RSS = "rss", "RSS"
+    SKYPE = "skype", "Skype"
+    SLACK = "slack", "Slack"
+    SNAPCHAT = "snapchat", "Snapchat"
+    TELEGRAM = "telegram", "Telegram"
+    TIKTOK = "tiktok", "TikTok"
+    TUMBLR = "tumblr", "Tumblr"
+    TWITCH = "twitch", "Twitch"
+    TWITTER = "twitter", "Twitter"
+    VIMEO = "vimeo", "Vimeo"
+    WHATSAPP = "whatsapp", "WhatsApp"
+    X = "X", "X"
+    YOUTUBE = "youtube", "YouTube"
+    ZOOM = "zoom", "Zoom"
