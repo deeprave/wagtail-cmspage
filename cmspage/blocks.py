@@ -3,12 +3,15 @@
 from django import forms
 from django.core.exceptions import ValidationError
 from django.forms.utils import ErrorList
+from django.utils.functional import cached_property
 from wagtail import blocks
 from wagtail.blocks import ListBlock
+from wagtail.blocks.struct_block import StructBlockAdapter
 from wagtail.documents import blocks as document_blocks
 from wagtail.images import blocks as image_blocks
 from wagtail.contrib.table_block import blocks as table_blocks
 from wagtail.images.blocks import ImageChooserBlock
+from wagtail.telepath import register
 
 from .themes import Backgrounds, Palette, Opacities, Heights, Insets, SocialIcon
 
@@ -237,7 +240,7 @@ class RadioSelectBlock(blocks.ChoiceBlock):
         self.field.widget = forms.RadioSelect(choices=self.field.widget.choices)
 
 
-class ImageAndTextMixin:
+class SmallImageAndTextBlock(blocks.StructBlock):
     palette = blocks.ChoiceBlock(
         choices=Palette.choices, default=Palette.WARNING, help_text="CTA palette"
     )
@@ -251,8 +254,6 @@ class ImageAndTextMixin:
         required=False,
         features=DEFAULT_RICHTEXTBLOCK_FEATURES,
     )
-
-class SmallImageAndTextBlock(ImageAndTextMixin, blocks.StructBlock):
     image_alignment = RadioSelectBlock(
         choices=(
             ("left", "Image to the left"),
@@ -268,7 +269,20 @@ class SmallImageAndTextBlock(ImageAndTextMixin, blocks.StructBlock):
         label = "Image & Text"
 
 
-class ImageAndTextBlock(ImageAndTextMixin, blocks.StructBlock):
+class ImageAndTextBlock(blocks.StructBlock):
+    palette = blocks.ChoiceBlock(
+        choices=Palette.choices, default=Palette.WARNING, help_text="CTA palette"
+    )
+    inset = blocks.ChoiceBlock(
+        choices=Insets.choices, default=Insets.SMALL, help_text="Padding around the block"
+    )
+    image = image_blocks.ImageChooserBlock(blank=True, null=True)
+    title = blocks.CharBlock(max_length=60, required=False, blank=True, null=True)
+    text = blocks.RichTextBlock(
+        blank=True,
+        required=False,
+        features=DEFAULT_RICHTEXTBLOCK_FEATURES,
+    )
     image_alignment = RadioSelectBlock(
         choices=(
             ("full", "Full width centered"),
@@ -487,16 +501,29 @@ URI_PATTERN = (
 )
 
 class SocialLinkBlock(blocks.StructBlock):
-    name = blocks.CharBlock(max_length=120, help_text="Social media name")
-    url = blocks.RegexBlock(URI_PATTERN, help_text="Social media URL")
     icon = blocks.ChoiceBlock(
         choices=SocialIcon.choices, default=SocialIcon.EMAIL, help_text="Social media icon"
     )
+    name = blocks.CharBlock(max_length=120, help_text="Social media name")
+    url = blocks.RegexBlock(URI_PATTERN, help_text="Social media URL")
 
     class Meta:
         template = "blocks/social_link_block.html"
         icon = "link"
         label = "Social Link"
+
+class SocialLinkBlockAdapter(StructBlockAdapter):
+    js_constructor = "cmspage.blocks.SocialLinkBlock"
+
+    @cached_property
+    def media(self):
+        structblock_media = super().media
+        return forms.Media(
+            js=structblock_media._js + ["js/social-link-block.js"],
+            css=structblock_media._css,
+        )
+
+register(SocialLinkBlockAdapter(), SocialLinkBlock)
 
 
 class SocialsBlock(blocks.StructBlock):

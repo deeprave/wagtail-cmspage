@@ -2,14 +2,16 @@
 
 <div class="row {{ value.inset }} {{ value.palette }} justify-content-center align-items-center">
   {% for social in value.links %}
+    {% if social.url %}
     <div class="col-auto text-center">
-      {% if social.url %}<a href="{{ social.url }}" title="{{ social.name }}" class="text-decoration-none text-reset" target="_blank">{% endif %}
+      <a href="{{ social.url }}" title="{{ social.name }}" class="text-decoration-none text-reset" target="_blank">
       <div class="social-icon">
         {% with social_icon="cmspage/icons/social/"|add:social.icon|add:".svg" %}
         {% include social_icon %}
         {% endwith %}
       </div>
-      {% if social.url %}</a>{% endif %}
+      </a>
     </div>
+    {% endif %}
   {% endfor %}
 </div>
