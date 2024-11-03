@@ -4,6 +4,14 @@
 
 from django.db import models
 
+__all__ = (
+    "Backgrounds",
+    "Palette",
+    "Opacities",
+    "Heights",
+    "Insets",
+    "SocialIcon",
+)
 
 class Backgrounds(models.TextChoices):
     NONE = "bg-transparent", "Transparent"
@@ -29,6 +37,7 @@ class Palette(models.TextChoices):
     BLACK = "bg-black text-white title-light", "White on Black Background"
     PRIMARY = "bg-primary text-dark title-dark", "Dark on Primary Background"
     SECONDARY = "bg-secondary text-dark title-dark", "Dark on Secondary Background"
+    TERTIARY = "bg-tertiary text-dark title-dark", "Dark on Tertiary Background"
     SUCCESS = "bg-success-subtle text-dark title-dark", "Dark on Success Background"
     WARNING = "bg-warning-subtle text-dark title-dark", "Dark on Warning Background"
     INFO = "bg-info-subtle text-dark title-dark", "Dark on Info Background"
@@ -86,3 +95,21 @@ class SocialIcon(models.TextChoices):
     X = "X", "X"
     YOUTUBE = "youtube", "YouTube"
     ZOOM = "zoom", "Zoom"
+
+
+class IconColorChoices(models.TextChoices):
+    BODY = "text-body", "Normal"
+    WHITE = "text-white", "White"
+    BLACK = "text-black", "Dark"
+    PRIMARY = "text-primary", "Primary"
+    SECONDARY = "text-secondary", "Secondary"
+    TERTIARY = "text-tertiary", "Tertiary"
+    SUCCESS = "text-success", "Success"
+    WARNING = "text-warning", "Warning"
+    INFO = "text-info", "Info"
+    DANGER = "text-danger", "Danger"
+    LIGHT = "text-light", "Light"
+    DARK = "text-dark", "Dark"
+    MUTED = "text-muted", "Muted"
+    BLACK50 = "text-black-50", "Black 50% opacity"
+    WHITE50 = "text-white-50", "White 50% opacity"
