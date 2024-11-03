@@ -297,9 +297,9 @@
 
 .main-panel {
   display: flex;
-    flex-direction: column;
-    justify-content: start;
-    @media (min-width: $breakpoint-md) {
-      min-height: 25rem;
-    }
+  flex-direction: column;
+  justify-content: start;
+  @media (min-width: $breakpoint-md) {
+    min-height: 25rem;
+  }
 }
