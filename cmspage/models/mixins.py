@@ -10,6 +10,7 @@ from django.template import engines, TemplateDoesNotExist
 
 from .functional import conditional_lru_cache, conditional_cached_property
 
+# Django settings names
 CMSPAGE_TEMPLATE_STYLES = "CMSPAGE_TEMPLATE_STYLES"
 CMSPAGE_TEMPLATE_BASE = "CMSPAGE_TEMPLATE_BASE"
 CMSPAGE_TEMPLATE_BASE_DIR = "CMSPAGE_TEMPLATE_BASE_DIR"
@@ -17,6 +18,7 @@ CMSPAGE_TEMPLATE_INCLUDE_DIR = "CMSPAGE_TEMPLATE_INCLUDE_DIR"
 CMSPAGE_TEMPLATE_INCLUDE_FILES = "CMSPAGE_TEMPLATE_INCLUDE_FILES"
 CMSPAGE_TEMPLATE_INCLUDE_FILES_EXTRA = "CMSPAGE_TEMPLATE_INCLUDE_FILES_EXTRA"
 
+# Default settings
 DEFAULT_TEMPLATE_EXTENSIONS = [".html", ".htm"]
 DEFAULT_BASE_TEMPLATE_NAME = "cmspage.html"
 DEFAULT_TEMPLATE_INCLUDE_NAMES = [
@@ -38,7 +40,7 @@ DEFAULT_TEMPLATE_INCLUDE_NAMES = [
     "contact",
     "media",
 ]
-
+# optional logging (for development)
 _logger = logging.getLogger("cmspage")
 
 

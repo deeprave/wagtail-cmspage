@@ -271,6 +271,11 @@
   line-height: 1.2em;
 }
 
+.block-title {
+  font-size: 4.0rem;
+  color: var(--heading-color);
+}
+
 .block-text, .card-text {
   line-height: 1.2em;
 }
@@ -302,4 +307,17 @@
   @media (min-width: $breakpoint-md) {
     min-height: 25rem;
   }
+}
+
+.bg-tertiary {
+  background-color: #{$tertiary};
+}
+
+.text-tertiary {
+  --bs-text-opacity: 1;
+  color: rgba(var(--bs-tertiary-color-rgb), var(--bs-text-opacity)) !important;
+}
+
+.text-tertiary-emphasis {
+  color: var(--bs-tertiary-text-emphasis) !important;
 }

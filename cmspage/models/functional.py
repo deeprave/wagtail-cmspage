@@ -1,6 +1,7 @@
 """
 This module implements conditional versions of lru_cache and Django's cached_property
-decorators. The conditional versions allow the cache to be disabled by setting a flag.
+decorators. The conditional versions allow the cache to be disabled by setting a flag
+that is useful for testing.
 """
 
 from functools import lru_cache

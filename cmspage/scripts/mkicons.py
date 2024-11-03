@@ -4,6 +4,8 @@ Generate a Django model.TextChoices for SVG icons.
 
 This script scans one or more directories for SVG files and creates
 a module containing a Django TextChoices class with entries for each icon.
+
+If using the default output, this must be run from the root of the cmspage app directory.
 """
 
 import sys
@@ -11,7 +13,7 @@ from pathlib import Path
 from typing import List, Set, Generator
 import argparse
 
-OUTFILE_NAME = "choice_icon.py"
+OUTFILE_NAME = "models/choice_icon.py"
 TEMPLATES_PREFIX = "templates/"
 
 

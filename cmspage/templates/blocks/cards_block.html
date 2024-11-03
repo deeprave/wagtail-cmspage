@@ -27,11 +27,10 @@
         {% endif %}
         <div class="px-2 py-1 card-block-text d-flex flex-column text-center flex-grow-1 mt-auto">
           {% if card.text %}
-            <p class="flex-grow-1">{{ card.text|richtext }}</p>
+            <p class="flex-grow-1 richtext">{{ card.text|richtext }}</p>
           {% endif %}
-          <div class="mt-auto text-center text-md-end">
-            {% if card.link.link_url %}
-              <a href="{{ card.link.link_url }}" class="text-decoration-none">
+          {% if card.link.link_url %}
+            <div class="mt-auto text-center text-md-end">
               {% if card.link.link_title == '-' %}
                 <div class="inline-block link-arrow text-dark">{% include "icons/right-pointing-arrow-icon.svg" %}</div>
               {% elif card.link.link_title %}
@@ -40,10 +39,8 @@
                     &#10132;
                   </div>
                 </div>
-              {% endif %}
-              </a>
-            {% endif %}
-          </div>
+            </div>
+          {% endif %}
         </div>
         {% if card.link.link_url %}</a>{% endif %}
       </div>
