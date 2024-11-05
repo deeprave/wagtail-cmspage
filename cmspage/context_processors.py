@@ -3,16 +3,19 @@ import logging
 from typing import List
 
 from django.http import HttpRequest
+from django.contrib.auth import get_user_model
 from wagtail.models import Site
 
 from .models import SiteVariables, MenuLink
 
 __all__ = ("navigation", "site_variables", "cmspage_context")
 
+User = get_user_model()
 logger = logging.getLogger("cmspage.context_processors")
 
 
-def _nav_pages_for_site(site: Site, user_id: int) -> List[dict]:
+def _nav_pages_for_site(site: Site, user: User|None) -> List[dict]:
+    user_id = user.pk if user else 0
     cached_menu_links = MenuLink.get_cached_menu_links(site, user_id)
 
     tree = []
@@ -20,6 +23,8 @@ def _nav_pages_for_site(site: Site, user_id: int) -> List[dict]:
     unlinked = defaultdict(list)
 
     for link in cached_menu_links:
+        if link.staff_only and not (user and user.is_active and (user.is_staff or user.is_superuser)):
+            continue
         node = {
             "id": link.id,
             "title": link.menu_title or link.menu_link_title,
@@ -50,9 +55,9 @@ def _nav_pages_for_site(site: Site, user_id: int) -> List[dict]:
 
 
 def navigation(request: HttpRequest) -> dict:
-    user_id = request.user.id if request.user.is_authenticated else 0
+    user = request.user if request.user.is_authenticated else None
     site: Site = Site.find_for_request(request)
-    return {"navigation": _nav_pages_for_site(site, user_id)}
+    return {"navigation": _nav_pages_for_site(site, user)}
 
 
 def site_variables(request: HttpRequest) -> dict:

@@ -143,6 +143,11 @@ class MenuLink(models.Model):
         blank=True,
         help_text="Specify a theme color for the icon",
     )
+    staff_only = models.BooleanField(
+        "Staff Only",
+        default=False,
+        help_text="Check this box to restrict display to staff users only",
+    )
 
     def menu_site(self, _=None):
         return f"{self.site.site_name}{' (default)' if self.site.is_default_site else ''}"
