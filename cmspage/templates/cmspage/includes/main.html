@@ -1,5 +1,15 @@
 {% load wagtailcore_tags %}
 <div class="col-md-10 main-panel">
+  {% if messages %}
+  <div class="row alerts my-2">
+    <div class="col">
+      {% for message in messages %}
+        <div class="alert {{ message.tags }}" role="alert">
+          {{ message }}
+        </div>
+      {% endfor %}
+    </div>
+  </div>
   {% for block in self.body %}
     {% include_block block %}
   {% endfor %}

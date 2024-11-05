@@ -4,7 +4,7 @@ from django.utils.text import slugify
 from django.http import HttpRequest
 from cmspage.models import CMSPage
 
-from cmspage.functional import set_functional_cache
+from cmspage.models.functional import set_functional_cache
 
 
 @pytest.fixture(scope="session", autouse=True)
