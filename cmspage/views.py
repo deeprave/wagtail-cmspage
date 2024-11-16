@@ -1,7 +1,7 @@
 from wagtail.models import Site
 from wagtail.snippets.views.snippets import SnippetViewSet
 
-from .models import MenuLink, SiteVariables
+from .models import MenuLink
 
 
 class MenuLinkViewSet(SnippetViewSet):
@@ -16,11 +16,3 @@ class MenuLinkViewSet(SnippetViewSet):
     def get_queryset(self, request):
         site = Site.find_for_request(request)
         return MenuLink.objects.get_ordered_queryset(site)
-
-
-class SiteVariablesViewSet(SnippetViewSet):
-    model = SiteVariables
-    menu_label = "Site Variables"
-    menu_icon = "cog"
-    list_display = ("site",)
-    list_filter = ("site",)  # Optional: Filter by site

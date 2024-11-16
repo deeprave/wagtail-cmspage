@@ -1,12 +1,14 @@
 # -*- coding: utf-8 -*-
 
 from django.conf import settings
+from django.contrib.contenttypes.fields import GenericRelation
 from django.core.cache import cache
 from django.core.exceptions import ValidationError
 from django.db import models
 from wagtail.admin.panels import FieldPanel, FieldRowPanel, PageChooserPanel, MultiFieldPanel
 from wagtail.admin.widgets import AdminPageChooser
-from wagtail.models import Site
+from wagtail.models import Site, PreviewableMixin, DraftStateMixin, RevisionMixin
+from wagtail.search.index import Indexed, FilterField, SearchField
 
 from .choice_icon import IconChoices
 from ..blocks import IconColorChoices
@@ -54,7 +56,7 @@ class MenuLinkManager(models.Manager):
         )
 
 
-class MenuLink(models.Model):
+class MenuLink(PreviewableMixin, DraftStateMixin, RevisionMixin, Indexed, models.Model):
     """
     A class that represents a menu link.
     This is a standard django module that can be managed in the admin interface.
@@ -122,7 +124,8 @@ class MenuLink(models.Model):
             "Leave title blank to use this document's title"
         ),
     )
-    link_url = models.URLField(
+    # don't use URLField because it doesn't allow an empty scheme for self-site references
+    link_url = models.CharField(
         "External Link",
         blank=True,
         help_text="Set a custom URL if not linking to a page or document." "Title is required for this link type",
@@ -148,6 +151,28 @@ class MenuLink(models.Model):
         default=False,
         help_text="Check this box to restrict display to staff users only",
     )
+    revisions = GenericRelation("wagtailcore.Revision", related_query_name="menu_links")
+
+    objects = MenuLinkManager()
+
+    def get_preview_context(self, request, mode_name):
+        from cmspage.models import CMSFooterPage
+        return {
+            "level": 0,
+            "navigation": self.get_menu_links(self.site),
+            "page_footer": CMSFooterPage.objects.first(),
+            "include": {
+                "header": "cmspage/includes/header.html",
+                "messages": "cmspage/includes/messages.html",
+                "main": "cmspage/includes/main.html",
+                "footer": "cmspage/includes/footer.html",
+                "navigation": "cmspage/includes/navigation.html",
+                "navigation_item": "cmspage/includes/navigation_item.html",
+            }
+        }
+
+    def get_preview_template(self, request, mode_name):
+        return "preview/menu_link.html"
 
     def menu_site(self, _=None):
         return f"{self.site.site_name}{' (default)' if self.site.is_default_site else ''}"
@@ -183,12 +208,16 @@ class MenuLink(models.Model):
         return self.link_document.url if self.link_document else self.link_url
 
     @classmethod
+    def get_menu_links(cls, site: Site):
+        return list(MenuLink.objects.get_ordered_queryset(site))
+
+    @classmethod
     def get_cached_menu_links(cls, site: Site, user_id: int):
         cache_key = f"menu_links:{site.id}:{user_id}"
         menu_links = cls.cache_enabled and cache.get(cache_key)
         if not menu_links:
-            menu_links = list(MenuLink.objects.get_ordered_queryset(site))
-            cache.set(cache_key, menu_links, 300)
+            menu_links = cls.get_menu_links(site)
+            cache.set(cache_key, menu_links, 1800)
         return menu_links
 
     def clean(self):
@@ -207,12 +236,11 @@ class MenuLink(models.Model):
         elif self.link_url and not self.menu_title:
             raise ValidationError({"link_url": ValidationError(EXTERNAL_URL_REQUIRES_TITLE)})
 
-    objects = MenuLinkManager()
-
     def __str__(self):
         return self.title
 
     class Meta:
+        app_label = "cmspage"
         verbose_name = "Menu Link"
         ordering = ["menu_order", "id"]
 
@@ -233,4 +261,11 @@ class MenuLink(models.Model):
                 FieldRowPanel([FieldPanel("menu_icon"), FieldPanel("menu_icon_color"), FieldPanel("menu_order")]),
             ],
         ),
+    ]
+
+    search_fields = [
+        FilterField("title"),
+        FilterField("parent"),
+        SearchField("title"),
+        SearchField("url"),
     ]

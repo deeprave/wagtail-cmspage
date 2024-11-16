@@ -27,3 +27,6 @@ class CMSPageImage(WagtailImage):
         # Optionally, update the file field to the new WebP path, if required
         self.file.name = f"{os.path.splitext(self.file.name)[0]}.webp"
         super().save(*args, **kwargs)  # Save again to update the file name
+
+    class Meta:
+        app_label = "cmspage"

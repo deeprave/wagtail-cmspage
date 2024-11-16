@@ -1,5 +1,5 @@
 {% load static wagtailadmin_tags %}
-{# include.navigation_item #}
+
 <li class="menu-item">
   <a href="{{ item.url }}" class="menu-link level-{{ level }} align-top">
     {% if item.icon %}
@@ -12,8 +12,10 @@
     {% endif %}
   </a>
   {% if item.children %}
+    {% with next_level=level|add:1 %}
     <ul class="list-unstyled">{% for child in item.children %}
-      {% include include.navigation_item with item=child level=level|add:1 %}
+      {% include include.navigation_item with item=child level=next_level %}
     {% endfor %}</ul>
+    {% endwith %}
   {% endif %}
 </li>

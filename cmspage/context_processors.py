@@ -6,9 +6,9 @@ from django.http import HttpRequest
 from django.contrib.auth import get_user_model
 from wagtail.models import Site
 
-from .models import SiteVariables, MenuLink
+from .models import MenuLink
 
-__all__ = ("navigation", "site_variables", "cmspage_context")
+__all__ = ("navigation", "cmspage_context")
 
 User = get_user_model()
 logger = logging.getLogger("cmspage.context_processors")
@@ -60,12 +60,6 @@ def navigation(request: HttpRequest) -> dict:
     return {"navigation": _nav_pages_for_site(site, user)}
 
 
-def site_variables(request: HttpRequest) -> dict:
-    site: Site = Site.find_for_request(request)
-    site_vars = SiteVariables.get_cached_variables(site)
-    return {"site": site_vars}
-
-
 def cmspage_context(request: HttpRequest) -> dict:
     # combines all the above context processors into one
-    return navigation(request) | site_variables(request)
+    return navigation(request)

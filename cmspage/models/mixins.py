@@ -64,12 +64,8 @@ class CMSTemplateMixin:
         - Returns:
             - List[str]: The list of names.
 
-    - `get_site_variables(request) -> dict`:
-        - Returns the site variables for the current site.
-        - Parameters:
-            - `request`: The request object containing the current site information.
-        - Returns:
-            - dict: The site variables dictionary.
+    - `as_list(names: Iterable[str] | None) -> str`:
+        - Converts a list of names to a comma/space separated string.
 
     - `base_template` (cached_property):
         - Returns the base template for the CMSTemplateMixin instance.
@@ -155,6 +151,13 @@ class CMSTemplateMixin:
         Return the template debug flag
         """
         return getattr(settings, "TEMPLATE_DEBUG", False)
+
+    def get_context(self, request, *args, **kwargs):
+        # noinspection PyUnresolvedReferences
+        context = super().get_context(request, *args, **kwargs) if hasattr(super(), "get_context") else {}
+        context["base_template"] = self.base_template
+        context |= {"include": self.include_templates()}
+        return context
 
     def log(self, message: str, *args, **kwargs) -> logging.Logger:
         if self.template_debug:
@@ -284,3 +287,21 @@ class CMSTemplateMixin:
                     self.log(f"Error resolving template: {template_name}", exc_info=True)
         # MISS, let the user figure this out
         return template_path
+
+
+class CMSPageMixin(CMSTemplateMixin):
+    """
+    CMSPageMixin class provides a set of utility methods for handling templates and includes
+    in non-cmspage pages to povide a subset of CMSPage functionality including include template
+    files and footer.
+
+    """
+    default_base_template = DEFAULT_BASE_TEMPLATE_NAME
+    default_template_dir = "cmspage"
+    default_include_dir = "includes"
+
+    def get_context(self, request, *args, **kwargs):
+        from .cms_page import CMSFooterPage
+        context = super().get_context(request, *args, **kwargs)
+        context["page_footer"] = CMSFooterPage.objects.first()
+        return context

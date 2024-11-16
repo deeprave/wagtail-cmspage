@@ -5,11 +5,11 @@ from wagtail.embeds import blocks as embed_blocks
 from wagtail.fields import StreamField
 from wagtail.models import Page
 
-from .. import blocks as cmsblocks
+import cmspage.blocks as cmsblocks
 from .mixins import CMSTemplateMixin
 
 
-class AbstractCMSPage(Page, CMSTemplateMixin):
+class AbstractCMSPage(CMSTemplateMixin, Page):
     """
     The `AbstractCMSPage` class handles the overall configurations for all Content Management System (CMS) pages.
      You can modify its behaviour by either overriding the class's properties or by adjusting the corresponding
@@ -42,10 +42,7 @@ class AbstractCMSPage(Page, CMSTemplateMixin):
         return self.find_existing_template(template_name, *self.template_styles)
 
     def get_context(self, request, *args, **kwargs):
-        context = super().get_context(request, *args, **kwargs)
-        context["base_template"] = self.base_template
-        context |= {"include": self.include_templates()}
-        return context
+        return super().get_context(request, *args, **kwargs)
 
     tags = ClusterTaggableManager(
         through="cmspage.PageTag",
@@ -77,6 +74,7 @@ class AbstractCMSPage(Page, CMSTemplateMixin):
     ] + Page.promote_panels
 
     class Meta:
+        app_label = "cmspage"
         abstract = True
 
 
@@ -103,10 +101,11 @@ class CMSPageBase(AbstractCMSPage):
 
     def get_context(self, request, *args, **kwargs):
         context = super().get_context(request, *args, **kwargs)
-        context["page_footer"] = CMSFooterPage.objects.first()
+        context["page_footer"] = CMSFooterPage.objects.live().first()
         return context
 
     class Meta:
+        app_label = "cmspage"
         abstract = True
 
     content_panels = AbstractCMSPage.content_panels + [
@@ -121,6 +120,7 @@ class CMSPage(CMSPageBase):
     subpage_types = ["cmspage.CMSPage", "wagtailcore.Page"]
 
     class Meta:
+        app_label = "cmspage"
         verbose_name = "CMS Page"
         verbose_name_plural = "CMS Pages"
 
@@ -142,6 +142,7 @@ class CMSFooterPage(AbstractCMSPage):
     ]
 
     class Meta:
+        app_label = "cmspage"
         verbose_name = "CMS Footer Page"
         verbose_name_plural = "CMS Footer Pages"
 
@@ -158,5 +159,6 @@ class CMSHomePage(CMSPageBase):
     body = StreamField(body_blocks, blank=True, null=True)
 
     class Meta:
+        app_label = "cmspage"
         verbose_name = "CMS Home Page"
         verbose_name_plural = "CMS Home Pages"
