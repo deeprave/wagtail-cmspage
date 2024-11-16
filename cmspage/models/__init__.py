@@ -1,9 +1,8 @@
-from .site_variables import SiteVariables
 from .cms_page import CMSPage, CMSFooterPage, CMSHomePage
 from .tags import PageTag, Tag
 from .menu_link import MenuLink, min_length_validator
 from .image import CMSPageImage
-from .mixins import CMSTemplateMixin
+from .mixins import CMSTemplateMixin, CMSPageMixin
 
 __all__ = (
     "CMSPage",
@@ -11,9 +10,9 @@ __all__ = (
     "CMSHomePage",
     "CMSPageImage",
     "CMSTemplateMixin",
+    "CMSPageMixin",
     "PageTag",
     "Tag",
     "MenuLink",
-    "SiteVariables",
     "min_length_validator",
 )
