@@ -694,7 +694,7 @@ wheels = [
 
 [[package]]
 name = "wagtail"
-version = "6.3"
+version = "6.3.1"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "anyascii" },
@@ -715,9 +715,9 @@ dependencies = [
     { name = "telepath" },
     { name = "willow", extra = ["heif"] },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/06/c0/a8cb5cdf0f66b3e7e9d544a49ddd83a3ea7092f184292eeb750cd9e2c810/wagtail-6.3.tar.gz", hash = "sha256:98d94d12183b8fc689a0186ab095e6056bf116c21d94f245bdfd02ed4775442a", size = 6636030 }
+sdist = { url = "https://files.pythonhosted.org/packages/fb/2f/f60b18e9bd4938b25cf8ce2941ffd4b1bb6413f2ea23eb6718666cb2c611/wagtail-6.3.1.tar.gz", hash = "sha256:93876cc7a3bfcfff4c0393949562cbf249f244c4ca653d58a2dbab737f455715", size = 6636295 }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/0d/a1/6991dc078459cad04ce4dae80a1d2beab2d08ab7e577823f24abf0beb64b/wagtail-6.3-py3-none-any.whl", hash = "sha256:627e4d5c2a47cd8533994503f473da231a782dbd0f1f8f53641e0d994556a0f2", size = 9122845 },
+    { url = "https://files.pythonhosted.org/packages/a1/53/1c8a83656a6f51164767bf34de362f051707d4174f5819407b6ce05674bc/wagtail-6.3.1-py3-none-any.whl", hash = "sha256:d7d4e4fcb5edb4a5d0aaff5de72eaf33a51e4fa26c2d3a57801c58c4da35b209", size = 9126402 },
 ]
 
 [[package]]
@@ -752,7 +752,7 @@ requires-dist = [
     { name = "pytest-django", marker = "extra == 'test'", specifier = ">=4.9" },
     { name = "pytest-mock", marker = "extra == 'test'", specifier = ">=3.14" },
     { name = "ruff", marker = "extra == 'dev'", specifier = "==0.5.7" },
-    { name = "wagtail", specifier = ">=6.3" },
+    { name = "wagtail", specifier = ">=6.3.1" },
 ]
 
 [[package]]
