@@ -8,7 +8,8 @@ from django.apps import apps
 from django.conf import settings
 from django.template import engines, TemplateDoesNotExist
 
-from .functional import conditional_lru_cache, conditional_cached_property
+
+__all__ = ("CMSTemplateMixin", "CMSPageMixin")
 
 # Django settings names
 CMSPAGE_TEMPLATE_STYLES = "CMSPAGE_TEMPLATE_STYLES"
@@ -51,6 +52,7 @@ class CMSTemplateMixin:
     This mixin helps to determine the appropriate template to use
     for rendering CMS pages based on various conditions and settings.
     """
+    from cmspage.models.functional import conditional_lru_cache, conditional_cached_property
 
     """
 
@@ -300,8 +302,13 @@ class CMSPageMixin(CMSTemplateMixin):
     default_template_dir = "cmspage"
     default_include_dir = "includes"
 
+    def get_parent_class_name(self) -> str:
+        return self.__class__.__bases__[0].__name__
+
     def get_context(self, request, *args, **kwargs):
-        from .cms_page import CMSFooterPage
+        from cmspage.models import CMSFooterPage
+
         context = super().get_context(request, *args, **kwargs)
+        context |= CMSTemplateMixin.get_context(self, self.request, **kwargs)
         context["page_footer"] = CMSFooterPage.objects.first()
         return context

@@ -1,5 +1,4 @@
 {% load static wagtailcore_tags wagtailimages_tags %}
-
 {% if self.image_alignment == "full" %}
 <div class="row position-relative text-center {{ self.inset }} {{ self.bg.background }} {{ self.bg.opacity }}">
   <picture>
@@ -45,9 +44,7 @@
     </div>
   {% endif %}
 </div>
-
 {% else %}
-<!-- {{ self.image_alignment }} -->
 <div class="row {% if self.image_alignment == "right" %}flex-row-reverse {% endif %}position-relative {{ self.inset }} {{ self.bg.background }} {{ self.bg.opacity }}">
   <div class="col-auto{% if self.image_alignment == "right" %} text-end{% else %} text-start{% endif %}">
     <picture>
@@ -69,7 +66,6 @@
       {% endif %}
     </picture>
   </div>
-
   <div class="col{% if self.image_alignment == "left" %}{% if self.overlay %} overlay-text-right{% endif %} text-end{% else %}{% if self.overlay %} overlay-text-left{% endif %} text-start{% endif %} py-5 block-text">
     <div class="block-title">
     {% if self.title %}<h2 class="block-title">{{ self.title }}</h2>{% endif %}

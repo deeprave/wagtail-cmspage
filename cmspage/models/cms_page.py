@@ -6,7 +6,7 @@ from wagtail.fields import StreamField
 from wagtail.models import Page
 
 import cmspage.blocks as cmsblocks
-from .mixins import CMSTemplateMixin
+from cmspage.mixins import CMSTemplateMixin
 
 
 class AbstractCMSPage(CMSTemplateMixin, Page):
