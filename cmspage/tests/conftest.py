@@ -3,6 +3,8 @@ from pathlib import Path
 import random
 import string
 
+from testcontainers.postgres import PostgresContainer
+
 import django
 from django.conf import settings
 
@@ -11,7 +13,25 @@ KEYLEN = 50
 
 if not settings.configured:
     BASE_DIR = Path(__file__).resolve().parent
-    DATABASES = {"default": {"ENGINE": "django.db.backends.sqlite3", "NAME": ":memory:"}}
+    POSTGRES_USER = "pguser"
+    POSTGRES_PASSWORD = "pgpass"
+    POSTGRES_DB = "pgdb"
+
+    postgres_container = PostgresContainer(
+        "postgres:16-alpine", username=POSTGRES_USER, password=POSTGRES_PASSWORD, dbname=POSTGRES_DB, driver="psychopg"
+    )
+    postgres_container.start()
+
+    DATABASES = {
+        "default": {
+            "ENGINE": "django.db.backends.postgresql",
+            "HOST": postgres_container.get_container_host_ip(),
+            "PORT": postgres_container.get_exposed_port(5432),
+            "NAME": POSTGRES_DB,
+            "USER": POSTGRES_USER,
+            "PASSWORD": POSTGRES_PASSWORD,
+        }
+    }
 
     # Configure test environment
     settings.configure(
