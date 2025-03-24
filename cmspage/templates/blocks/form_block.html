@@ -1,0 +1,68 @@
+{% load wagtailcore_tags %}
+
+<div class="form-container my-5">
+  {% if value.form_title %}
+    <h2 class="mb-3">{{ value.form_title }}</h2>
+  {% endif %}
+
+  {% if value.form_description %}
+    <div class="form-description mb-4">
+      {{ value.form_description }}
+    </div>
+  {% endif %}
+
+  <form action="{{ value.submit_url }}" method="POST" class="needs-validation" novalidate id="dynamic-form">
+    {% csrf_token %}
+
+    {% for field in value.fields %}
+      {% include_block field %}
+    {% endfor %}
+
+    <div class="mt-4">
+      <button type="submit" class="btn btn-primary">{{ value.submit_button_text }}</button>
+    </div>
+  </form>
+
+  <div class="alert alert-success mt-3 d-none" id="form-success">
+    {{ value.success_message }}
+  </div>
+</div>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    const form = document.getElementById('dynamic-form');
+    const successAlert = document.getElementById('form-success');
+
+    form.addEventListener('submit', function(event) {
+      event.preventDefault();
+
+      if (!form.checkValidity()) {
+        event.stopPropagation();
+        form.classList.add('was-validated');
+        return;
+      }
+
+      // Submit form via AJAX
+      const formData = new FormData(form);
+
+      fetch(form.action, {
+        method: 'POST',
+        body: formData,
+        headers: {
+          'X-Requested-With': 'XMLHttpRequest'
+        }
+      })
+      .then(response => response.json())
+      .then(data => {
+        if (data.success) {
+          form.reset();
+          form.classList.remove('was-validated');
+          successAlert.classList.remove('d-none');
+          setTimeout(() => {
+            successAlert.classList.add('d-none');
+          }, 5000);
+        }
+      });
+    });
+  });
+</script>

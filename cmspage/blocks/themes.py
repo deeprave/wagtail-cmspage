@@ -13,7 +13,13 @@ __all__ = (
     "SocialIcon",
 )
 
-class Backgrounds(models.TextChoices):
+class Choices(models.TextChoices):
+    @property
+    def choices(self):
+        # noinspection PyUnresolvedReferences
+        return super().choices
+
+class Backgrounds(Choices):
     NONE = "bg-transparent", "Transparent"
     PAGE = "bg-body", "Page"
     LIGHT = "bg-light", "Light"
@@ -28,23 +34,23 @@ class Backgrounds(models.TextChoices):
     DANGER = "bg-danger", "Danger"
 
 
-class Palette(models.TextChoices):
-    NONE = "bg-transparent text-dark title-dark", "Dark on Transparent"
-    PAGE = "bg-body text-dark title-dark", "Dark on Page Background"
-    LIGHT = "bg-light text-dark title-dark", "Dark on Light Background"
-    DARK = "bg-dark text-light title-light", "Light on Dark Background"
-    WHITE = "bg-white text-black title-dark", "Black on White Background"
-    BLACK = "bg-black text-white title-light", "White on Black Background"
-    PRIMARY = "bg-primary text-dark title-dark", "Dark on Primary Background"
-    SECONDARY = "bg-secondary text-dark title-dark", "Dark on Secondary Background"
-    TERTIARY = "bg-tertiary text-dark title-dark", "Dark on Tertiary Background"
-    SUCCESS = "bg-success-subtle text-dark title-dark", "Dark on Success Background"
-    WARNING = "bg-warning-subtle text-dark title-dark", "Dark on Warning Background"
-    INFO = "bg-info-subtle text-dark title-dark", "Dark on Info Background"
-    DANGER = "bg-danger-subtle text-dark title-dark", "Dark on Danger Background"
+class Palette(Choices):
+    NONE = "bg-transparent text-dark title-dark links-dark", "Dark on Transparent"
+    PAGE = "bg-body text-dark title-dark links-dark", "Dark on Page Background"
+    LIGHT = "bg-light text-dark title-dark links-dark", "Dark on Light Background"
+    DARK = "bg-dark text-light title-light links-light", "Light on Dark Background"
+    WHITE = "bg-white text-black title-dark links-dark", "Black on White Background"
+    BLACK = "bg-black text-white title-light links-light", "White on Black Background"
+    PRIMARY = "bg-primary text-dark title-dark links-dark", "Dark on Primary Background"
+    SECONDARY = "bg-secondary text-dark title-dark links-dark", "Dark on Secondary Background"
+    TERTIARY = "bg-tertiary text-dark title-dark links-dark", "Dark on Tertiary Background"
+    SUCCESS = "bg-success-subtle text-dark title-dark links-dark", "Dark on Success Background"
+    WARNING = "bg-warning-subtle text-dark title-dark links-dark", "Dark on Warning Background"
+    INFO = "bg-info-subtle text-dark title-dark links-dark", "Dark on Info Background"
+    DANGER = "bg-danger-subtle text-dark title-dark links-dark", "Dark on Danger Background"
 
 
-class Opacities(models.TextChoices):
+class Opacities(Choices):
     OPACITY_FULL = "bg-opacity-100", "100%"
     OPACITY_75 = "bg-opacity-75", "75%"
     OPACITY_50 = "bg-opacity-50", "50%"
@@ -52,7 +58,7 @@ class Opacities(models.TextChoices):
     OPACITY_10 = "bg-opacity-10", "10%"
 
 
-class Heights(models.TextChoices):
+class Heights(Choices):
     SMALLEST = "height-0", "None"
     SMALL = "height-1 py-1", "Small"
     MEDIUM = "height-2 py-2", "Medium"
@@ -61,7 +67,7 @@ class Heights(models.TextChoices):
     LARGEST = "height-5 py-5", "Largest"
 
 
-class Insets(models.TextChoices):
+class Insets(Choices):
     SMALLEST = "p-0", "None"
     SMALL = "p-1", "Small"
     MEDIUM = "p-2", "Medium"
@@ -70,7 +76,7 @@ class Insets(models.TextChoices):
     LARGEST = "p-5", "Largest"
 
 
-class SocialIcon(models.TextChoices):
+class SocialIcon(Choices):
     DISCORD = "discord", "Discord"
     EMAIL = "envelope", "Email"
     FACEBOOK = "facebook", "Facebook"
@@ -97,7 +103,7 @@ class SocialIcon(models.TextChoices):
     ZOOM = "zoom", "Zoom"
 
 
-class IconColorChoices(models.TextChoices):
+class IconColorChoices(Choices):
     BODY = "text-body", "Normal"
     WHITE = "text-white", "White"
     BLACK = "text-black", "Dark"
@@ -113,3 +119,9 @@ class IconColorChoices(models.TextChoices):
     MUTED = "text-muted", "Muted"
     BLACK50 = "text-black-50", "Black 50% opacity"
     WHITE50 = "text-white-50", "White 50% opacity"
+
+
+class Justifications(Choices):
+    LEFT = "text-left", "Left"
+    CENTER = "text-center", "Center"
+    RIGHT = "text-right", "Right"

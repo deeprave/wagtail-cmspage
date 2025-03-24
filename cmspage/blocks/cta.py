@@ -3,7 +3,7 @@ from wagtail import blocks
 from cmspage import DEFAULT_RICHTEXTBLOCK_FEATURES
 from .background import BackgroundBlock
 from .links import LinkBlock
-from .themes import Insets, Palette
+from .themes import Insets, Palette, Justifications
 
 
 class CallToActionBlock(blocks.StructBlock):
@@ -21,6 +21,7 @@ class CallToActionBlock(blocks.StructBlock):
         max_length=60,
         help_text="Max length of 60 characters, optional",
     )
+    justify = blocks.ChoiceBlock(required=False, choices=Justifications.choices, default=Justifications.LEFT, help_text="Text alignment")
     text = blocks.RichTextBlock(
         required=False,
         blank=True,

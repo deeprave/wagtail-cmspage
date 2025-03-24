@@ -3,7 +3,7 @@ from wagtail.images import blocks as image_blocks
 
 from .background import BackgroundBlock
 from .links import LinkBlock
-from .themes import Palette, Insets
+from .themes import Palette, Insets, Justifications
 
 
 class Card(blocks.StructBlock):
@@ -21,6 +21,7 @@ class Card(blocks.StructBlock):
         label="Card Title",
         help_text="Bold title text for this card (len=255)",
     )
+    justify = blocks.ChoiceBlock(required=False, choices=Justifications.choices, default=Justifications.LEFT, help_text="Text alignment")
     text = blocks.RichTextBlock(
         blank=True, null=True, required=False, label="Card Text", help_text="Optional text for this card"
     )

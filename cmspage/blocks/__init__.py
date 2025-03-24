@@ -15,6 +15,7 @@ from .carousel import CarouselImageBlock
 from .social import SocialsBlock, SocialLinkBlock
 from .title import TitleBlock, RichTextWithTitleBlock
 from .themes import Backgrounds, Palette, Opacities, Heights, Insets, SocialIcon, IconColorChoices
+from .form import FormBlock
 
 __all__ = (
     # themes
@@ -48,4 +49,5 @@ __all__ = (
     "SocialLinkBlock",
     "SocialsBlock",
     "TitleBlock",
+    "FormBlock",
 )

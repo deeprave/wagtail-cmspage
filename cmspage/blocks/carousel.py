@@ -3,7 +3,7 @@ from wagtail.blocks import ListBlock
 from wagtail.images.blocks import ImageChooserBlock
 
 from .background import BackgroundBlock
-from .themes import Insets
+from .themes import Insets, Justifications
 
 
 class CarouselImageStructBlock(blocks.StructBlock):
@@ -27,6 +27,7 @@ class CarouselImageStructBlock(blocks.StructBlock):
     # noinspection PyUnresolvedReferences
     carousel_image = ImageChooserBlock()
     carousel_title = blocks.CharBlock(required=False, max_length=120, help_text="Display title, optional (max len=120)")
+    carousel_justify = blocks.ChoiceBlock(required=False, choices=Justifications.choices, default=Justifications.LEFT, help_text="Text alignment")
     carousel_content = blocks.RichTextBlock(required=False, features=RICHTEXTBLOCK_FEATURES, max_length=256, help_text="Short description")
     carousel_attribution = blocks.CharBlock(required=False, max_length=80, help_text="Attribution, optional (max len=80)")
 
