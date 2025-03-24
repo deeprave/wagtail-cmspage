@@ -5,7 +5,7 @@
       {% if value.link.link_url %}<a href="{{ value.link.link_url }}" class="text-decoration-none text-reset">{% endif %}
       {% if value.title %}<h3 class="block-title display-3 fw-bolder text-bg-dark title-text-light">{{ value.title }}</h3>{% endif %}
       <div class="block-text-large richtext-text p-2 px-3">
-        {% if value.text %}<p class="block-text-large">{{ value.text|richtext }}</p>{% endif %}
+        {% if value.text %}<p class="block-text-large {{ value.justify }}">{{ value.text|richtext }}</p>{% endif %}
       </div>
       <div class="row m-2 p-3">
         <a href="{{ self.link.link_url }}" class="text-decoration-none">

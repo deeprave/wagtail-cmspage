@@ -1,5 +1,41 @@
 ## ChangeLog
 
+
+### 2024.3.0
+
+#### Added
+
+* Created new `CMSFormPage` class for dynamic form handling
+* Added form block functionality with nested sfields
+* Implemented various form field block types:
+  * `TextFieldBlock`: Standard text input field
+  * `TextAreaFieldBlock`: Multi-line text input field
+  * `EmailFieldBlock`: Email input field with validation
+  * `IntegerFieldBlock`: Integer input field with min/max validation
+  * `DecimalFieldBlock`: Decimal input field with precision control
+  * `SelectFieldBlock`: Dropdown selection with configurable options
+  * `MultiSelectFieldBlock`: Multiple selection field with configurable options
+  * `OptionBlock`: Helper block for defining select options
+* Created `FormBlock` container with form metadata (title, description, submit URL, etc.)
+* Added Bootstrap compatible templates for form rendering:
+  * Main form container template (`blocks/form_block.html`)
+  * Field-specific templates for each input type
+  * Client-side validation with feedback messages
+  * AJAX form submission handling
+  * Success message display
+* Limited form blocks to one per page through StreamField configuration
+
+#### Changed
+
+* Extended base `CMSPageBase` functionality to support form capabilities
+* Enhanced form field validation with appropriate constraints based on field type
+
+#### Technical
+
+* Added proper Django templates in the template directory structure
+* Implemented Bootstrap 5 styling for all form elements
+* Added client-side form validation and submission handling via JavaScript
+
 ### 2024.3.2
 
 - Expanded CMSPage documentation with detailed installation, usage, and configuration instructions.
@@ -36,7 +72,7 @@
 ## 2024.2.0
 
 - Almost a complete rewrite, including:
-    - moving template path generation to a separate possibly reusable mixin
-    - support tiered template paths overridable via config for different frontend CSS frameworks
-    - additional models/orderables for complex content structures
-    - improved documentation
+  - moving template path generation to a separate possibly reusable mixin
+  - support tiered template paths overridable via config for different frontend CSS frameworks
+  - additional models/orderables for complex content structures
+  - improved documentation

@@ -1,0 +1,22 @@
+<div class="mb-3">
+  <label for="{{ id }}" class="form-label">
+    {{ value.label }}{% if value.required %} <span class="text-danger">*</span>{% endif %}
+  </label>
+  <input
+      type="number"
+      class="form-control"
+      id="{{ id }}"
+      name="{{ id }}"
+      {% if value.required %}required{% endif %}
+      {% if value.default_value %}value="{{ value.default_value }}"{% endif %}
+      {% if value.min_value %}min="{{ value.min_value }}"{% endif %}
+      {% if value.max_value %}max="{{ value.max_value }}"{% endif %}
+      step="1"
+  >
+  {% if value.help_text %}
+    <div class="form-text">{{ value.help_text }}</div>
+  {% endif %}
+  <div class="invalid-feedback">
+    Please provide a valid integer value{% if value.min_value %} (min: {{ value.min_value }}){% endif %}{% if value.max_value %} (max: {{ value.max_value }}){% endif %}.
+  </div>
+</div>

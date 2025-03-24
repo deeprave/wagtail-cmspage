@@ -2,7 +2,8 @@ from wagtail import blocks
 
 from cmspage import DEFAULT_RICHTEXTBLOCK_FEATURES
 from .background import BackgroundBlock
-from .themes import Insets
+from .themes import Insets, Justifications
+
 
 class TitleBlock(blocks.StructBlock):
     bg = BackgroundBlock()
@@ -30,6 +31,7 @@ class RichTextWithTitleBlock(blocks.StructBlock):
         max_length=120,
         help_text="Display title, optional (max len=120)",
     )
+    justify = blocks.ChoiceBlock(required=False, choices=Justifications.choices, default=Justifications.LEFT, help_text="Text alignment")
     content = blocks.RichTextBlock(features=DEFAULT_RICHTEXTBLOCK_FEATURES, help_text="Rich text block, required")
 
     class Meta:

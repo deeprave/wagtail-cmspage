@@ -1,0 +1,18 @@
+<div class="mb-3">
+  <label for="{{ id }}" class="form-label">
+    {{ value.label }}{% if value.required %} <span class="text-danger">*</span>{% endif %}
+  </label>
+  <textarea
+      class="form-control"
+      id="{{ id }}"
+      name="{{ id }}"
+      rows="{{ value.rows|default:3 }}"
+      {% if value.required %}required{% endif %}
+  >{% if value.default_value %}{{ value.default_value }}{% endif %}</textarea>
+  {% if value.help_text %}
+    <div class="form-text">{{ value.help_text }}</div>
+  {% endif %}
+  <div class="invalid-feedback">
+    Please provide a valid input for this field.
+  </div>
+</div>

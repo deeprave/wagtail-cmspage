@@ -4,7 +4,7 @@ from wagtail.images import blocks as image_blocks
 from cmspage import DEFAULT_RICHTEXTBLOCK_FEATURES
 from .radio import RadioSelectBlock
 from .background import BackgroundBlock
-from .themes import Palette, Insets
+from .themes import Palette, Insets, Justifications
 
 
 class SmallImageAndTextBlock(blocks.StructBlock):
@@ -16,6 +16,7 @@ class SmallImageAndTextBlock(blocks.StructBlock):
     )
     image = image_blocks.ImageChooserBlock(blank=True, null=True)
     title = blocks.CharBlock(max_length=60, required=False, blank=True, null=True)
+    justify = blocks.ChoiceBlock(required=False, choices=Justifications.choices, default=Justifications.LEFT, help_text="Text alignment")
     text = blocks.RichTextBlock(
         blank=True,
         required=False,

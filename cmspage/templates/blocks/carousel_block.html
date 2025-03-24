@@ -26,7 +26,7 @@
           <div class="carousel-caption d-none d-md-block">
             <div class="overlay-grid px-4">
               {% if image.carousel_title %}<p class="h5 inline-heading text-white">{{ image.carousel_title }}</p>{% endif %}
-              {% if image.carousel_content %}<p class="block-text text-white">{{ image.carousel_content|richtext }}</p>{% endif %}
+              {% if image.carousel_content %}<p class="block-text text-white {{ image.carousel_justify }}">{{ image.carousel_content|richtext }}</p>{% endif %}
               {% if image.carousel_attribution %}<p class="block-text text-white fst-italic text-end">- {{ image.carousel_attribution }}</p>{% endif %}
             </div>
           </div>
