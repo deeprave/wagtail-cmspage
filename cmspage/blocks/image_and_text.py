@@ -46,6 +46,7 @@ class ImageAndTextBlock(blocks.StructBlock):
     )
     image = image_blocks.ImageChooserBlock(blank=True, null=True)
     title = blocks.CharBlock(max_length=60, required=False, blank=True, null=True)
+    justify = blocks.ChoiceBlock(required=False, choices=Justifications.choices, default=Justifications.LEFT, help_text="Text alignment")
     text = blocks.RichTextBlock(
         blank=True,
         required=False,
