@@ -20,9 +20,9 @@
     {% endif %}
   </picture>
   <div class="{% if self.overlay %} overlay-top{% endif %} py-3 block-text">
-    <div class="block-title text-center">
+    <div class="block-title {{ self.justify }}">
     {% if self.title %}<h2>{{ self.title }}</h2></div>{% endif %}
-    {% if self.text %}<p class="block-text richtext-text">{{ self.text|richtext }}</p>{% endif %}
+    {% if self.text %}<p class="block-text richtext-text {{ self.justify }}">{{ self.text|richtext }}</p>{% endif %}
   </div>
   {% if self.link.link_url %}
     <div class="row m-2 p-3">
@@ -68,9 +68,9 @@
   </div>
   <div class="col{% if self.image_alignment == "left" %}{% if self.overlay %} overlay-text-right{% endif %} text-end{% else %}{% if self.overlay %} overlay-text-left{% endif %} text-start{% endif %} py-5 block-text">
     <div class="block-title">
-    {% if self.title %}<h2 class="block-title">{{ self.title }}</h2>{% endif %}
+    {% if self.title %}<h2 class="block-title {{ self.justify }}">{{ self.title }}</h2>{% endif %}
     </div>
-    {% if self.text %}<p class="block-text richtext-text">{{ self.text|richtext }}</p>{% endif %}
+    {% if self.text %}<p class="block-text richtext-text {{ self.justify }}">{{ self.text|richtext }}</p>{% endif %}
   </div>
   {% if self.link.link_url %}
     <div class="row m-2 p-3">
