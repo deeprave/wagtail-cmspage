@@ -2,8 +2,8 @@
 
 <div class="row {{ self.inset }} {{ value.bg.background }} {{ value.bg.opacity }}">
   <div class="col-12 richtext">
-    {% if value.title %}<h3 class="block-title text-start text-lg-center display-4">{{ value.title }}</h3>{% endif %}
-    <div class="block-text text-start text-lg-center richtext-text">
+    {% if value.title %}<h3 class="block-title text-start {{ value.justify }} display-4">{{ value.title }}</h3>{% endif %}
+    <div class="block-text text-start {{ value.justify }} richtext-text">
       {{ value.content|richtext }}
     </div>
   </div>

@@ -9,13 +9,13 @@
         <img src="{{ the_image.url }}" alt="{{ the_image.alt }}">
     </picture>
   </div>
-  <div class="col text-center">
+  <div class="col {{ value.justify }}">
     {% if value.title %}
     <div class="block-title">
       <h2 class="block-title">{{ value.title }}</h2>
     </div>
     {% endif %}
-    <div class="block-text">
+    <div class="block-text {{ value.justify }}">
       {% if value.text %}<p class="block-text richtext-text text-break">{{ value.text|richtext }}</p>{% endif %}
     </div>
   </div>

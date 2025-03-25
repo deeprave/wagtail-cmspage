@@ -3,7 +3,7 @@
 <div class="row {{ value.inset }} {{ value.palette }} justify-content-center align-items-center">
   {% for social in value.links %}
     {% if social.url %}
-    <div class="col-auto text-center">
+    <div class="col-auto {{ value.justify }}">
       <a href="{{ social.url }}" title="{{ social.name }}" class="text-decoration-none text-reset" target="_blank">
       <div class="social-icon">
         {% with social_icon="cmspage/icons/social/"|add:social.icon|add:".svg" %}

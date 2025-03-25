@@ -13,7 +13,7 @@
   <div class="col-12 col-lg-6 col-xl-{{ colspread }} {{ card.palette }}">
     <div class="card shadow rounded-3 h-100 bg-tertiary">
       <div class="card-header p-1 m-0">
-        <h3 class="card-block-title p-1 mb-0 text-center display-4">{{ card.title }}</h3>
+        <h3 class="card-block-title p-1 mb-0 {{ card.justify }} display-4">{{ card.title }}</h3>
       </div>
       <div class="card-body d-flex flex-column p-1">
         {% if card.link.link_url %}<a href="{{ card.link.link_url }}" class="text-decoration-none text-reset">{% endif %}
@@ -25,12 +25,12 @@
             <img src="{{ img.url }}" alt="{{ img.alt }}" class="card-img-top">
           </picture>
         {% endif %}
-        <div class="px-2 py-1 card-block-text d-flex flex-column text-center flex-grow-1 mt-auto">
+        <div class="px-2 py-1 card-block-text d-flex flex-column {{ card.justify }} flex-grow-1 mt-auto">
           {% if card.text %}
             <p class="flex-grow-1 richtext {{ card.justify }}">{{ card.text|richtext }}</p>
           {% endif %}
           {% if card.link.link_url %}
-            <div class="mt-auto text-center text-md-end">
+            <div class="mt-auto {{ card.justify }} text-md-end">
               {% if card.link.link_title == '-' %}
                 <div class="inline-block link-arrow text-dark">{% include "icons/right-pointing-arrow-icon.svg" %}</div>
               {% elif card.link.link_title %}
