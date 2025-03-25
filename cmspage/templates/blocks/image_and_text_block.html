@@ -1,6 +1,6 @@
 {% load static wagtailcore_tags wagtailimages_tags %}
 {% if self.image_alignment == "full" %}
-<div class="row position-relative text-center {{ self.inset }} {{ self.bg.background }} {{ self.bg.opacity }}">
+<div class="row position-relative {{ self.justify }} {{ self.inset }} {{ self.bg.background }} {{ self.bg.opacity }}">
   <picture>
     {% if self.image_size == "portrait" %}
       {% image self.image fill-540x960-c50 format-webp as webp_image %}

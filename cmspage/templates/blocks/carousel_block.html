@@ -1,6 +1,6 @@
 {% load wagtailcore_tags wagtailimages_tags %}
 
-<div class="row text-center {{ self.inset }} {{ value.bg.background }} {{ value.bg.opacity }}">
+<div class="row {{ self.justify }} {{ self.inset }} {{ value.bg.background }} {{ value.bg.opacity }}">
   <div id="carouselBlock" class="carousel slide" data-bs-ride="carousel"
        data-bs-interval="{% if block.value.carousel|length > 1 %}{{ value.carousel_interval }}{% else %}0{% endif %}">
 

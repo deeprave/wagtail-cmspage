@@ -5,7 +5,7 @@
   <button class="accordion-button inherit-color" type="button" data-bs-toggle="collapse" data-bs-target="#{{ lineid }}-collapse"
           aria-expanded="{% if counter == "1" %}true{% else %}false{% endif %}" aria-controls="{{ lineid }}-collapse">
   {% if number %}
-    <span class="col-1 text-center">
+    <span class="col-1 {{ self.justify }}">
       <span class="d-inline-block block-text-large text-end">{{ counter }}</span>
     </span>
   {% endif %}
@@ -28,7 +28,7 @@
 {% else %}
   <div class="row">
     {% if number %}
-    <div class="col-1 text-center">
+    <div class="col-1 {{ self.justify }}">
       <div class="block-text-large text-end">{{ counter }}</div>
     </div>
     {% endif %}
