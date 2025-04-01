@@ -208,6 +208,16 @@
   font-size: 1.5em;
   display: inline-block;
   text-align: end;
+  vertical-align: baseline;
+}
+
+.outer-heading {
+  font-weight: bolder;
+  color: var(--heading-color);
+  margin: 0 0.5em;
+  padding: 0 0.5em;
+  text-align: end;
+  vertical-align: top;
 }
 
 // menu

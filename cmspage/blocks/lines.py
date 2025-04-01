@@ -8,7 +8,7 @@ class LineItemBlock(blocks.StructBlock):
     content = blocks.RichTextBlock(required=False, features=DEFAULT_RICHTEXTBLOCK_FEATURES, help_text="Dropdown text block, optional")
 
     class Meta:
-        template = "blocks/ålineitem_block.html"
+        template = "blocks/lineitem_block.html"
         icon = "arrow-down"
         label = "Line Content"
 

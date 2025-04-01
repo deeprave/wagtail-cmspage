@@ -5,6 +5,7 @@ from cmspage import DEFAULT_RICHTEXTBLOCK_FEATURES
 from .radio import RadioSelectBlock
 from .background import BackgroundBlock
 from .themes import Palette, Insets, Justifications
+from .links import LinkBlock
 
 
 class SmallImageAndTextBlock(blocks.StructBlock):
@@ -30,6 +31,7 @@ class SmallImageAndTextBlock(blocks.StructBlock):
         default="left",
         help_text="Image left - text right, or image right - text left.",
     )
+    link = LinkBlock()
 
     class Meta:
         template = "blocks/small_image_and_text_block.html"
@@ -62,6 +64,7 @@ class ImageAndTextBlock(blocks.StructBlock):
         help_text="Full image - text below, Image left - text right, or image right - text left.",
     )
     overlay = blocks.BooleanBlock(default=False, required=False, blank=True, help_text="Overlay text on image")
+    link = LinkBlock()
 
     class Meta:
         template = "blocks/image_and_text_block.html"
@@ -75,6 +78,7 @@ class LargeImageBlock(blocks.StructBlock):
         choices=Insets.choices, default=Insets.SMALL, help_text="Padding around the block"
     )
     image = image_blocks.ImageChooserBlock()
+    link = LinkBlock()
 
     class Meta:
         template = "blocks/large_image_block.html"
