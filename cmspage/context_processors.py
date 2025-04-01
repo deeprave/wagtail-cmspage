@@ -41,19 +41,17 @@ def image_config(_: HttpRequest):
     }
 
     # Build the complete dimensions dictionary
-    image_dimensions = {}
-    for orientation, sizes in base.items():
-        image_dimensions[orientation] = {}
-        for size, (width, height) in sizes.items():
-            # Handle the special case for "original" size
-            spec = size if size == "original" else f"fill-{width}x{height}{centering}"
-
-            # Create the full configuration for this orientation/size
-            image_dimensions[orientation][size] = {
+    image_dimensions = {
+        orientation: {
+            size: {
                 "width": width,
                 "height": height,
-                "spec": spec
+                "spec": size if size == "original" else f"fill-{width}x{height}{centering}"
             }
+            for size, (width, height) in sizes.items()
+        }
+        for orientation, sizes in base.items()
+    }
 
     # Define alignment classes mapping
     image_alignment = {
