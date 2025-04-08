@@ -1,14 +1,11 @@
-{% load wagtailcore_tags wagtailimages_tags %}
+{% load wagtailcore_tags wagtailimages_tags cmspage_tags %}
 
 <style>
     .card-img-top {
         object-fit: cover;
     }
-    .card-text {
-        margin-bottom: 0;
-    }
 </style>
-<div class="row g-0 g-sm-1 g-md-2 g-lg-3 me-1 {{ value.bg.background }} {{ value.bg.opacity }}">
+<div class="row g-0 g-sm-1 g-md-2 g-lg-3 me-1 {{ value.inset }}{{ value.bg.background }} {{ value.bg.opacity }}">
   {% for card in value.cards %}
   <div class="col-12 col-lg-6 col-xl-{{ colspread }} {{ card.palette }}">
     <div class="card shadow rounded-3 h-100 bg-tertiary">
@@ -19,10 +16,7 @@
         {% if card.link.link_url %}<a href="{{ card.link.link_url }}" class="text-decoration-none text-reset">{% endif %}
         {% if card.image %}
           <picture>
-            {% image card.image fill-570x370 format-webp as webp_image %}
-            <source srcset="{{ webp_image.url }}" type="image/webp">
-            {% image card.image fill-570x370 as img %}
-            <img src="{{ img.url }}" alt="{{ img.alt }}" class="card-img-top">
+            {% render_image card.image orientation=card.orientation|lower size=card.size|lower responsive=card.responsive %}
           </picture>
         {% endif %}
         <div class="px-2 py-1 card-block-text d-flex flex-column {{ card.justify }} flex-grow-1 mt-auto">

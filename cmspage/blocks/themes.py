@@ -11,7 +11,17 @@ __all__ = (
     "Heights",
     "Insets",
     "SocialIcon",
+    "Orientations",
+    "Justifications",
+    "ImageSizes",
+    "IconColorChoices",
+    "ImageAlignment",
+    "CropPercentage",
 )
+
+
+# these intermediate classes explicitly define the metaclass `choices` property
+# to avoid `noinspection PyUnresolvedReferences` warnings in PyCharm
 
 class Choices(models.TextChoices):
     @property
@@ -19,35 +29,44 @@ class Choices(models.TextChoices):
         # noinspection PyUnresolvedReferences
         return super().choices
 
+
+class IntChoices(models.IntegerChoices):
+    @property
+    def choices(self):
+        # noinspection PyUnresolvedReferences
+        return super().choices
+
+
 class Backgrounds(Choices):
-    NONE = "bg-transparent", "Transparent"
-    PAGE = "bg-body", "Page"
-    LIGHT = "bg-light", "Light"
-    DARK = "bg-dark", "Dark"
-    WHITE = "bg-white", "White"
-    BLACK = "bg-black", "Black"
-    PRIMARY = "bg-primary", "Primary"
-    SECONDARY = "bg-secondary", "Secondary"
-    SUCCESS = "bg-success", "Success"
-    WARNING = "bg-warning", "Warning"
-    INFO = "bg-info", "Info"
-    DANGER = "bg-danger", "Danger"
+    NONE = "bg-transparent links-dark", "Transparent"
+    PAGE = "bg-body links-dark", "Page"
+    LIGHT = "bg-light links-dark", "Light"
+    DARK = "bg-dark links-light", "Dark"
+    WHITE = "bg-white links-dark", "White"
+    BLACK = "bg-black links-light", "Black"
+    PRIMARY = "bg-primary links-dark", "Primary"
+    SECONDARY = "bg-secondary links-dark", "Secondary"
+    TERTIARY = "bg-tertiary links-dark", "Tertiary"
+    SUCCESS = "bg-success-subtle links-dark", "Success"
+    WARNING = "bg-warning-subtle links-dark", "Warning"
+    INFO = "bg-info-subtle links-dark", "Info"
+    DANGER = "bg-danger-subtle links-dark", "Danger"
 
 
 class Palette(Choices):
-    NONE = "bg-transparent text-dark title-dark links-dark", "Dark on Transparent"
-    PAGE = "bg-body text-dark title-dark links-dark", "Dark on Page Background"
-    LIGHT = "bg-light text-dark title-dark links-dark", "Dark on Light Background"
-    DARK = "bg-dark text-light title-light links-light", "Light on Dark Background"
-    WHITE = "bg-white text-black title-dark links-dark", "Black on White Background"
-    BLACK = "bg-black text-white title-light links-light", "White on Black Background"
-    PRIMARY = "bg-primary text-dark title-dark links-dark", "Dark on Primary Background"
-    SECONDARY = "bg-secondary text-dark title-dark links-dark", "Dark on Secondary Background"
-    TERTIARY = "bg-tertiary text-dark title-dark links-dark", "Dark on Tertiary Background"
-    SUCCESS = "bg-success-subtle text-dark title-dark links-dark", "Dark on Success Background"
-    WARNING = "bg-warning-subtle text-dark title-dark links-dark", "Dark on Warning Background"
-    INFO = "bg-info-subtle text-dark title-dark links-dark", "Dark on Info Background"
-    DANGER = "bg-danger-subtle text-dark title-dark links-dark", "Dark on Danger Background"
+    NONE = f"{Backgrounds.NONE.value} text-dark title-dark", "Dark on Transparent"
+    PAGE = f"{Backgrounds.PAGE.value} text-dark title-dark", "Dark on Page Background"
+    LIGHT = f"{Backgrounds.LIGHT.value} text-dark title-dark", "Dark on Light Background"
+    DARK = f"{Backgrounds.DARK.value} text-light title-light", "Light on Dark Background"
+    WHITE = f"{Backgrounds.LIGHT.value} text-black title-dark", "Black on White Background"
+    BLACK = f"{Backgrounds.WHITE.value} text-white title-light", "White on Black Background"
+    PRIMARY = f"{Backgrounds.PRIMARY.value} text-dark title-dark", "Dark on Primary Background"
+    SECONDARY = f"{Backgrounds.SECONDARY.value} text-dark title-dark", "Dark on Secondary Background"
+    TERTIARY = f"{Backgrounds.TERTIARY.value} text-dark title-dark", "Dark on Tertiary Background"
+    SUCCESS = f"{Backgrounds.SUCCESS.value} text-dark title-dark", "Dark on Success Background"
+    WARNING = f"{Backgrounds.WARNING.value} text-dark title-dark", "Dark on Warning Background"
+    INFO = f"{Backgrounds.INFO.value} text-dark title-dark", "Dark on Info Background"
+    DANGER = f"{Backgrounds.DANGER.value} text-dark title-dark", "Dark on Danger Background"
 
 
 class Opacities(Choices):
@@ -122,6 +141,47 @@ class IconColorChoices(Choices):
 
 
 class Justifications(Choices):
-    LEFT = "text-left", "Left"
+    LEFT = "text-start", "Left"
     CENTER = "text-center", "Center"
-    RIGHT = "text-right", "Right"
+    RIGHT = "text-end", "Right"
+
+
+class Orientations(Choices):
+    LANDSCAPE = "landscape", "Landscape"
+    PORTRAIT = "portrait", "Portrait"
+    SQUARE = "square", "Square"
+    EXTRAWIDE = "extrawide", "Extra Wide"
+
+
+class ImageSizes(Choices):
+    TINY = "tiny", "Tiny"
+    SMALL = "small", "Small"
+    MEDIUM = "medium", "Medium"
+    LARGE = "large", "Large"
+    FULL_WIDTH = "full_width", "Full Width"
+    ORIGINAL = "original", "Original"
+
+
+class ImageAlignment(Choices):
+    LEFT = "left", "Left"
+    RIGHT = "right", "Right"
+    CENTER = "center", "Center"
+    FULL = "full", "Full"
+
+
+class CropPercentage(IntChoices):
+    NONE = 0, "None"
+    SMALL = 25, "Small"
+    MEDIUM = 50, "Medium"
+    LARGE = 75, "Large"
+    FULL = 100, "Full"
+
+
+class ImageRounding(IntChoices):
+    NONE = -1, "None"
+    TINY = 0, "0"
+    SMALL = 1, "1"
+    MEDIUM = 2, "2"
+    LARGE = 3, "3"
+    LARGER = 4, "4"
+    LARGEST = 5, "5"

@@ -10,6 +10,3 @@ class BackgroundBlock(blocks.StructBlock):
     opacity = blocks.ChoiceBlock(
         choices=Opacities.choices, default=Opacities.OPACITY_FULL, help_text="Background opacity"
     )
-    class Meta:
-        label = "Background"
-        form_template = "blocks/background_block.html"
