@@ -134,6 +134,7 @@ class CMSFooterPage(AbstractCMSPage):
         ("copy", cmsblocks.copy.CopyrightBlock(label="Copyright", classnames="text-center text-muted text-small")),
         ("links", cmsblocks.links.LinksBlock()),
         ("social", cmsblocks.social.SocialsBlock()),
+        ("new_section", cmsblocks.new_section.NewSectionBlock()),
     ]
     footer = StreamField(footer_blocks, blank=False, null=False)
 

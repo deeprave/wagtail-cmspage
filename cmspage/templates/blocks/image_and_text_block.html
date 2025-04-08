@@ -1,22 +1,12 @@
-{% load static wagtailcore_tags wagtailimages_tags %}
+{% load static wagtailcore_tags wagtailimages_tags cmspage_tags %}
+
 {% if self.image_alignment == "full" %}
 <div class="row position-relative {{ self.justify }} {{ self.inset }} {{ self.bg.background }} {{ self.bg.opacity }}">
   <picture>
-    {% if self.image_size == "portrait" %}
-      {% image self.image fill-540x960-c50 format-webp as webp_image %}
-      <source srcset="{{ webp_image.url }}" type="image/webp">
-      {% image self.image fill-540x960-c50 as the_image %}
-      <img src="{{ the_image.url }}" alt="{{ the_image.alt }}" class="img-fluid">
-    {% elif self.image_size == "landscape" %}
-      {% image self.image fill-960x540-c50 format-webp as webp_image %}
-      <source srcset="{{ webp_image.url }}" type="image/webp">
-      {% image self.image fill-960x540-c50 as the_image %}
-      <img src="{{ the_image.url }}" alt="{{ the_image.alt }}" class="img-fluid">
-    {% else %}
-      {% image self.image original format-webp as webp_image %}
-      <source srcset="{{ webp_image.url }}" type="image/webp">
-      {% image self.image original as the_image %}
-      <img src="{{ the_image.url }}" alt="{{ the_image.alt }}" class="img-fluid">
+    {% if self.image %}
+      <picture>
+        {% render_image self.image orientation=self.orientation|lower size=self.size|lower responsive=self.responsive %}
+      </picture>
     {% endif %}
   </picture>
   <div class="{% if self.overlay %} overlay-top{% endif %} py-3 block-text">
@@ -48,21 +38,10 @@
 <div class="row {% if self.image_alignment == "right" %}flex-row-reverse {% endif %}position-relative {{ self.inset }} {{ self.bg.background }} {{ self.bg.opacity }}">
   <div class="col-auto{% if self.image_alignment == "right" %} text-end{% else %} text-start{% endif %}">
     <picture>
-      {% if self.image_size == "portrait" %}
-        {% image self.image fill-540x960-c50 format-webp as webp_image %}
-        <source srcset="{{ webp_image.url }}" type="image/webp">
-        {% image self.image fill-540x960-c50 as the_image %}
-        <img src="{{ the_image.url }}" alt="{{ the_image.alt }}" class="img-fluid">
-      {% elif self.image_size == "landscape" %}
-        {% image self.image fill-960x540-c50 format-webp as webp_image %}
-        <source srcset="{{ webp_image.url }}" type="image/webp">
-        {% image self.image fill-960x540-c50 as the_image %}
-        <img src="{{ the_image.url }}" alt="{{ the_image.alt }}" class="img-fluid">
-      {% else %}
-        {% image self.image original format-webp as webp_image %}
-        <source srcset="{{ webp_image.url }}" type="image/webp">
-        {% image self.image original as the_image %}
-        <img src="{{ the_image.url }}" alt="{{ the_image.alt }}" class="img-fluid">
+      {% if self.image %}
+        <picture>
+          {% render_image self.image orientation=self.orientation|lower size=self.size|lower responsive=self.responsive %}
+        </picture>
       {% endif %}
     </picture>
   </div>

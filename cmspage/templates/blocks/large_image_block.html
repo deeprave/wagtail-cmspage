@@ -1,12 +1,9 @@
-{% load wagtailimages_tags %}
+{% load wagtailimages_tags cmspage_tags %}
 
 <div class="row mb-2 text-center {{ self.inset }} {{ self.bg.background }} {{ self.bg.opacity }}">
   <div class="col">
     <picture>
-      {% image self.image fill-1200x775-c75 format-webp as webp_image %}
-      <source srcset="{{ webp_image.url }}" type="image/webp">
-      {% image self.image fill-1200x775-c75 as original_image %}  {# Fallback to original #}
-      <img src="{{ original_image.url }}" alt="{{ original_image.alt }}" class="img-fluid">
+      {% render_image self.image orientation=self.orientation|lower size=self.size|lower responsive=self.responsive %}
     </picture>
   </div>
 </div>

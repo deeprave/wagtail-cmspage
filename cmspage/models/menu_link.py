@@ -5,6 +5,8 @@ from django.contrib.contenttypes.fields import GenericRelation
 from django.core.cache import cache
 from django.core.exceptions import ValidationError
 from django.db import models
+from django.db.models.signals import post_save, post_delete
+from django.dispatch import receiver
 from wagtail.admin.panels import FieldPanel, FieldRowPanel, PageChooserPanel, MultiFieldPanel
 from wagtail.admin.widgets import AdminPageChooser
 from wagtail.models import Site, PreviewableMixin, DraftStateMixin, RevisionMixin
@@ -211,14 +213,40 @@ class MenuLink(PreviewableMixin, DraftStateMixin, RevisionMixin, Indexed, models
     def get_menu_links(cls, site: Site):
         return list(MenuLink.objects.get_ordered_queryset(site))
 
+    MENU_LINKS_KEY = "menu_links_ids"
+    MENU_LINKS_TIMEOUT = 1800  # 30 minutes
+
     @classmethod
     def get_cached_menu_links(cls, site: Site, user_id: int):
+        if not cls.cache_enabled:
+            return cls.get_menu_links(site)
+
         cache_key = f"menu_links:{site.id}:{user_id}"
-        menu_links = cls.cache_enabled and cache.get(cache_key)
-        if not menu_links:
-            menu_links = cls.get_menu_links(site)
-            cache.set(cache_key, menu_links, 1800)
+        menu_links = cache.get(cache_key)
+        if menu_links:
+            return menu_links
+        menu_links = cls.get_menu_links(site)
+        cache.set(cache_key, menu_links, cls.MENU_LINKS_TIMEOUT)
+
+        # get and update the list of cached site.id/user_id combos
+        # this simplifies deletion of cached menu links
+        registry = cache.get(cls.MENU_LINKS_KEY) or set()
+        registry.add((site.id, user_id))
+        cache.set(cls.MENU_LINKS_KEY, registry, cls.MENU_LINKS_TIMEOUT)
+
         return menu_links
+
+    @classmethod
+    def clear_cached_menu_links(cls):
+        registry = cache.get(cls.MENU_LINKS_KEY) or set()
+
+        for site_id, user_id in registry:
+            if site_id and user_id:  # Basic validation
+                cache_key = f"menu_links:{site_id}:{user_id}"
+                cache.delete(cache_key)
+
+        # Delete the registry itself
+        cache.delete(cls.MENU_LINKS_KEY)
 
     def clean(self):
         super().clean()
@@ -269,3 +297,10 @@ class MenuLink(PreviewableMixin, DraftStateMixin, RevisionMixin, Indexed, models
         SearchField("title"),
         SearchField("url"),
     ]
+
+@receiver([post_save, post_delete], sender=MenuLink)
+def clear_menu_link_cache(sender, instance, **kwargs):
+    """
+    Clear the MenuLink cache whenever a MenuLink is saved or deleted.
+    """
+    MenuLink.clear_cached_menu_links()

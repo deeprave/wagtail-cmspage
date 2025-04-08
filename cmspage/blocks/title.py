@@ -10,7 +10,9 @@ class TitleBlock(blocks.StructBlock):
     inset = blocks.ChoiceBlock(
         choices=Insets.choices, default=Insets.SMALL, help_text="Padding around the block"
     )
+    justify = blocks.ChoiceBlock(required=False, choices=Justifications.choices, default=Justifications.CENTER, help_text="Text alignment")
     text = blocks.CharBlock(help_text="Title text to display")
+    cursive = blocks.BooleanBlock(required=False, default=False, help_text="Use the cursive font?")
 
     class Meta:
         template = "blocks/title_block.html"
@@ -31,6 +33,7 @@ class RichTextWithTitleBlock(blocks.StructBlock):
         max_length=120,
         help_text="Display title, optional (max len=120)",
     )
+    cursive = blocks.BooleanBlock(required=False, default=False, help_text="Use the cursive font?")
     justify = blocks.ChoiceBlock(required=False, choices=Justifications.choices, default=Justifications.LEFT, help_text="Text alignment")
     content = blocks.RichTextBlock(features=DEFAULT_RICHTEXTBLOCK_FEATURES, help_text="Rich text block, required")
 

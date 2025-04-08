@@ -1,12 +1,13 @@
-{% load static wagtailcore_tags wagtailimages_tags %}
+{% load static wagtailcore_tags wagtailimages_tags cmspage_tags %}
 
  <div class="row {% if value.image_alignment == "right" %}flex-row-reverse {% endif %} {{ value.inset }} {{ value.palette }} align-items-center shadow-sm">
   <div class="col-auto d-flex align-items-center">
     <picture>
-        {% image value.image fill-125x125 format-webp as webp_image %}
-        <source srcset="{{ webp_image.url }}" type="image/webp">
-        {% image value.image fill-125x125 as the_image %}
-        <img src="{{ the_image.url }}" alt="{{ the_image.alt }}">
+      {% if value.image %}
+        <picture>
+          {% render_image value.image orientation=value.orientation|lower size=value.size|lower responsive=value.responsive %}
+        </picture>
+      {% endif %}
     </picture>
   </div>
   <div class="col {{ value.justify }}">
