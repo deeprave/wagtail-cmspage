@@ -1,7 +1,6 @@
 {% load wagtailimages_tags cmspage_tags %}
-
-<div class="row {{ self.justify }} shadow {{ self.inset }} {{ self.bg.background }} {{ self.bg.opacity }}">
-  <div class="col w-100">
+<div class="p-3 m-5 text-center {{ self.inset }} {{ self.palette }}">
+  <div class="image-container" style="z-index: 1;">
     <picture>
       {% render_image self.image orientation=self.orientation|lower size=self.size|lower responsive=self.responsive %}
     </picture>

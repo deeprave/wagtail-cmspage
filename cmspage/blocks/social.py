@@ -40,13 +40,13 @@ class SocialLinkBlockAdapter(StructBlockAdapter):
 
 
 class SocialsBlock(blocks.StructBlock):
+    links = blocks.ListBlock(SocialLinkBlock())
     palette = blocks.ChoiceBlock(
         choices=Palette.choices, default=Palette.WARNING, help_text="LineBlock palette"
     )
     inset = blocks.ChoiceBlock(
         choices=Insets.choices, default=Insets.SMALL, help_text="Padding around the block"
     )
-    links = blocks.ListBlock(SocialLinkBlock())
 
     class Meta:
         template = "blocks/socials_block.html"

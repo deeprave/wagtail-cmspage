@@ -7,7 +7,6 @@ from django.db import models
 __all__ = (
     "Backgrounds",
     "Palette",
-    "Opacities",
     "Heights",
     "Insets",
     "SocialIcon",
@@ -67,14 +66,6 @@ class Palette(Choices):
     WARNING = f"{Backgrounds.WARNING.value} text-dark title-dark", "Dark on Warning Background"
     INFO = f"{Backgrounds.INFO.value} text-dark title-dark", "Dark on Info Background"
     DANGER = f"{Backgrounds.DANGER.value} text-dark title-dark", "Dark on Danger Background"
-
-
-class Opacities(Choices):
-    OPACITY_FULL = "bg-opacity-100", "100%"
-    OPACITY_75 = "bg-opacity-75", "75%"
-    OPACITY_50 = "bg-opacity-50", "50%"
-    OPACITY_25 = "bg-opacity-25", "25%"
-    OPACITY_10 = "bg-opacity-10", "10%"
 
 
 class Heights(Choices):

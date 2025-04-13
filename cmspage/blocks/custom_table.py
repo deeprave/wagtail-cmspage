@@ -1,12 +1,13 @@
 from wagtail import blocks
 from wagtail.contrib.table_block import blocks as table_blocks
 
-from .background import BackgroundBlock
-from .themes import Insets
+from .themes import Insets, Palette
 
 
 class CustomTableBlock(table_blocks.TableBlock):
-    bg = BackgroundBlock()
+    palette = blocks.ChoiceBlock(
+        choices=Palette.choices, default=Palette.WARNING, help_text="Palette"
+    )
     inset = blocks.ChoiceBlock(
         choices=Insets.choices, default=Insets.SMALL, help_text="Padding around the block"
     )

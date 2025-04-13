@@ -1,7 +1,6 @@
 from wagtail import blocks
 from wagtail.images import blocks as image_blocks
 
-from .background import BackgroundBlock
 from .links import LinkBlock
 from .themes import Palette, Insets, Justifications, Orientations, ImageSizes, CropPercentage, ImageRounding
 from .. import DEFAULT_RICHTEXTBLOCK_FEATURES
@@ -33,10 +32,10 @@ class Card(blocks.StructBlock):
     crop = blocks.ChoiceBlock(choices=CropPercentage.choices, default=CropPercentage.FULL, help_text="Crop percentage")
     responsive = blocks.BooleanBlock(required=False, default=False, help_text="Image responsive")
     palette = blocks.ChoiceBlock(
-        choices=Palette.choices, default=Palette.WARNING, help_text="Cards palette"
+        choices=Palette.choices, default=Palette.WARNING, help_text="Card palette"
     )
     inset = blocks.ChoiceBlock(
-        choices=Insets.choices, default=Insets.SMALL, help_text="Padding around the block"
+        choices=Insets.choices, default=Insets.SMALL, help_text="Padding around the card"
     )
     link = LinkBlock(required=False, label="Card Link", help_text="Enter a page or document, or an external link")
 
@@ -47,13 +46,15 @@ class Card(blocks.StructBlock):
 
 
 class CardsBlock(blocks.StructBlock):
-    bg = BackgroundBlock()
+    cards = blocks.ListBlock(Card())
+    cursive = blocks.BooleanBlock(required=False, default=False, help_text="Use the cursive font in titles?")
+    rounded = blocks.ChoiceBlock(required=False, choices=ImageRounding.choices, default=ImageRounding.NONE, help_text="Image rounding")
+    palette = blocks.ChoiceBlock(
+        choices=Palette.choices, default=Palette.WARNING, help_text="Palette"
+    )
     inset = blocks.ChoiceBlock(
         choices=Insets.choices, default=Insets.SMALL, help_text="Padding around the block"
     )
-    cursive = blocks.BooleanBlock(required=False, default=False, help_text="Use the cursive font in titles?")
-    rounded = blocks.ChoiceBlock(required=False, choices=ImageRounding.choices, default=ImageRounding.NONE, help_text="Image rounding")
-    cards = blocks.ListBlock(Card())
 
     def get_context(self, value, parent_context=None):
         context = super().get_context(value, parent_context)
