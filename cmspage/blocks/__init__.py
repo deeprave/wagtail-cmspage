@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 
-from .background import BackgroundBlock
 from .cards import Card, CardsBlock
 from .copy import CopyrightBlock
 from .cta import CallToActionBlock
@@ -14,21 +13,19 @@ from .links import LinkBlock, LinksBlock
 from .carousel import CarouselImageBlock
 from .social import SocialsBlock, SocialLinkBlock
 from .title import TitleBlock, RichTextWithTitleBlock
-from .themes import Backgrounds, Palette, Opacities, Heights, Insets, SocialIcon, IconColorChoices
+from .themes import Backgrounds, Palette, Heights, Insets, SocialIcon, IconColorChoices
 from .form import FormBlock
 
 __all__ = (
     # themes
     "Backgrounds",
     "Palette",
-    "Opacities",
     "Heights",
     "Insets",
     "SocialIcon",
     "IconColorChoices",
     # blocks
     "AbstractLinesBlock",
-    "BackgroundBlock",
     "CallToActionBlock",
     "Card",
     "CardsBlock",

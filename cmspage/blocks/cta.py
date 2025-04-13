@@ -1,7 +1,6 @@
 from wagtail import blocks
 
 from cmspage import DEFAULT_RICHTEXTBLOCK_FEATURES
-from .background import BackgroundBlock
 from .links import LinkBlock
 from .themes import Insets, Palette, Justifications
 
@@ -22,13 +21,12 @@ class CallToActionBlock(blocks.StructBlock):
         help_text="Call to action text, optional (max=200)",
     )
     justify = blocks.ChoiceBlock(required=False, choices=Justifications.choices, default=Justifications.LEFT, help_text="Text alignment")
-    bg = BackgroundBlock(label="Block Background", help_text="Background color for the block")
-    inset = blocks.ChoiceBlock(
-        choices=Insets.choices, default=Insets.SMALL, help_text="Padding around the block"
-    )
     palette = blocks.ChoiceBlock(
         choices=Palette.choices, default=Palette.WARNING, help_text="CTA palette",
         label="CTA Button palette"
+    )
+    inset = blocks.ChoiceBlock(
+        choices=Insets.choices, default=Insets.SMALL, help_text="Padding around the block"
     )
     link = LinkBlock(required=False, blank=True, null=True)
 
@@ -36,4 +34,4 @@ class CallToActionBlock(blocks.StructBlock):
         template = "blocks/call_to_action_block.html"
         icon = "warning"
         label = "Call to Action"
-        label_format = "Call to Action"
+        label_format = "Call to Action {title}"

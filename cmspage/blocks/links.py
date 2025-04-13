@@ -35,10 +35,11 @@ INVALID_LINK_ERROR_MESSAGE = "Invalid link. Please select a page or document, or
 
 
 class LinkBlock(blocks.StructBlock):
-    """
-    Common attributes for creating a link within the CMS.
-    """
-
+    button_title = blocks.CharBlock(
+        required=False,
+        max_length=255,
+        label="Button Title (use hyphen for special link button)",
+    )
     page_link = blocks.PageChooserBlock(
         required=False,
         label="Page link",
@@ -51,11 +52,6 @@ class LinkBlock(blocks.StructBlock):
         required=False,
         max_length=255,
         label="Extra link",
-    )
-    button_title = blocks.CharBlock(
-        required=False,
-        max_length=255,
-        label="Button Title (use hyphen for special link button)",
     )
 
     def clean(self, value):

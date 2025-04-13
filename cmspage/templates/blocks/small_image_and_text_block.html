@@ -1,22 +1,20 @@
 {% load static wagtailcore_tags wagtailimages_tags cmspage_tags %}
 
- <div class="row {% if value.image_alignment == "right" %}flex-row-reverse {% endif %} {{ value.inset }} {{ value.palette }} align-items-center shadow-sm">
-  <div class="col-auto d-flex align-items-center">
+<div class="row {% if value.image_alignment == "right" %}flex-row-reverse {% endif %} {{ value.inset }} {{ value.palette }} align-items-center shadow-sm">
+  {% if value.image %}
+  <div class="col-auto d-flex align-items-center p-1">
     <picture>
-      {% if value.image %}
-        <picture>
-          {% render_image value.image orientation=value.orientation|lower size=value.size|lower responsive=value.responsive %}
-        </picture>
-      {% endif %}
+      {% render_image value.image orientation=value.orientation|lower size=value.size|lower responsive=value.responsive %}
     </picture>
   </div>
-  <div class="col {{ value.justify }}">
+  {% endif %}
+  <div class="col {{ self.justify }}">
     {% if value.title %}
     <div class="block-title">
       <h2 class="block-title">{{ value.title }}</h2>
     </div>
     {% endif %}
-    <div class="block-text {{ value.justify }}">
+    <div class="block-text px-2 px-md-3 px-lg-5">
       {% if value.text %}<p class="block-text richtext-text text-break">{{ value.text|richtext }}</p>{% endif %}
     </div>
   </div>

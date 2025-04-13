@@ -1,7 +1,7 @@
 {% load wagtailimages_tags table_block_tags %}
 {% comment %}table_block_tags requires wagtail.contrib.table_block in INSTALLED_APPS{% endcomment %}
 
-<div class="col-md-10 offset-md-1">
+<div class="col {{ self.palette }} {{ self.inset }}">
 <!-- Custom Table Block -->
   <div class="table-responsive d-block my-4">
     <table role="table" class="table">

@@ -1,72 +1,57 @@
 {% load static wagtailcore_tags wagtailimages_tags cmspage_tags %}
 
 {% if self.image_alignment == "full" %}
-<div class="row position-relative {{ self.justify }} {{ self.inset }} {{ self.bg.background }} {{ self.bg.opacity }}">
-  <picture>
-    {% if self.image %}
-      <picture>
-        {% render_image self.image orientation=self.orientation|lower size=self.size|lower responsive=self.responsive %}
-      </picture>
-    {% endif %}
-  </picture>
-  <div class="{% if self.overlay %} overlay-top{% endif %} py-3 block-text">
-    <div class="block-title {{ self.justify }}">
-    {% if self.title %}<h2>{{ self.title }}</h2></div>{% endif %}
-    {% if self.text %}<p class="block-text richtext-text {{ self.justify }}">{{ self.text|richtext }}</p>{% endif %}
+{% if self.link.link_url %}<a href="{{ self.link.link_url }}" class="text-decoration-none text-reset">{% endif %}
+
+<div class="row position-relative {{ self.justify }} {{ self.inset }} {{ self.palette }}">
+  {% if self.image %}
+    <picture>
+      {% render_image self.image orientation=self.orientation|lower size=self.size|lower responsive=self.responsive rounded=self.rounded %}
+    </picture>
+  {% endif %}
+  <div class="{% if self.overlay %} overlay-top{% endif %} py-3 block-text {{ self.justify }}">
+    {% if self.title %}<h3 class="block-title{% if self.cursive %} cursive{% endif %}">{{ self.title }}</h3></div>{% endif %}
+    {% if self.text %}<p class="block-text richtext-text richtext {{ self.justify }}">{{ self.text|richtext }}</p>{% endif %}
   </div>
   {% if self.link.link_url %}
     <div class="row m-2 p-3">
-      <a href="{{ self.link.link_url }}" class="text-decoration-none">
-        {% if self.link.button_title and self.link.button_title != '-' %}
-        <div class="col text-end">
-          <div class="btn btn-outline-primary btn-lg collapsing-button-width">
-            {{ self.link.button_title }}
-          </div>
+      <div class="col {{ self.justify }}">
+        <div class="btn btn-outline-primary btn-lg collapsing-button-width">
+          {{ self.link.button_title }}
         </div>
-        {% else %}
-        <div class="col text-end">
-          <div class="btn btn-outline-primary btn-lg collapsing-button-width link-elongated-arrow border-0">
-            &#10132;
-          </div>
-        </div>
-        {% endif %}
-      </a>
+      </div>
     </div>
   {% endif %}
 </div>
+{% if self.link.link_url %}</a>{% endif %}
+
 {% else %}
-<div class="row {% if self.image_alignment == "right" %}flex-row-reverse {% endif %}position-relative {{ self.inset }} {{ self.bg.background }} {{ self.bg.opacity }}">
+
+{% if self.link.link_url %}<a href="{{ self.link.link_url }}" class="text-decoration-none text-reset">{% endif %}
+<div class="row {% if self.image_alignment == "right" %}flex-row-reverse {% endif %}position-relative {{ self.inset }} {{ self.palette }}">
+  {% if self.image %}
   <div class="col-auto{% if self.image_alignment == "right" %} text-end{% else %} text-start{% endif %}">
     <picture>
-      {% if self.image %}
-        <picture>
-          {% render_image self.image orientation=self.orientation|lower size=self.size|lower responsive=self.responsive %}
-        </picture>
-      {% endif %}
+      {% render_image self.image orientation=self.orientation|lower size=self.size|lower responsive=self.responsive rounded=self.rounded %}
     </picture>
   </div>
-  <div class="col{% if self.image_alignment == "left" %}{% if self.overlay %} overlay-text-right{% endif %} text-end{% else %}{% if self.overlay %} overlay-text-left{% endif %} text-start{% endif %} py-5 block-text">
-    <div class="block-title">
-    {% if self.title %}<h2 class="block-title {{ self.justify }}">{{ self.title }}</h2>{% endif %}
+  {% endif %}
+
+  <div class="col{% if self.image_alignment == "left" %}{% if self.overlay %} overlay-text-right{% endif %} text-end{% else %}{% if self.overlay %} overlay-text-left{% endif %} text-start{% endif %}">
+    {% if self.title %}<h3 class="block-title{% if self.cursive %} cursive{% endif %}">{{ self.title }}</h3>{% endif %}
+    <div class="block-text text-lg-start mx-1 {{ self.justify }}">
+      {% if self.text %}<p class="block-text richtext-text {{ self.justify }}">{{ self.text|richtext }}</p>{% endif %}
     </div>
-    {% if self.text %}<p class="block-text richtext-text {{ self.justify }}">{{ self.text|richtext }}</p>{% endif %}
   </div>
   {% if self.link.link_url %}
-    <div class="row m-2 p-3">
-      {% if self.link.button_title and self.link.button_title != '-' %}
-        <div class="col text-end">
-          <a href="{{ self.link.link_url }}" class="btn btn-outline-primary btn-lg collapsing-button-width">
-            {{ self.link.button_title }}
-          </a>
+    <div class="row m-1 p-1">
+      <div class="col text-end">
+        <div class="btn btn-outline-primary btn-lg collapsing-button-width">
+          {{ self.link.button_title }}
         </div>
-      {% else %}
-        <div class="col text-end">
-          <a href="{{ self.link.link_url }}" class="btn btn-outline-primary btn-lg collapsing-button-width link-elongated-arrow border-0">
-            &#10132;
-          </a>
-        </div>
-      {% endif %}
+      </div>
     </div>
   {% endif %}
 </div>
+{% if self.link.link_url %}</a>{% endif %}
 {% endif %}

@@ -2,6 +2,7 @@
 import re
 from django.template import Template, Context
 from django import template
+from wagtail.images.models import Image
 
 register = template.Library()
 
@@ -39,22 +40,34 @@ for orientation_index, orientation in enumerate(ORIENTATIONS):
 
 
 @register.simple_tag
-def render_image(image, orientation="landscape", size="medium", crop=None, rounded=None, responsive=True):
+def render_image(
+        image: Image,
+        orientation: str="landscape",
+        size: str="medium",
+        size_prefix: str="fill",
+        alt_text: str=None,
+        crop: str|int=None,
+        rounded: int=None,
+        responsive: bool=True
+):
     """
     Creates and renders a template for the specified image rendition.
     """
-    # Define image specifications
-
     # Get the spec or default to medium landscape
-    css_classes = []
-    if responsive:
-        css_classes.append("img-fluid")
-    if rounded is not None:
+    css_classes = ["img-fluid"] if responsive else []
+    if rounded:
         css_classes.append(f"rounded-{rounded}")
-    css_class = f" class=\"{" ".join(css_classes)}\"" if css_classes else ""
+    css_class = f" class=\"{' '.join(css_classes)}\"" if css_classes else ""
+
     cropping = f"-c{crop}" if crop else ""
-    dimensions = IMAGE_SIZES.get(orientation, {}).get(size) or IMAGE_SIZES["landscape"]["medium"]
-    image_size = "original" if dimensions == "original" else f"fill-{dimensions}" if responsive else f"max-{dimensions}"
+    dimensions = IMAGE_SIZES.get(orientation, {}).get(size)
+    image_size = (
+        "original" if dimensions == "original" else
+        f"{size_prefix}-{dimensions}"
+    ) if dimensions else size
+
+    alt_text = alt_text or image.title or image.description or ""
+    alt = f' alt="{alt_text}"' if alt_text else ""
 
     # Create a template string with the specific image tag
     template_string = f"""
@@ -62,7 +75,7 @@ def render_image(image, orientation="landscape", size="medium", crop=None, round
     {{% image image {image_size}{cropping} format-webp as webp_image %}}
     <source srcset="{{{{ webp_image.url }}}}" type="image/webp"{css_class}>
     {{% image image {image_size} as the_image %}}
-    <img src="{{ image.url }}" alt="{{ image.alt }}"{css_class}>
+    <img src="{{ image.url }}" {alt}{css_class}>
     """
 
     # Create and render the template

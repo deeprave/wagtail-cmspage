@@ -2,8 +2,7 @@ from wagtail import blocks
 from wagtail.blocks import ListBlock
 from wagtail.images.blocks import ImageChooserBlock
 
-from .background import BackgroundBlock
-from .themes import Insets, Justifications
+from .themes import Insets, Justifications, Palette
 
 
 class CarouselImageStructBlock(blocks.StructBlock):
@@ -33,12 +32,15 @@ class CarouselImageStructBlock(blocks.StructBlock):
 
 
 class CarouselImageBlock(blocks.StructBlock):
-    bg = BackgroundBlock()
+    carousel = ListBlock(CarouselImageStructBlock())
+    carousel_interval = blocks.IntegerBlock(default=12000, help_text="Keep visible for time in milliseconds",)
+    palette = blocks.ChoiceBlock(
+        choices=Palette.choices, default=Palette.WARNING, help_text="Palette"
+    )
     inset = blocks.ChoiceBlock(
         choices=Insets.choices, default=Insets.SMALL, help_text="Padding around the block"
     )
     carousel_interval = blocks.IntegerBlock(default=12000, help_text="Keep visible for time in milliseconds",)
-    carousel = ListBlock(CarouselImageStructBlock())
 
     class Meta:
         template = "blocks/carousel_block.html"
