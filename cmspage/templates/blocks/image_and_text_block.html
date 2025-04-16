@@ -3,7 +3,7 @@
 {% if self.image_alignment == "full" or self.image_alignment == "center" %}
 {% if self.link.link_url %}<a href="{{ self.link.link_url }}" class="text-decoration-none text-reset">{% endif %}
 
-<div class="row position-relative {{ self.justify }}{% if self.image_alignment == "full"%} w-100{% endif %} {{ self.inset }} {{ self.palette }}">
+<div class="row position-relative {{ self.justify }}{% if self.image_alignment == "full"%} w-100{% else %} text-center{% endif %} {{ self.inset }} {{ self.palette }}">
   {% if self.image %}
     <picture>
       {% render_image self.image orientation=self.orientation|lower size=self.size|lower responsive=self.responsive rounded=self.rounded crop=self.crop %}
