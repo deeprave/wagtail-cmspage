@@ -3,7 +3,7 @@
 <div class="row mb-2 text-center {{ self.inset }} {{ self.bg.background }} {{ self.bg.opacity }}">
   <div class="col">
     <picture>
-      {% render_image self.image orientation=self.orientation|lower size=self.size|lower responsive=self.responsive %}
+      {% render_image self.image orientation=self.orientation|lower size=self.size|lower responsive=self.responsive rounded=self.rounded crop=self.crop %}
     </picture>
   </div>
 </div>

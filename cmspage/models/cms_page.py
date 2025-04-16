@@ -117,7 +117,7 @@ class CMSPage(CMSPageBase):
     page_description = "This page type is for general content and can be used for most purposes."
     # Default implementation of CMSPage
     parent_page_types = ["cmspage.CMSHomePage", "cmspage.CMSPage"]
-    subpage_types = ["cmspage.CMSPage", "wagtailcore.Page"]
+    subpage_types = ["cmspage.CMSPage", "wagtailcore.Page", "cmspage.CMSFormPage"]
 
     class Meta:
         app_label = "cmspage"
@@ -151,7 +151,7 @@ class CMSFooterPage(AbstractCMSPage):
 class CMSHomePage(CMSPageBase):
     page_description = "This page type is only for a site home page."
     parent_page_types = ["wagtailcore.Page"]
-    subpage_types = ["cmspage.CMSPage", "wagtailcore.Page", "cmspage.CMSFooterPage"]
+    subpage_types = ["cmspage.CMSPage", "wagtailcore.Page", "cmspage.CMSFooterPage", "cmspage.CMSFormPage"]
     max_count = 1
 
     body_blocks = [

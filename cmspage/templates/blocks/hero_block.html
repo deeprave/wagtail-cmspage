@@ -2,7 +2,7 @@
 <div class="p-3 m-5 text-center {{ self.inset }} {{ self.palette }}">
   <div class="image-container" style="z-index: 1;">
     <picture>
-      {% render_image self.image orientation=self.orientation|lower size=self.size|lower responsive=self.responsive %}
+      {% render_image self.image orientation=self.orientation|lower size=self.size|lower responsive=self.responsive rounded=self.rounded crop=self.crop %}
     </picture>
   </div>
 </div>

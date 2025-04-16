@@ -9,8 +9,8 @@ class CMSFormPage(CMSPageBase):
     A specialized CMS page type designed for building forms.
     """
     page_description = "This page type is for building forms"
-    parent_page_types = ["wagtailcore.Page"]
-    subpage_types = []
+    # parent_page_types = ["cmspage.CMSHomePage", "cmspage.CMSPage"]
+    # subpage_types = []
 
     # Extend body_blocks like CMSHomePage but without the hero block
     body_blocks = [
