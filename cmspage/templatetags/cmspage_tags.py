@@ -17,10 +17,10 @@ def get_embed_url_with_parameters(url):
     return url
 
 
-RAW_SIZES = { # landscape (width, height),
-              # portrait (width, height),
-              # square (width, height),
-              # extrawide (width, height)
+RAW_SIZES = {  # landscape (width, height),
+    # portrait (width, height),
+    # square (width, height),
+    # extrawide (width, height)
     "tiny": ((150, 100), (100, 150), (150, 150), (450, 150)),
     "small": ((300, 200), (200, 300), (300, 300), (900, 300)),
     "medium": ((480, 320), (320, 480), (480, 480), (1440, 480)),
@@ -41,14 +41,14 @@ for orientation_index, orientation in enumerate(ORIENTATIONS):
 
 @register.simple_tag
 def render_image(
-        image: Image,
-        orientation: str="landscape",
-        size: str="medium",
-        size_prefix: str="fill",
-        alt_text: str=None,
-        crop: str|int=None,
-        rounded: int=None,
-        responsive: bool=True
+    image: Image,
+    orientation: str = "landscape",
+    size: str = "medium",
+    size_prefix: str = "fill",
+    alt_text: str = None,
+    crop: str | int = None,
+    rounded: int = None,
+    responsive: bool = True,
 ):
     """
     Creates and renders a template for the specified image rendition.
@@ -57,14 +57,11 @@ def render_image(
     css_classes = ["img-fluid"] if responsive else []
     if rounded:
         css_classes.append(f"rounded-{rounded}")
-    css_class = f" class=\"{' '.join(css_classes)}\"" if css_classes else ""
+    css_class = f' class="{" ".join(css_classes)}"' if css_classes else ""
 
-    cropping = f"-c{crop}" if crop else ""
     dimensions = IMAGE_SIZES.get(orientation, {}).get(size)
-    image_size = (
-        "original" if dimensions == "original" else
-        f"{size_prefix}-{dimensions}"
-    ) if dimensions else size
+    image_size = ("original" if dimensions == "original" else f"{size_prefix}-{dimensions}") if dimensions else size
+    cropping = f"-c{crop}" if crop and dimensions != "original" else ""
 
     alt_text = alt_text or image.title or image.description or ""
     alt = f' alt="{alt_text}"' if alt_text else ""
