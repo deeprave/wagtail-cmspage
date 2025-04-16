@@ -1,7 +1,7 @@
 {% load wagtailimages_tags cmspage_tags %}
 
 <div class="row mb-2 text-center {{ self.inset }} {{ self.bg.background }} {{ self.bg.opacity }}">
-  <div class="col">
+  <div class="col text-center {{ self.justify }}">
     <picture>
       {% render_image self.image orientation=self.orientation|lower size=self.size|lower responsive=self.responsive rounded=self.rounded crop=self.crop %}
     </picture>

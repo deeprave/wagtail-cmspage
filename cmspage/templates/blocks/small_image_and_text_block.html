@@ -2,7 +2,7 @@
 
 <div class="row {% if value.image_alignment == "right" %}flex-row-reverse {% endif %} {{ value.inset }} {{ value.palette }} align-items-center shadow-sm">
   {% if value.image %}
-  <div class="col-auto d-flex align-items-center p-1">
+  <div class="col-auto d-flex align-items-center{% if value.image_alignment == "center" %} text-center{% endif %} p-1">
     <picture>
       {% render_image value.image orientation=value.orientation|lower size=value.size|lower responsive=value.responsive rounded=self.rounded crop=self.crop %}
     </picture>
