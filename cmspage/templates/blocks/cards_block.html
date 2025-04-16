@@ -16,7 +16,7 @@
         <div class="card-header text-center p-1 m-0"> {# Header already has text-center #}
           <span class="card-block-title{% if value.cursive %} cursive{% endif %} fs-4 p-1 mb-0">{{ card.title }}</span>
         </div>
-        <div class="card-body p-1">
+        <div class="card-body text-center p-1">
           {% if card.image %}
             <picture>
               {% render_image card.image orientation=card.orientation|lower size=card.size|lower responsive=card.responsive rounded=value.rounded crop=self.crop %}
