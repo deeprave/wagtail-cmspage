@@ -19,7 +19,7 @@
         <div class="card-body p-1">
           {% if card.image %}
             <picture>
-              {% render_image card.image orientation=card.orientation|lower size=card.size|lower responsive=card.responsive rounded=value.rounded %}
+              {% render_image card.image orientation=card.orientation|lower size=card.size|lower responsive=card.responsive rounded=value.rounded crop=self.crop %}
             </picture>
           {% endif %}
           <div class="px-2 py-1 card-block-text d-flex flex-column {{ card.justify }} flex-grow-1 mt-auto">

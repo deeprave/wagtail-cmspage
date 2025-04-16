@@ -4,7 +4,7 @@
   {% if value.image %}
   <div class="col-auto d-flex align-items-center p-1">
     <picture>
-      {% render_image value.image orientation=value.orientation|lower size=value.size|lower responsive=value.responsive %}
+      {% render_image value.image orientation=value.orientation|lower size=value.size|lower responsive=value.responsive rounded=self.rounded crop=self.crop %}
     </picture>
   </div>
   {% endif %}
