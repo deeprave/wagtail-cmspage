@@ -1,14 +1,16 @@
 {% load static wagtailcore_tags wagtailimages_tags cmspage_tags %}
 
-{% if self.image_alignment == "full" or self.image_alignment == "center" %}
 {% if self.link.link_url %}<a href="{{ self.link.link_url }}" class="text-decoration-none text-reset">{% endif %}
+{% if self.image_alignment == "full" or self.image_alignment == "center" %}
 
-<div class="row position-relative {{ self.justify }}{% if self.image_alignment == "full"%} w-100{% else %} text-center{% endif %} {{ self.inset }} {{ self.palette }}">
+<div class="row position-relative {{ self.inset }} {{ self.palette }}">
+  <div class="col-12 text-center">
   {% if self.image %}
     <picture>
       {% render_image self.image orientation=self.orientation|lower size=self.size|lower responsive=self.responsive rounded=self.rounded crop=self.crop %}
     </picture>
   {% endif %}
+  </div>
   <div class="{% if self.overlay %} overlay-top{% endif %} py-3 block-text {{ self.justify }}">
     {% if self.title %}<h3 class="block-title{% if self.cursive %} cursive{% endif %}">{{ self.title }}</h3></div>{% endif %}
     {% if self.text %}<p class="block-text richtext-text richtext {{ self.justify }}">{{ self.text|richtext }}</p>{% endif %}
@@ -23,11 +25,9 @@
     </div>
   {% endif %}
 </div>
-{% if self.link.link_url %}</a>{% endif %}
 
 {% else %}
 
-{% if self.link.link_url %}<a href="{{ self.link.link_url }}" class="text-decoration-none text-reset">{% endif %}
 <div class="row {% if self.image_alignment == "right" %}flex-row-reverse {% endif %}position-relative {{ self.inset }} {{ self.palette }}">
   {% if self.image %}
   <div class="col-auto{% if self.image_alignment == "right" %} text-end{% else %} text-start{% endif %}">
@@ -45,7 +45,7 @@
   </div>
   {% if self.link.link_url %}
     <div class="row m-1 p-1">
-      <div class="col text-end">
+      <div class="col {{ self.justify }}">
         <div class="btn btn-outline-primary btn-lg collapsing-button-width">
           {{ self.link.button_title }}
         </div>
@@ -53,5 +53,6 @@
     </div>
   {% endif %}
 </div>
-{% if self.link.link_url %}</a>{% endif %}
+
 {% endif %}
+{% if self.link.link_url %}</a>{% endif %}
