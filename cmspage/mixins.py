@@ -52,6 +52,7 @@ class CMSTemplateMixin:
     This mixin helps to determine the appropriate template to use
     for rendering CMS pages based on various conditions and settings.
     """
+
     from cmspage.models.functional import conditional_lru_cache, conditional_cached_property
 
     """
@@ -119,7 +120,7 @@ class CMSTemplateMixin:
     template_extensions = DEFAULT_TEMPLATE_EXTENSIONS
     template_include_names = DEFAULT_TEMPLATE_INCLUDE_NAMES
     template_include_names_extra = None
-    logging_level = logging.INFO
+    logging_level = logging.DEBUG
 
     @property
     def default_template_dir(self):
@@ -298,6 +299,7 @@ class CMSPageMixin(CMSTemplateMixin):
     files and footer.
 
     """
+
     default_base_template = DEFAULT_BASE_TEMPLATE_NAME
     default_template_dir = "cmspage"
     default_include_dir = "includes"
