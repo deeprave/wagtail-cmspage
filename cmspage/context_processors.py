@@ -8,7 +8,7 @@ from wagtail.models import Site
 
 from .models import MenuLink
 
-__all__ = ("navigation", "cmspage_context")
+__all__ = ("navigation", "cmspage_context", "site_variables")
 
 User = get_user_model()
 logger = logging.getLogger("cmspage.context_processors")
@@ -61,6 +61,31 @@ def navigation(request: HttpRequest) -> dict:
     return {"navigation": _nav_pages_for_site(site, user)}
 
 
+def site_variables(request: HttpRequest) -> dict:
+    """
+    Provide site-specific variables for templates
+    """
+    try:
+        site: Site = Site.find_for_request(request)
+        return {
+            "site": site,
+            "site_name": site.site_name,
+            "site_hostname": site.hostname,
+            "site_is_default": site.is_default_site,
+        }
+    except Site.DoesNotExist:
+        # No site found for this request
+        return {
+            "site": None,
+            "site_name": "",
+            "site_hostname": "",
+            "site_is_default": False,
+        }
+
+
 def cmspage_context(request: HttpRequest) -> dict:
     # combines all the above context processors into one
-    return navigation(request)
+    context = {}
+    context.update(navigation(request))
+    context.update(site_variables(request))
+    return context

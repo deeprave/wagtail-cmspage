@@ -61,7 +61,7 @@ if not settings.configured:
             "django.contrib.admin.apps.SimpleAdminConfig",
             "django.contrib.staticfiles",
         ),
-        ROOT_URLCONF="",  # tests override urlconf, but it still needs to be defined
+        ROOT_URLCONF="tests.urls",  # Use minimal test URL configuration
         MIDDLEWARE_CLASSES=(
             "django.contrib.sessions.middleware.SessionMiddleware",
             "django.middleware.common.CommonMiddleware",
@@ -86,7 +86,6 @@ if not settings.configured:
                 },
             },
         ],
-        FORMS_URLFIELD_ASSUME_HTTPS=True,
         WAGTAILADMIN_STATIC_FILE_VERSION_STRINGS=False,
     )
 

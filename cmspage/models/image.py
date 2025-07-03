@@ -11,22 +11,38 @@ from wagtail.images.models import Image as WagtailImage
 
 class CMSPageImage(WagtailImage):
     def save(self, *args, **kwargs):
-        # Call the original save method to save the image first
-        super().save(*args, **kwargs)
+        # Check if this is a WebP file already
+        if self.file and self.file.name and not self.file.name.lower().endswith(".webp"):
+            # Call the original save method to save the image first
+            super().save(*args, **kwargs)
 
-        # Get the original image path
-        original_image_path = self.file.path
+            try:
+                # Get the original image path
+                original_image_path = self.file.path
 
-        # Open the original image using PIL
-        with WillowImage.open(original_image_path) as image:
-            # Define the new path for the WebP image
-            webp_image_path = f"{os.path.splitext(original_image_path)[0]}.webp"
-            # Save the image in WebP format
-            image.save(webp_image_path, "WEBP")
+                # Open the original image using PIL and convert to WebP
+                with WillowImage.open(original_image_path) as image:
+                    # Define the new path for the WebP image
+                    webp_image_path = f"{os.path.splitext(original_image_path)[0]}.webp"
+                    # Save the image in WebP format
+                    image.save(webp_image_path, "WEBP")
 
-        # Optionally, update the file field to the new WebP path, if required
-        self.file.name = f"{os.path.splitext(self.file.name)[0]}.webp"
-        super().save(*args, **kwargs)  # Save again to update the file name
+                    # Update the file field to the new WebP path
+                    from django.core.files.base import ContentFile
+                    with open(webp_image_path, "rb") as webp_file:
+                        webp_content = ContentFile(webp_file.read())
+                        webp_filename = f"{os.path.splitext(self.file.name)[0]}.webp"
+                        self.file.save(webp_filename, webp_content, save=False)
+
+                    # Clean up the original WebP file
+                    os.remove(webp_image_path)
+
+            except Exception:
+                # If WebP conversion fails, just use the original file
+                pass
+        else:
+            # For WebP files or files without a name, just save normally
+            super().save(*args, **kwargs)
 
     class Meta:
         app_label = "cmspage"
