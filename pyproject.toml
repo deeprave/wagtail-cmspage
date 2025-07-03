@@ -28,9 +28,6 @@ testpaths = ["tests"]
 
 [dependency-groups]
 dev = [
-    "ruff == 0.5.7",
-]
-test = [
     "pytest >= 8.2",
     "pytest-django >= 4.9",
     "pytest-mock >= 3.14",
