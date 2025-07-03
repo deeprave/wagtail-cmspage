@@ -3,34 +3,55 @@
  */
 @import 'partials/variables';
 
+@mixin vertical-gradient-from-base($base-color) {
+  $light-color: mix($base-color, white, 70%);
+  $dark-color: mix($base-color, black, 70%);
+
+  background: linear-gradient(
+                  to bottom,
+                  $light-color,
+                  $base-color,
+                  $dark-color
+  );
+}
+
+
 .alert {
-  padding: 0.25em 0.5em;
-  margin: 0 3em 0.25em;
+  padding: 0.5rem 0.5rem;
+  margin: 0 2.5rem;
+  font-size: 1.25rem;
+  border-radius: 0.5rem;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.25);
 }
 
 .alert-error {
   color: white;
-  background-color: #ff2020ff;
+  @include vertical-gradient-from-base(#ff2020);
+}
+
+.alert-danger {
+  color: white;
+  @include vertical-gradient-from-base(#ff2020);
 }
 
 .alert-warning {
   color: black;
-  background-color: #ffff20ff;
+  @include vertical-gradient-from-base(#ffff20);
 }
 
 .alert-success {
-  color: white;
-  background-color: #20ff208f;
+  color: black;
+  @include vertical-gradient-from-base(#20ff20);
 }
 
 .alert-info {
   color: black;
-  background-color: #20ffff8f;
+  @include vertical-gradient-from-base(#20ffff);
 }
 
 .alert-debug {
   color: black;
-  background-color: #d7d7d78f;
+  @include vertical-gradient-from-base(#d7d7d7);
 }
 
 .hellohoney {

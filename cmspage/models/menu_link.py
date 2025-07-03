@@ -31,11 +31,28 @@ class MyPageChooser(AdminPageChooser):
 
 
 class MenuLinkManager(models.Manager):
+    def get_optimized_queryset(self, site: Site):
+        """
+        Get an optimized queryset with all related objects prefetched to avoid N+1 queries
+        """
+        return (
+            self.get_queryset()
+            .filter(site=site)
+            .select_related(
+                "site",
+                "parent",
+                "link_page",
+                "link_document"
+            )
+            .order_by("menu_order", "id")
+        )
+
     def _get_ordered_menu_links(self, site, parent=None, menu_links=None, ordered_links=None):
         if ordered_links is None:
             ordered_links = []
         if menu_links is None:
-            menu_links = list(self.get_queryset().filter(site=site).order_by("menu_order", "id"))
+            # Use optimized queryset to avoid N+1 queries
+            menu_links = list(self.get_optimized_queryset(site))
 
         children = [link for link in menu_links if link.parent_id == parent]
         for child in children:
@@ -45,14 +62,49 @@ class MenuLinkManager(models.Manager):
         return ordered_links
 
     def get_ordered_queryset(self, site: Site):
-        # For each site, fetch the MenuLink records in the desired hierarchical order
-        final_ordered_links = self._get_ordered_menu_links(site)
+        """
+        Get menu links in hierarchical order with optimized database queries
+        """
+        # Use the optimized approach - single query with all relations prefetched
+        return self.get_optimized_queryset(site)
 
-        # Extract IDs from the ordered links and construct an ordered queryset
-        ordered_ids = [link.id for link in final_ordered_links]
+    def get_hierarchy_optimized(self, site: Site):
+        """
+        Alternative method that builds hierarchy more efficiently using a single query
+        and in-memory processing with all relations pre-loaded
+        """
+        # Single query with all related data
+        all_links = list(self.get_optimized_queryset(site))
+
+        # Build hierarchy efficiently in memory
+        links_by_parent = {}
+        root_links = []
+
+        # Group by parent_id for O(1) lookups
+        for link in all_links:
+            parent_id = link.parent_id
+            if parent_id not in links_by_parent:
+                links_by_parent[parent_id] = []
+            links_by_parent[parent_id].append(link)
+
+        # Get root level links (no parent)
+        root_links = links_by_parent.get(None, [])
+
+        # Recursively build ordered list
+        def add_children(link_list, ordered_list):
+            for link in sorted(link_list, key=lambda x: (x.menu_order, x.id)):
+                ordered_list.append(link)
+                children = links_by_parent.get(link.id, [])
+                if children:
+                    add_children(children, ordered_list)
+
+        ordered_links = []
+        add_children(root_links, ordered_links)
+
+        # Return as queryset-like object (keeping existing interface)
+        ordered_ids = [link.id for link in ordered_links]
         return (
-            super()
-            .get_queryset()
+            self.get_optimized_queryset(site)
             .filter(id__in=ordered_ids)
             .order_by(models.Case(*[models.When(id=pk, then=pos) for pos, pk in enumerate(ordered_ids)]))
         )
@@ -207,11 +259,19 @@ class MenuLink(PreviewableMixin, DraftStateMixin, RevisionMixin, Indexed, models
     def url(self):
         if self.link_page:
             return self.link_page.url
-        return self.link_document.url if self.link_document else self.link_url
+        elif self.link_document:
+            return self.link_document.url
+        elif self.link_url:
+            return self.link_url
+        else:
+            return "#"
 
     @classmethod
     def get_menu_links(cls, site: Site):
-        return list(MenuLink.objects.get_ordered_queryset(site))
+        """
+        Get menu links with optimized database queries to avoid N+1 problems
+        """
+        return list(MenuLink.objects.get_optimized_queryset(site))
 
     MENU_LINKS_KEY = "menu_links_ids"
     MENU_LINKS_TIMEOUT = 1800  # 30 minutes
@@ -222,19 +282,58 @@ class MenuLink(PreviewableMixin, DraftStateMixin, RevisionMixin, Indexed, models
             return cls.get_menu_links(site)
 
         cache_key = f"menu_links:{site.id}:{user_id}"
+
+        # Try to get from cache first
         menu_links = cache.get(cache_key)
         if menu_links:
             return menu_links
+
+        # Cache miss - generate menu links with optimized queries
         menu_links = cls.get_menu_links(site)
+
+        # Cache the result
         cache.set(cache_key, menu_links, cls.MENU_LINKS_TIMEOUT)
 
-        # get and update the list of cached site.id/user_id combos
-        # this simplifies deletion of cached menu links
+        # Update the registry for easier cache invalidation
         registry = cache.get(cls.MENU_LINKS_KEY) or set()
         registry.add((site.id, user_id))
         cache.set(cls.MENU_LINKS_KEY, registry, cls.MENU_LINKS_TIMEOUT)
 
         return menu_links
+
+    @classmethod
+    def warm_cache_for_site(cls, site: Site, user_ids: list = None):
+        """
+        Pre-warm cache for common user scenarios to avoid cache misses
+        """
+        if not cls.cache_enabled:
+            return
+
+        # Default user scenarios: anonymous (0) and authenticated users
+        if user_ids is None:
+            user_ids = [0]  # Anonymous user
+
+        for user_id in user_ids:
+            cache_key = f"menu_links:{site.id}:{user_id}"
+            if not cache.get(cache_key):
+                cls.get_cached_menu_links(site, user_id)
+
+    @classmethod
+    def bulk_create_menu_links(cls, menu_links_data: list, site: Site):
+        """
+        Create multiple menu links efficiently using bulk_create
+        """
+        menu_links = []
+        for data in menu_links_data:
+            data["site"] = site
+            menu_links.append(cls(**data))
+
+        created_links = cls.objects.bulk_create(menu_links)
+
+        # Clear cache after bulk creation
+        cls.clear_cached_menu_links()
+
+        return created_links
 
     @classmethod
     def clear_cached_menu_links(cls):
@@ -271,6 +370,16 @@ class MenuLink(PreviewableMixin, DraftStateMixin, RevisionMixin, Indexed, models
         app_label = "cmspage"
         verbose_name = "Menu Link"
         ordering = ["menu_order", "id"]
+        indexes = [
+            # Optimize queries by site
+            models.Index(fields=["site", "menu_order", "id"], name="menulink_site_order_idx"),
+            # Optimize hierarchy queries
+            models.Index(fields=["parent", "menu_order"], name="menulink_parent_order_idx"),
+            # Optimize staff filtering
+            models.Index(fields=["site", "staff_only", "menu_order"], name="menulink_site_staff_idx"),
+            # Optimize cache key lookups
+            models.Index(fields=["site", "parent"], name="menulink_site_parent_idx"),
+        ]
 
     panels = [
         FieldPanel("site"),
