@@ -37,9 +37,11 @@ class CMSPageImage(WagtailImage):
                     # Clean up the original WebP file
                     os.remove(webp_image_path)
 
-            except Exception:
-                # If WebP conversion fails, just use the original file
-                pass
+            except Exception as e:
+                # If WebP conversion fails, just use the original file but log the exception
+                import logging
+                logger = logging.getLogger(__name__)
+                logger.warning("WebP conversion failed for %s: %s", self.file.name, e, exc_info=True)
         else:
             # For WebP files or files without a name, just save normally
             super().save(*args, **kwargs)
