@@ -244,7 +244,7 @@ class CMSTemplateMixin:
         }
         return include_templates
 
-    # @conditional_lru_cache(maxsize=128)
+    @conditional_lru_cache(maxsize=128)
     def include_templates(self) -> dict:
         """
         Return a dictionary of include templates

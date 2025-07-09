@@ -59,8 +59,30 @@ def conditional_cache(user_function, /):
 def conditional_lru_cache(*args: Any, **kwargs: Any) -> Callable:
     """
     Applies the lru_cache decorator conditionally based on the cache state.
-
+    Checks cache_state at runtime, not at decoration time.
     """
-    if not cache_state:
-        kwargs["maxsize"] = 0
-    return lru_cache(*args, **kwargs)
+    def decorator(func):
+        # Create both cached and uncached versions
+        cached_func = lru_cache(*args, **kwargs)(func)
+        uncached_func = func
+
+        def wrapper(*func_args, **func_kwargs):
+            if cache_state:
+                return cached_func(*func_args, **func_kwargs)
+            else:
+                return uncached_func(*func_args, **func_kwargs)
+
+        # Add cache_clear method for compatibility
+        wrapper.cache_clear = getattr(cached_func, "cache_clear", lambda: None)
+        wrapper.cache_info = getattr(cached_func, "cache_info", lambda: None)
+
+        return wrapper
+
+    # Handle both @conditional_lru_cache and @conditional_lru_cache() usage
+    if len(args) == 1 and callable(args[0]) and not kwargs:
+        # Called as @conditional_lru_cache
+        func = args[0]
+        return conditional_lru_cache()(func)
+    else:
+        # Called as @conditional_lru_cache() or @conditional_lru_cache(maxsize=...)
+        return decorator

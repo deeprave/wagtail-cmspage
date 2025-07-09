@@ -1,6 +1,6 @@
 [project]
 name = "wagtail-cmspage"
-version = "2025.4.6"
+version = "2025.7.1"
 description = "Base extensible and comprehensive: CMSPage type for Wagtail"
 authors = [
   { name = "David Nugent", email = "davidn@uniquode.io" }
@@ -9,36 +9,36 @@ license = { text = "MIT" }
 readme = "README.md"
 dependencies = [
     "django >= 5.1",
-    "pillow-heif>=0.21",
-    "wagtail>=6.3.1",
+    "pillow-heif >= 0.21",
+    "wagtail >= 6.3",
 ]
-requires-python = ">= 3.10"
+requires-python = ">= 3.11"
+
+[project.urls]
+repository = "https://github.com/deeprave/wagtail-cmspage"
+homepage = "https://github.com/deeprave/wagtail-cmspage"
 
 [project.optional-dependencies]
-dev = [
-    "ruff == 0.5.7",
-]
-test = [
-    "pytest >= 8.2",
-    "pytest-django >= 4.9",
-    "pytest-mock >= 3.14",
-    "pytest-cov >= 5.0.0",
-]
 vault = [
     "hvac >= 1.1.1",
 ]
 
 [tool.pytest.ini_options]
-testpaths = ["cmspage"]
-
-[build-system]
-requires = ["hatchling"]
-build-backend = "hatchling.build"
+testpaths = ["tests"]
 
 [dependency-groups]
-test = [
+dev = [
+    "pytest >= 8.2",
+    "pytest-django >= 4.9",
+    "pytest-mock >= 3.14",
+    "pytest-cov >= 5.0.0",
     "testcontainers>=4.9.0",
+    "psycopg[binary]>=3.2.9",
 ]
 
 [tool.hatch.build.targets.wheel]
 packages = ["cmspage"]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"

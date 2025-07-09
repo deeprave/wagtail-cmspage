@@ -179,38 +179,26 @@ def test_base_template(settings, base_name, base_path, expected_path):
 
 
 @pytest.mark.django_db
-@pytest.mark.parametrize(
-    "title, base_name, expected_base, include_names, expected_includes",
-    [
-        pytest.param(
-            "Test Page",
-            None,
-            "cmspage/cmspage.html",
-            "header,main,footer",
-            {
-                "header": "cmspage/includes/header.html",
-                "main": "cmspage/includes/main.html",
-                "footer": "cmspage/includes/footer.html",
-            },
-            id="default-base-includes",
-        ),
-        pytest.param(
-            "Another Page",
-            "/cmspage.html",
-            "cmspage.html",
-            "header,navigation,footer",
-            {
-                "header": "cmspage/includes/header.html",
-                "navigation": "cmspage/includes/navigation.html",
-                "footer": "cmspage/includes/footer.html",
-            },
-            id="explicit-base-includes",
-        ),
-    ],
-)
-def test_cmspage_get_context(settings, title, base_name, expected_base, include_names, expected_includes):
+def test_cmspage_get_context_default(settings):
+    """Test CMSPage get_context with default settings"""
+    # Disable caching to avoid interference between tests
+    from cmspage.models import functional
+    original_cache_state = functional.cache_state
+    functional.cache_state = False
+
+    title = "Test Page"
+    base_name = None
+    expected_base = "cmspage/cmspage.html"
+    include_names = "header,main,footer"
+    expected_includes = {
+        "header": "cmspage/includes/header.html",
+        "main": "cmspage/includes/main.html",
+        "footer": "cmspage/includes/footer.html",
+    }
+
     settings.CMSPAGE_TEMPLATE_BASE = base_name
     settings.CMSPAGE_TEMPLATE_INCLUDE_FILES = include_names
+
     # Create a CMSPage instance
     page = CMSPage(title=title, slug=slugify(title))
     page.pk = 1
@@ -232,3 +220,53 @@ def test_cmspage_get_context(settings, title, base_name, expected_base, include_
     assert context["request"] == request
     assert context["base_template"] == expected_base
     assert context["include"] == expected_includes
+
+    # Restore original cache state
+    functional.cache_state = original_cache_state
+
+
+@pytest.mark.django_db
+def test_cmspage_get_context_explicit(settings):
+    """Test CMSPage get_context with explicit settings"""
+    # Disable caching to avoid interference between tests
+    from cmspage.models import functional
+    original_cache_state = functional.cache_state
+    functional.cache_state = False
+
+    title = "Another Page"
+    base_name = "/cmspage.html"
+    expected_base = "cmspage.html"
+    include_names = "header,navigation,footer"
+    expected_includes = {
+        "header": "cmspage/includes/header.html",
+        "navigation": "cmspage/includes/navigation.html",
+        "footer": "cmspage/includes/footer.html",
+    }
+
+    settings.CMSPAGE_TEMPLATE_BASE = base_name
+    settings.CMSPAGE_TEMPLATE_INCLUDE_FILES = include_names
+
+    # Create a CMSPage instance
+    page = CMSPage(title=title, slug=slugify(title))
+    page.pk = 1
+
+    # Create a HttpRequest instance
+    request = HttpRequest()
+
+    # Call the get_context method
+    context = page.get_context(request)
+
+    # Check that the context contains the expected keys
+    assert "base_template" in context
+    assert "include" in context
+    assert "page" in context
+    assert "request" in context
+
+    # Check that the context contains the correct values
+    assert context["page"] == page
+    assert context["request"] == request
+    assert context["base_template"] == expected_base
+    assert context["include"] == expected_includes
+
+    # Restore original cache state
+    functional.cache_state = original_cache_state
