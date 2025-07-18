@@ -109,37 +109,65 @@ class CMSPageBase(AbstractCMSPage):
 
         return context
 
+    @classmethod
+    def _extract_image_ids_from_block(cls, block):
+        """
+        Extract image IDs from a block, checking the block type to determine if it can contain images.
+        Only recurses into block types that are known to contain images.
+        """
+        ids = []
+
+        # Check if the block has a block_type attribute
+        if hasattr(block, "block_type"):
+            block_type = block.block_type
+
+            # Handle specific block types that contain images
+            if block_type == "cards":
+                # Cards block has a "cards" field which is a list of cards, each with an "image" field
+                cards = block.value.get("cards", [])
+                ids.extend(card["image"].id for card in cards if card.get("image"))
+            elif block_type == "carousel":
+                # Carousel block has a "carousel" field which is a list of carousel items, each with a "carousel_image" field
+                carousel_items = block.value.get("carousel", [])
+                ids.extend(
+                    item["carousel_image"].id
+                    for item in carousel_items
+                    if item.get("carousel_image")
+                )
+            elif block_type in ["image_and_text", "large_image", "small_image_and_text", "hero"]:
+                # These blocks have an "image" field directly
+                if block.value.get("image"):
+                    ids.append(block.value["image"].id)
+
+            elif hasattr(block, "value") and isinstance(block.value, dict):
+                # Check for common image field names in the block's value
+                if "image" in block.value and block.value["image"] and hasattr(block.value["image"], "id"):
+                    ids.append(block.value["image"].id)
+                elif "carousel_image" in block.value and block.value["carousel_image"] and hasattr(block.value["carousel_image"], "id"):
+                    ids.append(block.value["carousel_image"].id)
+
+        elif isinstance(block, list):
+            for item in block:
+                ids.extend(cls._extract_image_ids_from_block(item))
+
+        elif hasattr(block, "id"):
+            ids.append(block.id)
+
+        elif isinstance(block, dict):
+            # Check for common image field names
+            if "image" in block and block["image"] and hasattr(block["image"], "id"):
+                ids.append(block["image"].id)
+            elif "carousel_image" in block and block["carousel_image"] and hasattr(block["carousel_image"], "id"):
+                ids.append(block["carousel_image"].id)
+
+        return ids
+
     def _prefetch_block_images(self):
         """Prefetch all images used in StreamField blocks to avoid N+1 queries"""
         image_ids = []
 
-        # Helper function to recursively extract image IDs from blocks
-        def _extract_image_ids(block):
-            ids = []
-            # If the block is a StructBlock or StreamBlock, recurse into its children
-            if hasattr(block, "block") and hasattr(block.block, "child_blocks"):
-                for child_name, child_block in block.block.child_blocks.items():
-                    value = block.value.get(child_name)
-                    if isinstance(value, list):
-                        for item in value:
-                            ids.extend(_extract_image_ids(item))
-                    elif value is not None:
-                        ids.extend(_extract_image_ids(value))
-            # If the block is a StreamValue (list of blocks)
-            elif isinstance(block, list):
-                for item in block:
-                    ids.extend(_extract_image_ids(item))
-            # If the block contains an image id, extract it (assuming a convention)
-            elif hasattr(block, "id"):
-                ids.append(block.id)
-            # If the block is a dict (raw value), check for image id keys
-            elif isinstance(block, dict):
-                for v in block.values():
-                    ids.extend(_extract_image_ids(v))
-            return ids
-
         for block in self.body:
-            image_ids.extend(_extract_image_ids(block))
+            image_ids.extend(self._extract_image_ids_from_block(block))
 
         if image_ids:
             # Deduplicate image_ids to avoid redundant queries
