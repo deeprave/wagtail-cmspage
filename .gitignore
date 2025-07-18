@@ -14,5 +14,4 @@ dist/
 /.claude
 /cmspage/scss/*.css
 /cmspage/scss/*.css.map
-/original_images/
-/tests/original_images/
+original_images/

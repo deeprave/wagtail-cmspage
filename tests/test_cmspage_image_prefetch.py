@@ -119,6 +119,100 @@ class TestCMSPageImagePrefetch:
         assert len(image_ids) == 1
         assert self.image1.id in image_ids
 
+    def test_extract_image_ids_from_title_block(self):
+        """Test extracting image IDs from a title block (which has no images)"""
+        # Create a mock title block
+        mock_block = MagicMock()
+        mock_block.block_type = "title"
+        mock_block.value = {
+            "text": "This is a title",
+            "cursive": False,
+            "justify": "center",
+            "palette": "warning",
+            "inset": "small",
+        }
+
+        # Call the method
+        image_ids = CMSPage._extract_image_ids_from_block(mock_block)
+
+        # Assert that no image IDs were extracted
+        assert len(image_ids) == 0
+
+    def test_extract_image_ids_from_richtext_with_title_block(self):
+        """Test extracting image IDs from a richtext_with_title block (which has no images)"""
+        # Create a mock richtext_with_title block
+        mock_block = MagicMock()
+        mock_block.block_type = "richtext"
+        mock_block.value = {
+            "title": "This is a title",
+            "cursive": False,
+            "content": "<p>This is some rich text content</p>",
+            "justify": "left",
+            "palette": "warning",
+            "inset": "small",
+        }
+
+        # Call the method
+        image_ids = CMSPage._extract_image_ids_from_block(mock_block)
+
+        # Assert that no image IDs were extracted
+        assert len(image_ids) == 0
+
+    def test_extract_image_ids_from_copyright_block(self):
+        """Test extracting image IDs from a copyright block (which has no images)"""
+        # Create a mock copyright block
+        mock_block = MagicMock()
+        mock_block.block_type = "copy"
+        mock_block.value = {
+            "copyright": "© 2025 Example Company",
+            "palette": "warning",
+            "inset": "small",
+        }
+
+        # Call the method
+        image_ids = CMSPage._extract_image_ids_from_block(mock_block)
+
+        # Assert that no image IDs were extracted
+        assert len(image_ids) == 0
+
+    def test_extract_image_ids_from_call_to_action_block(self):
+        """Test extracting image IDs from a call_to_action block (which has no images)"""
+        # Create a mock call_to_action block
+        mock_block = MagicMock()
+        mock_block.block_type = "cta"
+        mock_block.value = {
+            "title": "Call to Action",
+            "cursive": False,
+            "text": "<p>Click here to learn more</p>",
+            "justify": "left",
+            "palette": "warning",
+            "inset": "small",
+            "link": {"button_title": "Learn More", "page_link": None, "doc_link": None, "extra_link": "/learn-more"},
+        }
+
+        # Call the method
+        image_ids = CMSPage._extract_image_ids_from_block(mock_block)
+
+        # Assert that no image IDs were extracted
+        assert len(image_ids) == 0
+
+    def test_extract_image_ids_from_new_section_block(self):
+        """Test extracting image IDs from a new_section block (which has no images)"""
+        # Create a mock new_section block
+        mock_block = MagicMock()
+        mock_block.block_type = "new_section"
+        mock_block.value = {
+            "height": "medium",
+            "palette": "warning",
+            "inset": "small",
+        }
+
+        # Call the method
+        image_ids = CMSPage._extract_image_ids_from_block(mock_block)
+
+        # Assert that no image IDs were extracted
+        assert len(image_ids) == 0
+
     def test_image_id_deduplication(self):
         # sourcery skip: extract-duplicate-method
         """Test that image IDs are deduplicated when prefetching"""
