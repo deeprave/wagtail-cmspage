@@ -12,3 +12,7 @@ __pycache__
 dist/
 /.coverage
 /.claude
+/cmspage/scss/*.css
+/cmspage/scss/*.css.map
+/original_images/
+/tests/original_images/

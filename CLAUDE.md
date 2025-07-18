@@ -1,15 +1,18 @@
 # Project Instructions
 
-## Python Environment
+Instructions for non-PyCharm agents:
 
-- All python commands and scripts (like pytest) must be run with a prefix "uv run ..." to set up the virtual environment correctly
+  ## Python Environment
 
-## Testing
+  - All python commands and scripts (like pytest) must be run with a prefix "uv run ..." to set up the virtual environment correctly
+  - use uv to run tests with pytest (uv run pytest...)
 
-- Use pytest to run tests (uv run pytest...), do not use django tests (./manage.py test)
-- When creating new tests, prefer pytest style tests
-- When creating tests, ensure that the name of the test includes the module name, so as not to confuse pytest with naming collisions
-  - Example: `test_module_topic.py` not `test_topic.py` (which could apply to any module)
+For all agents:
+
+  - Don't attempt to use django style testing (./manage.py test)
+  - When creating new tests, prefer pytest style tests
+  - When creating tests, ensure that the name of the test file includes the module name, so as not to confuse pytest with naming collisions across modules
+    - Example: `test_module_topic.py` not `test_topic.py` (which could apply to any module)
 
 ## Code Standards
 
@@ -18,4 +21,4 @@
 
 ## Bug Handling
 
-- If bugs or misbehaviours are discovered, don't make tests allow for it, instead attempt to fix the issue and notify of its existence.
+- If bugs or misbehaviour are discovered, don't make tests allow for it, instead attempt to fix the issue and notify of the bug's existence.
