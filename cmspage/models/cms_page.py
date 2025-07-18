@@ -151,31 +151,6 @@ class CMSPageBase(AbstractCMSPage):
             # Store in a cache for template access
             self._prefetched_images = {img.id: img for img in images}
 
-    @staticmethod
-    def _extract_image_ids_from_block(block) -> list:
-        """Extract image IDs from a block value"""
-        image_ids = []
-        block_type = block.block_type
-        value = block.value
-
-        # Handle different block types
-        if block_type == "cards":
-            image_ids.extend(card["image"].id for card in value.get("cards", []) if card.get("image"))
-        elif block_type == "carousel":
-            image_ids.extend(
-                carousel_item["carousel_image"].id
-                for carousel_item in value.get("carousel", [])
-                if carousel_item.get("carousel_image")
-            )
-        elif block_type in ["image_and_text", "large_image"]:
-            if value.get("image"):
-                image_ids.append(value["image"].id)
-        elif isinstance(value, dict) and value.get("image"):
-            # Generic fallback for other image blocks
-            image_ids.append(value["image"].id)
-
-        return image_ids
-
     class Meta:
         app_label = "cmspage"
         abstract = True
