@@ -821,7 +821,7 @@ wheels = [
 
 [[package]]
 name = "wagtail-cmspage"
-version = "2025.7.2"
+version = "2025.7.3"
 source = { editable = "." }
 dependencies = [
     { name = "django" },
@@ -846,10 +846,10 @@ dev = [
 
 [package.metadata]
 requires-dist = [
-    { name = "django", specifier = ">=5.1" },
+    { name = "django", specifier = ">=5.2" },
     { name = "hvac", marker = "extra == 'vault'", specifier = ">=1.1.1" },
-    { name = "pillow-heif", specifier = ">=0.21" },
-    { name = "wagtail", specifier = ">=6.3" },
+    { name = "pillow-heif", specifier = ">=1.0" },
+    { name = "wagtail", specifier = ">=7.0" },
 ]
 provides-extras = ["vault"]
 
