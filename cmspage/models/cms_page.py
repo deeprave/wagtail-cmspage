@@ -102,7 +102,79 @@ class CMSPageBase(AbstractCMSPage):
     def get_context(self, request, *args, **kwargs):
         context = super().get_context(request, *args, **kwargs)
         context["page_footer"] = CMSFooterPage.objects.live().first()
+
+        # Prefetch images for all blocks to avoid N+1 queries
+        if self.body:
+            self._prefetch_block_images()
+
         return context
+
+    def _prefetch_block_images(self):
+        """Prefetch all images used in StreamField blocks to avoid N+1 queries"""
+        image_ids = []
+
+        # Helper function to recursively extract image IDs from blocks
+        def _extract_image_ids(block):
+            ids = []
+            # If the block is a StructBlock or StreamBlock, recurse into its children
+            if hasattr(block, "block") and hasattr(block.block, "child_blocks"):
+                for child_name, child_block in block.block.child_blocks.items():
+                    value = block.value.get(child_name)
+                    if isinstance(value, list):
+                        for item in value:
+                            ids.extend(_extract_image_ids(item))
+                    elif value is not None:
+                        ids.extend(_extract_image_ids(value))
+            # If the block is a StreamValue (list of blocks)
+            elif isinstance(block, list):
+                for item in block:
+                    ids.extend(_extract_image_ids(item))
+            # If the block contains an image id, extract it (assuming a convention)
+            elif hasattr(block, "id"):
+                ids.append(block.id)
+            # If the block is a dict (raw value), check for image id keys
+            elif isinstance(block, dict):
+                for v in block.values():
+                    ids.extend(_extract_image_ids(v))
+            return ids
+
+        for block in self.body:
+            image_ids.extend(_extract_image_ids(block))
+
+        if image_ids:
+            # Deduplicate image_ids to avoid redundant queries
+            deduped_image_ids = list(set(image_ids))
+            # Prefetch all images with select_related to get both CMSPageImage and WagtailImage data
+            from cmspage.models import CMSPageImage
+
+            images = CMSPageImage.objects.filter(id__in=deduped_image_ids).select_related()
+            # Store in a cache for template access
+            self._prefetched_images = {img.id: img for img in images}
+
+    @staticmethod
+    def _extract_image_ids_from_block(block) -> list:
+        """Extract image IDs from a block value"""
+        image_ids = []
+        block_type = block.block_type
+        value = block.value
+
+        # Handle different block types
+        if block_type == "cards":
+            image_ids.extend(card["image"].id for card in value.get("cards", []) if card.get("image"))
+        elif block_type == "carousel":
+            image_ids.extend(
+                carousel_item["carousel_image"].id
+                for carousel_item in value.get("carousel", [])
+                if carousel_item.get("carousel_image")
+            )
+        elif block_type in ["image_and_text", "large_image"]:
+            if value.get("image"):
+                image_ids.append(value["image"].id)
+        elif isinstance(value, dict) and value.get("image"):
+            # Generic fallback for other image blocks
+            image_ids.append(value["image"].id)
+
+        return image_ids
 
     class Meta:
         app_label = "cmspage"
