@@ -3,6 +3,7 @@ from modelcluster.contrib.taggit import ClusterTaggableManager
 from wagtail.admin.panels import FieldRowPanel, FieldPanel
 from wagtail.embeds import blocks as embed_blocks
 from wagtail.fields import StreamField
+from wagtail.images.models import Image as WagtailImage
 from wagtail.models import Page
 
 import cmspage.blocks as cmsblocks
@@ -123,17 +124,13 @@ class CMSPageBase(AbstractCMSPage):
 
             # Handle specific block types that contain images
             if block_type == "cards":
-                # Cards block has a "cards" field which is a list of cards, each with an "image" field
+                # Cards block has a "cards" field, which is a list of cards, each with an "image" field
                 cards = block.value.get("cards", [])
                 ids.extend(card["image"].id for card in cards if card.get("image"))
             elif block_type == "carousel":
-                # Carousel block has a "carousel" field which is a list of carousel items, each with a "carousel_image" field
+                # Carousel block has a "carousel" field, which is a list of carousel items, each with a "carousel_image" field
                 carousel_items = block.value.get("carousel", [])
-                ids.extend(
-                    item["carousel_image"].id
-                    for item in carousel_items
-                    if item.get("carousel_image")
-                )
+                ids.extend(item["carousel_image"].id for item in carousel_items if item.get("carousel_image"))
             elif block_type in ["image_and_text", "large_image", "small_image_and_text", "hero"]:
                 # These blocks have an "image" field directly
                 if block.value.get("image"):
@@ -143,14 +140,18 @@ class CMSPageBase(AbstractCMSPage):
                 # Check for common image field names in the block's value
                 if "image" in block.value and block.value["image"] and hasattr(block.value["image"], "id"):
                     ids.append(block.value["image"].id)
-                elif "carousel_image" in block.value and block.value["carousel_image"] and hasattr(block.value["carousel_image"], "id"):
+                elif (
+                    "carousel_image" in block.value
+                    and block.value["carousel_image"]
+                    and hasattr(block.value["carousel_image"], "id")
+                ):
                     ids.append(block.value["carousel_image"].id)
 
         elif isinstance(block, list):
             for item in block:
                 ids.extend(cls._extract_image_ids_from_block(item))
 
-        elif hasattr(block, "id"):
+        elif hasattr(block, "id") and isinstance(block, WagtailImage):
             ids.append(block.id)
 
         elif isinstance(block, dict):
