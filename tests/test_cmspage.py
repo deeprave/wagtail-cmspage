@@ -83,6 +83,7 @@ def test_get_template(rf, settings, template_styles, expected_template):
                 "links",
                 "contact",
                 "media",
+                "theme_switcher",
             ],
             id="default-includes",
         ),

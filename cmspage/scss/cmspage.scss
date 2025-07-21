@@ -2,6 +2,9 @@
  SCSS Source for custom styles used in CMS Pages
  */
 @import 'partials/variables';
+@import 'partials/utilities';
+@import 'partials/component-variants';
+@import 'partials/theme-switcher';
 
 @mixin vertical-gradient-from-base($base-color) {
   $light-color: mix($base-color, white, 70%);
@@ -66,7 +69,7 @@
   font-size: 2.0em;
   width: fit-content;
   font-kerning: normal;
-  color: var(--heading-color);
+  color: var(--cp-fg-heading, var(--heading-color, inherit));
 }
 
 .hero {
@@ -339,19 +342,6 @@
   @media (min-width: $breakpoint-md) {
     min-height: 28rem;
   }
-}
-
-.bg-tertiary {
-  background-color: #{$tertiary};
-}
-
-.text-tertiary {
-  --bs-text-opacity: 1;
-  color: rgba(var(--bs-tertiary-color-rgb), var(--bs-text-opacity)) !important;
-}
-
-.text-tertiary-emphasis {
-  color: var(--bs-tertiary-text-emphasis) !important;
 }
 
 .form-row {

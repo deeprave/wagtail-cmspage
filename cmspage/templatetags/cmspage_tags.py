@@ -1,10 +1,62 @@
 # -*- coding: utf-8 -*-
 import re
-from django.template import Template, Context
+from django.template import Template, Context, TemplateSyntaxError
 from django import template
+from django.template.loader import get_template
 from wagtail.images.models import Image
 
 register = template.Library()
+
+
+class SafeIncludeNode(template.Node):
+    """
+    A Node that safely includes templates, handling cases where the template variable is empty or None.
+    Only suppresses errors related to missing/empty template variables, not actual template errors.
+    """
+    def __init__(self, template_expr):
+        self.template_expr = template_expr
+
+    def render(self, context):
+        try:
+            template_name = self.template_expr.resolve(context)
+        except template.VariableDoesNotExist:
+            # If variable doesn't exist, return empty string silently
+            return ""
+
+        # If template name is empty, None, or evaluates to False, return empty string
+        if not template_name:
+            return ""
+
+        # Get the template - let TemplateDoesNotExist and other template errors bubble up
+        template_obj = get_template(template_name)
+
+        # Convert context to dict for template rendering
+        include_context = context.flatten()
+
+        # Render the included template - let all template errors bubble up
+        return template_obj.render(include_context)
+
+
+@register.tag("cmspage_include")
+def cmspage_include(parser, token):
+    """
+    Template tag that safely includes templates, gracefully handling empty template variables.
+
+    Usage:
+        {% load cmspage_tags %}
+        {% cmspage_include template_variable %}
+
+    If template_variable is None, empty, or doesn't exist, returns empty string instead of error.
+    All other template errors (TemplateDoesNotExist, syntax errors, etc.) bubble up normally.
+    """
+    bits = token.split_contents()
+    if len(bits) != 2:
+        raise TemplateSyntaxError("'cmspage_include' tag requires exactly one argument")
+
+    # Get the template expression
+    template_expr = parser.compile_filter(bits[1])
+
+    return SafeIncludeNode(template_expr)
 
 
 @register.filter(name="embedurl")

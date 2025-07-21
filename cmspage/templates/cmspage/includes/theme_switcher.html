@@ -1,0 +1,221 @@
+{% comment %}
+Theme Switcher Component for wagtail-cmspage
+Provides a fixed-position theme switcher with light, auto, and dark modes.
+
+Usage:
+  {% include include.theme_switcher %}
+
+The theme switcher will be positioned fixed in the top-right corner.
+It requires Bootstrap and Font Awesome icons to be loaded.
+
+Context variables:
+  - theme_switcher_enabled: Set to False to disable the theme switcher (defaults to True)
+  - theme_switcher_position: Dict with 'top' and 'right' keys to customize position (defaults to {'top': '2px', 'right': '2px'})
+  - theme_switcher_icons: Dict with 'light', 'auto', 'dark' keys for custom icons (defaults to Font Awesome icons)
+{% endcomment %}
+
+{% if theme_switcher_enabled|default:True %}
+{% with position=theme_switcher_position|default_if_none:None %}
+{% with icons=theme_switcher_icons|default_if_none:None %}
+<div class="theme-switcher-fixed" data-theme-switcher
+     {% if position %}style="top: {{ position.top|default:'2px' }}; right: {{ position.right|default:'2px' }};"{% endif %}>
+  <div class="btn-group-vertical btn-group-sm" role="group" aria-label="Theme selector">
+    <button type="button"
+            class="btn btn-outline-secondary btn-sm"
+            data-theme-option="light"
+            title="Light Theme - Always use light colors">
+      <i class="{{ icons.light|default:'fas fa-sun' }}" aria-hidden="true"></i>
+      <span class="visually-hidden">Light Theme</span>
+    </button>
+    <button type="button"
+            class="btn btn-outline-secondary btn-sm"
+            data-theme-option="auto"
+            title="Auto Theme - Follow system preference">
+      <i class="{{ icons.auto|default:'fas fa-adjust' }}" aria-hidden="true"></i>
+      <span class="visually-hidden">Auto Theme</span>
+    </button>
+    <button type="button"
+            class="btn btn-outline-secondary btn-sm"
+            data-theme-option="dark"
+            title="Dark Theme - Always use dark colors">
+      <i class="{{ icons.dark|default:'fas fa-moon' }}" aria-hidden="true"></i>
+      <span class="visually-hidden">Dark Theme</span>
+    </button>
+  </div>
+</div>
+
+<script>
+/**
+ * Theme Switcher for Custom Color Palette
+ * Handles switching between light, dark, and auto themes
+ */
+(function() {
+  'use strict';
+
+  class ThemeSwitcher {
+    constructor() {
+      this.theme = this.getStoredTheme() || 'auto';
+      this.init();
+    }
+
+    init() {
+      // Apply stored theme on page load
+      this.applyTheme(this.theme);
+
+      // Remove no-transitions class after page load to enable smooth transitions
+      if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', () => {
+          document.body.classList.remove('no-transitions');
+        });
+      } else {
+        // DOM already loaded
+        setTimeout(() => {
+          document.body.classList.remove('no-transitions');
+        }, 100);
+      }
+
+      // Listen for system theme changes when in auto mode
+      if (window.matchMedia) {
+        window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', (e) => {
+          if (this.theme === 'auto') {
+            this.applyTheme('auto');
+          }
+        });
+      }
+    }
+
+    getStoredTheme() {
+      try {
+        return localStorage.getItem('cp-theme');
+      } catch (e) {
+        return null;
+      }
+    }
+
+    setStoredTheme(theme) {
+      try {
+        localStorage.setItem('cp-theme', theme);
+      } catch (e) {
+        // localStorage not available
+      }
+    }
+
+    applyTheme(theme) {
+      const root = document.documentElement;
+
+      // Add no-transitions class to prevent flashing during theme switch
+      document.body.classList.add('no-transitions');
+
+      if (theme === 'auto') {
+        // Remove explicit theme attribute to let CSS handle auto mode
+        root.removeAttribute('data-theme');
+      } else {
+        // Set explicit theme
+        root.setAttribute('data-theme', theme);
+      }
+
+      // Remove no-transitions class after a brief delay
+      setTimeout(() => {
+        document.body.classList.remove('no-transitions');
+      }, 100);
+
+      // Update theme indicator if present
+      this.updateThemeIndicator(theme);
+
+      // Dispatch custom event for other components
+      window.dispatchEvent(new CustomEvent('themechange', {
+        detail: { theme, resolvedTheme: this.getResolvedTheme() }
+      }));
+    }
+
+    getResolvedTheme() {
+      if (this.theme === 'auto') {
+        return window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches
+          ? 'dark'
+          : 'light';
+      }
+      return this.theme;
+    }
+
+    updateThemeIndicator(theme) {
+      // Update theme switcher UI if present
+      document.querySelectorAll('[data-theme-switcher]').forEach(element => {
+        element.querySelectorAll('[data-theme-option]').forEach(option => {
+          const optionTheme = option.getAttribute('data-theme-option');
+          option.classList.toggle('active', optionTheme === theme);
+        });
+      });
+    }
+
+    setTheme(theme) {
+      if (!['light', 'dark', 'auto'].includes(theme)) {
+        console.warn('Invalid theme:', theme);
+        return;
+      }
+
+      this.theme = theme;
+      this.setStoredTheme(theme);
+      this.applyTheme(theme);
+    }
+
+    cycleTheme() {
+      const themes = ['light', 'auto', 'dark'];
+      const currentIndex = themes.indexOf(this.theme);
+      const nextIndex = (currentIndex + 1) % themes.length;
+      this.setTheme(themes[nextIndex]);
+    }
+
+    toggle() {
+      // Simple toggle between light and dark (skipping auto)
+      this.setTheme(this.theme === 'light' ? 'dark' : 'light');
+    }
+  }
+
+  // Initialize theme switcher
+  const themeSwitcher = new ThemeSwitcher();
+
+  // Global functions for template use
+  window.setTheme = (theme) => themeSwitcher.setTheme(theme);
+  window.cycleTheme = () => themeSwitcher.cycleTheme();
+  window.toggleTheme = () => themeSwitcher.toggle();
+
+  // Auto-wire theme switcher elements
+  function wireThemeSwitcher() {
+    // Handle theme option clicks
+    document.querySelectorAll('[data-theme-option]').forEach(element => {
+      element.addEventListener('click', (e) => {
+        e.preventDefault();
+        const theme = element.getAttribute('data-theme-option');
+        themeSwitcher.setTheme(theme);
+      });
+    });
+
+    // Handle theme cycle buttons
+    document.querySelectorAll('[data-theme-cycle]').forEach(element => {
+      element.addEventListener('click', (e) => {
+        e.preventDefault();
+        themeSwitcher.cycleTheme();
+      });
+    });
+
+    // Handle theme toggle buttons
+    document.querySelectorAll('[data-theme-toggle]').forEach(element => {
+      element.addEventListener('click', (e) => {
+        e.preventDefault();
+        themeSwitcher.toggle();
+      });
+    });
+  }
+
+  // Wire on DOM ready
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', wireThemeSwitcher);
+  } else {
+    // DOM already loaded
+    wireThemeSwitcher();
+  }
+})();
+</script>
+{% endwith %}
+{% endwith %}
+{% endif %}

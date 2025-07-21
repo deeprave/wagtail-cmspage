@@ -1,7 +1,157 @@
+// Generic Color Palette Variables for CMS Page
+// These provide default colors that can be overridden by specific sites
+
+// Brand Colors (to be overridden by sites)
+:root {
+  // Default brand colors
+  --cp-brand-primary: #0d6efd;     // Bootstrap primary blue as default
+  --cp-brand-secondary: #6c757d;   // Bootstrap secondary gray as default
+  --cp-brand-tertiary: #20c997;    // Bootstrap teal as default
+  --cp-brand-accent: #0dcaf0;      // Bootstrap cyan as default
+  --cp-brand-dark: #212529;        // Bootstrap dark as default
+  --cp-brand-text: #212529;        // Default text color
+
+  // Semantic colors for alerts/status
+  --cp-brand-success: #198754;     // Bootstrap success green
+  --cp-brand-warning: #ffc107;     // Bootstrap warning yellow
+  --cp-brand-info: #0dcaf0;        // Bootstrap info cyan
+  --cp-brand-danger: #dc3545;      // Bootstrap danger red
+
+  // Light mode (default)
+  --cp-fg-page: var(--cp-brand-text);
+  --cp-bg-page: #ffffff;
+  --cp-fg-menu: var(--cp-brand-text);
+  --cp-bg-menu: rgba(255, 255, 255, 0.95);
+  --cp-fg-menu-hover: var(--cp-brand-primary);
+  --cp-bg-menu-hover: rgba(13, 110, 253, 0.1);
+  --cp-fg-heading: var(--cp-brand-text);
+  --cp-bg-card: #f8f9fa;
+  --cp-fg-accent: var(--cp-brand-accent);
+  --cp-bg-accent: rgba(13, 202, 240, 0.1);
+  --cp-fg-accent-hover: darken(var(--cp-brand-accent), 10%);
+  --cp-fg-subtle: #6c757d;
+  --cp-bg-subtle: #e9ecef;
+  --cp-fg-emphasis: var(--cp-brand-primary);
+  --cp-bg-emphasis: rgba(13, 110, 253, 0.1);
+
+  // Fixed light theme
+  --cp-fg-light: #212529;
+  --cp-bg-light: #f8f9fa;
+
+  // Fixed dark theme
+  --cp-fg-dark: #f8f9fa;
+  --cp-bg-dark: #212529;
+
+  // Fixed white/black
+  --cp-fg-white: #000000;
+  --cp-bg-white: #ffffff;
+  --cp-fg-black: #ffffff;
+  --cp-bg-black: #000000;
+
+  // Semantic colors
+  --cp-fg-success: #000000;
+  --cp-bg-success: #d1e7dd;
+  --cp-fg-warning: #000000;
+  --cp-bg-warning: #fff3cd;
+  --cp-fg-info: #000000;
+  --cp-bg-info: #cff4fc;
+  --cp-fg-danger: #ffffff;
+  --cp-bg-danger: var(--cp-brand-danger);
+}
+
+// Dark mode colors
+[data-theme="dark"] {
+  --cp-fg-page: #f8f9fa;
+  --cp-bg-page: #1a1a1a;
+  --cp-fg-menu: #f8f9fa;
+  --cp-bg-menu: rgba(0, 0, 0, 0.95);
+  --cp-fg-menu-hover: var(--cp-brand-accent);
+  --cp-bg-menu-hover: rgba(13, 202, 240, 0.2);
+  --cp-fg-heading: #f8f9fa;
+  --cp-bg-card: #2c2c2c;
+  --cp-fg-accent: var(--cp-brand-accent);
+  --cp-bg-accent: rgba(13, 202, 240, 0.2);
+  --cp-fg-accent-hover: lighten(var(--cp-brand-accent), 10%);
+  --cp-fg-subtle: #adb5bd;
+  --cp-bg-subtle: #343a40;
+  --cp-fg-emphasis: lighten(var(--cp-brand-primary), 20%);
+  --cp-bg-emphasis: rgba(13, 110, 253, 0.2);
+
+  // Semantic colors in dark mode
+  --cp-fg-success: #ffffff;
+  --cp-bg-success: #0f5132;
+  --cp-fg-warning: #000000;
+  --cp-bg-warning: #664d03;
+  --cp-fg-info: #ffffff;
+  --cp-bg-info: #087990;
+  --cp-fg-danger: #ffffff;
+  --cp-bg-danger: #842029;
+}
+
+// Auto mode - respects system preference
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --cp-fg-page: #f8f9fa;
+    --cp-bg-page: #1a1a1a;
+    --cp-fg-menu: #f8f9fa;
+    --cp-bg-menu: rgba(0, 0, 0, 0.95);
+    --cp-fg-menu-hover: var(--cp-brand-accent);
+    --cp-bg-menu-hover: rgba(13, 202, 240, 0.2);
+    --cp-fg-heading: #f8f9fa;
+    --cp-bg-card: #2c2c2c;
+    --cp-fg-accent: var(--cp-brand-accent);
+    --cp-bg-accent: rgba(13, 202, 240, 0.2);
+    --cp-fg-accent-hover: lighten(var(--cp-brand-accent), 10%);
+    --cp-fg-subtle: #adb5bd;
+    --cp-bg-subtle: #343a40;
+    --cp-fg-emphasis: lighten(var(--cp-brand-primary), 20%);
+    --cp-bg-emphasis: rgba(13, 110, 253, 0.2);
+
+    // Semantic colors in auto dark mode
+    --cp-fg-success: #ffffff;
+    --cp-bg-success: #0f5132;
+    --cp-fg-warning: #000000;
+    --cp-bg-warning: #664d03;
+    --cp-fg-info: #ffffff;
+    --cp-bg-info: #087990;
+    --cp-fg-danger: #ffffff;
+    --cp-bg-danger: #842029;
+  }
+}
+
+// Print mode
+@media print {
+  :root {
+    --cp-fg-page: #000000;
+    --cp-bg-page: #ffffff;
+    --cp-fg-menu: #000000;
+    --cp-bg-menu: #f0f0f0;
+    --cp-fg-heading: #000000;
+    --cp-bg-card: #f8f8f8;
+    --cp-fg-accent: #000000;
+    --cp-bg-accent: #e0e0e0;
+  }
+}
+
+// High contrast mode
+@media (prefers-contrast: more) {
+  :root {
+    --cp-fg-page: #000000;
+    --cp-fg-menu: #000000;
+    --cp-fg-heading: #000000;
+    --cp-fg-accent: #0000ff;
+  }
+
+  [data-theme="dark"] {
+    --cp-fg-page: #ffffff;
+    --cp-bg-page: #000000;
+    --cp-fg-heading: #ffffff;
+    --cp-fg-accent: #ffff00;
+  }
+}
+
 $breakpoint-sm: 576px;
 $breakpoint-md: 768px;
 $breakpoint-lg: 992px;
 $breakpoint-xl: 1200px;
 $breakpoint-xxl: 1400px;
-
-$tertiary: #a7c6d9d4;

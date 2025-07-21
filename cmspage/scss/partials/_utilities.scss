@@ -1,0 +1,136 @@
+/**
+ * Shared Color Palette Utilities
+ * These utilities work with any site that defines the expected CSS variables
+ */
+
+// Text/Foreground utilities
+.cp-fg-page { color: var(--cp-fg-page) !important; }
+.cp-fg-menu { color: var(--cp-fg-menu) !important; }
+.cp-fg-heading { color: var(--cp-fg-heading) !important; }
+.cp-fg-accent { color: var(--cp-fg-accent) !important; }
+.cp-fg-subtle { color: var(--cp-fg-subtle) !important; }
+.cp-fg-emphasis { color: var(--cp-fg-emphasis) !important; }
+
+// Background utilities
+.cp-bg-page { background-color: var(--cp-bg-page) !important; }
+.cp-bg-menu { background-color: var(--cp-bg-menu) !important; }
+.cp-bg-card { background-color: var(--cp-bg-card) !important; }
+.cp-bg-accent { background-color: var(--cp-bg-accent) !important; }
+.cp-bg-subtle { background-color: var(--cp-bg-subtle) !important; }
+.cp-bg-emphasis { background-color: var(--cp-bg-emphasis) !important; }
+
+// Combined utilities (most common use cases)
+.cp-page {
+  color: var(--cp-fg-page) !important;
+  background-color: var(--cp-bg-page) !important;
+}
+
+.cp-menu {
+  color: var(--cp-fg-menu) !important;
+  background-color: var(--cp-bg-menu) !important;
+
+  &:hover {
+    background-color: var(--cp-bg-menu-hover) !important;
+    color: var(--cp-fg-menu-hover) !important;
+  }
+}
+
+.cp-card {
+  color: var(--cp-fg-page) !important;
+  background-color: var(--cp-bg-card) !important;
+}
+
+.cp-accent {
+  color: var(--cp-fg-accent) !important;
+  background-color: var(--cp-bg-accent) !important;
+}
+
+// Border utilities
+.cp-border-card { border-color: var(--cp-bg-card) !important; }
+.cp-border-menu { border-color: var(--cp-bg-menu) !important; }
+
+// Semantic palette utilities for new design system
+.cp-transparent {
+  background-color: transparent !important;
+}
+
+.cp-light {
+  color: var(--cp-fg-light) !important;
+  background-color: var(--cp-bg-light) !important;
+}
+
+.cp-dark {
+  color: var(--cp-fg-dark) !important;
+  background-color: var(--cp-bg-dark) !important;
+}
+
+.cp-white {
+  color: var(--cp-fg-white) !important;
+  background-color: var(--cp-bg-white) !important;
+}
+
+.cp-black {
+  color: var(--cp-fg-black) !important;
+  background-color: var(--cp-bg-black) !important;
+}
+
+.cp-highlight {
+  color: var(--cp-fg-accent) !important;
+  background-color: var(--cp-bg-accent) !important;
+}
+
+.cp-standout {
+  color: var(--cp-fg-emphasis) !important;
+  background-color: var(--cp-bg-emphasis) !important;
+}
+
+.cp-success {
+  color: var(--cp-fg-success) !important;
+  background-color: var(--cp-bg-success) !important;
+}
+
+.cp-warning {
+  color: var(--cp-fg-warning) !important;
+  background-color: var(--cp-bg-warning) !important;
+}
+
+.cp-info {
+  color: var(--cp-fg-info) !important;
+  background-color: var(--cp-bg-info) !important;
+}
+
+.cp-danger {
+  color: var(--cp-fg-danger) !important;
+  background-color: var(--cp-bg-danger) !important;
+}
+.cp-border-accent { border-color: var(--cp-fg-accent) !important; }
+.cp-border-page { border-color: var(--cp-fg-page) !important; }
+
+// Link utilities
+.cp-link {
+  color: var(--cp-fg-accent);
+  text-decoration: underline;
+
+  &:hover {
+    color: var(--cp-fg-accent-hover);
+    text-decoration: none;
+  }
+}
+
+.cp-link-menu {
+  color: var(--cp-fg-menu);
+
+  &:hover {
+    color: var(--cp-fg-menu-hover);
+  }
+}
+
+// Heading utilities
+.cp-heading {
+  color: var(--cp-fg-heading) !important;
+}
+
+// Helper utilities for opacity
+.cp-opacity-75 { opacity: 0.75 !important; }
+.cp-opacity-50 { opacity: 0.5 !important; }
+.cp-opacity-25 { opacity: 0.25 !important; }

@@ -1,0 +1,293 @@
+/**
+ * Shared Component Variants
+ * These components use the CSS variables defined by each site
+ * Works with any site that defines the expected variables
+ */
+
+// Button variants
+.btn-card {
+  color: var(--cp-fg-page);
+  background-color: var(--cp-bg-card);
+  border-color: var(--cp-bg-card);
+
+  &:hover {
+    color: var(--cp-fg-page);
+    background-color: color-mix(in srgb, var(--cp-bg-card) 85%, black);
+    border-color: color-mix(in srgb, var(--cp-bg-card) 75%, black);
+  }
+
+  &:focus,
+  &.focus {
+    color: var(--cp-fg-page);
+    background-color: color-mix(in srgb, var(--cp-bg-card) 85%, black);
+    border-color: color-mix(in srgb, var(--cp-bg-card) 75%, black);
+    box-shadow: 0 0 0 0.25rem color-mix(in srgb, var(--cp-bg-card) 50%, transparent);
+  }
+
+  &:active,
+  &.active,
+  .show > &.dropdown-toggle {
+    color: var(--cp-fg-page);
+    background-color: color-mix(in srgb, var(--cp-bg-card) 75%, black);
+    border-color: color-mix(in srgb, var(--cp-bg-card) 70%, black);
+  }
+
+  &:disabled,
+  &.disabled {
+    color: var(--cp-fg-page);
+    background-color: var(--cp-bg-card);
+    border-color: var(--cp-bg-card);
+    opacity: 0.65;
+  }
+}
+
+.btn-outline-card {
+  color: var(--cp-bg-card);
+  border-color: var(--cp-bg-card);
+  background-color: transparent;
+
+  &:hover {
+    color: var(--cp-fg-page);
+    background-color: var(--cp-bg-card);
+    border-color: var(--cp-bg-card);
+  }
+
+  &:focus,
+  &.focus {
+    box-shadow: 0 0 0 0.25rem color-mix(in srgb, var(--cp-bg-card) 50%, transparent);
+  }
+
+  &:active,
+  &.active,
+  .show > &.dropdown-toggle {
+    color: var(--cp-fg-page);
+    background-color: var(--cp-bg-card);
+    border-color: var(--cp-bg-card);
+  }
+
+  &:disabled,
+  &.disabled {
+    color: var(--cp-bg-card);
+    background-color: transparent;
+  }
+}
+
+.btn-menu {
+  color: var(--cp-fg-menu);
+  background-color: var(--cp-bg-menu);
+  border-color: var(--cp-bg-menu);
+
+  &:hover {
+    color: var(--cp-fg-menu-hover);
+    background-color: var(--cp-bg-menu-hover);
+    border-color: var(--cp-bg-menu-hover);
+  }
+
+  &:focus,
+  &.focus {
+    color: var(--cp-fg-menu-hover);
+    background-color: var(--cp-bg-menu-hover);
+    border-color: var(--cp-bg-menu-hover);
+    box-shadow: 0 0 0 0.25rem color-mix(in srgb, var(--cp-bg-menu) 50%, transparent);
+  }
+
+  &:disabled,
+  &.disabled {
+    color: var(--cp-fg-menu);
+    background-color: var(--cp-bg-menu);
+    border-color: var(--cp-bg-menu);
+    opacity: 0.65;
+  }
+}
+
+.btn-accent {
+  color: var(--cp-bg-page);
+  background-color: var(--cp-fg-accent);
+  border-color: var(--cp-fg-accent);
+
+  &:hover {
+    color: var(--cp-bg-page);
+    background-color: var(--cp-fg-accent-hover);
+    border-color: var(--cp-fg-accent-hover);
+  }
+
+  &:focus,
+  &.focus {
+    color: var(--cp-bg-page);
+    background-color: var(--cp-fg-accent-hover);
+    border-color: var(--cp-fg-accent-hover);
+    box-shadow: 0 0 0 0.25rem color-mix(in srgb, var(--cp-fg-accent) 50%, transparent);
+  }
+
+  &:disabled,
+  &.disabled {
+    color: var(--cp-bg-page);
+    background-color: var(--cp-fg-accent);
+    border-color: var(--cp-fg-accent);
+    opacity: 0.65;
+  }
+}
+
+// Alert variants
+.alert-card {
+  color: var(--cp-fg-page);
+  background-color: var(--cp-bg-card);
+  border-color: color-mix(in srgb, var(--cp-bg-card) 80%, var(--cp-fg-page));
+
+  .alert-link {
+    color: color-mix(in srgb, var(--cp-fg-page) 80%, black);
+  }
+}
+
+.alert-menu {
+  color: var(--cp-fg-menu);
+  background-color: var(--cp-bg-menu);
+  border-color: color-mix(in srgb, var(--cp-bg-menu) 80%, var(--cp-fg-menu));
+
+  .alert-link {
+    color: color-mix(in srgb, var(--cp-fg-menu) 80%, black);
+  }
+}
+
+.alert-accent {
+  color: var(--cp-bg-page);
+  background-color: var(--cp-fg-accent);
+  border-color: var(--cp-fg-accent);
+
+  .alert-link {
+    color: var(--cp-bg-page);
+    font-weight: 700;
+  }
+}
+
+// Badge variants
+.badge-card {
+  color: var(--cp-fg-page);
+  background-color: var(--cp-bg-card);
+}
+
+.badge-menu {
+  color: var(--cp-fg-menu);
+  background-color: var(--cp-bg-menu);
+}
+
+.badge-accent {
+  color: var(--cp-bg-page);
+  background-color: var(--cp-fg-accent);
+}
+
+// List group variants
+.list-group-item-card {
+  color: var(--cp-fg-page);
+  background-color: var(--cp-bg-card);
+
+  &.list-group-item-action:hover,
+  &.list-group-item-action:focus {
+    color: var(--cp-fg-page);
+    background-color: color-mix(in srgb, var(--cp-bg-card) 90%, black);
+  }
+
+  &.active {
+    color: var(--cp-bg-page);
+    background-color: var(--cp-fg-accent);
+    border-color: var(--cp-fg-accent);
+  }
+}
+
+.list-group-item-menu {
+  color: var(--cp-fg-menu);
+  background-color: var(--cp-bg-menu);
+
+  &.list-group-item-action:hover,
+  &.list-group-item-action:focus {
+    color: var(--cp-fg-menu-hover);
+    background-color: var(--cp-bg-menu-hover);
+  }
+}
+
+// Table variants
+.table-card {
+  --bs-table-bg: var(--cp-bg-card);
+  --bs-table-color: var(--cp-fg-page);
+  --bs-table-border-color: color-mix(in srgb, var(--cp-bg-card) 80%, var(--cp-fg-page));
+  --bs-table-striped-bg: color-mix(in srgb, var(--cp-bg-card) 95%, var(--cp-fg-page));
+  --bs-table-striped-color: var(--cp-fg-page);
+  --bs-table-active-bg: color-mix(in srgb, var(--cp-bg-card) 90%, var(--cp-fg-page));
+  --bs-table-active-color: var(--cp-fg-page);
+  --bs-table-hover-bg: color-mix(in srgb, var(--cp-bg-card) 93%, var(--cp-fg-page));
+  --bs-table-hover-color: var(--cp-fg-page);
+}
+
+.table-menu {
+  --bs-table-bg: var(--cp-bg-menu);
+  --bs-table-color: var(--cp-fg-menu);
+  --bs-table-border-color: color-mix(in srgb, var(--cp-bg-menu) 80%, var(--cp-fg-menu));
+  --bs-table-striped-bg: color-mix(in srgb, var(--cp-bg-menu) 95%, var(--cp-fg-menu));
+  --bs-table-striped-color: var(--cp-fg-menu);
+  --bs-table-active-bg: var(--cp-bg-menu-hover);
+  --bs-table-active-color: var(--cp-fg-menu-hover);
+  --bs-table-hover-bg: var(--cp-bg-menu-hover);
+  --bs-table-hover-color: var(--cp-fg-menu-hover);
+}
+
+// Card component variants
+.card-menu {
+  background-color: var(--cp-bg-menu);
+  color: var(--cp-fg-menu);
+  border-color: color-mix(in srgb, var(--cp-bg-menu) 80%, var(--cp-fg-menu));
+
+  .card-header {
+    background-color: color-mix(in srgb, var(--cp-bg-menu) 95%, black);
+    border-bottom-color: color-mix(in srgb, var(--cp-bg-menu) 80%, var(--cp-fg-menu));
+  }
+
+  .card-footer {
+    background-color: color-mix(in srgb, var(--cp-bg-menu) 95%, black);
+    border-top-color: color-mix(in srgb, var(--cp-bg-menu) 80%, var(--cp-fg-menu));
+  }
+}
+
+.card-accent {
+  background-color: var(--cp-bg-accent);
+  color: var(--cp-fg-accent);
+  border-color: var(--cp-fg-accent);
+
+  .card-header {
+    background-color: var(--cp-fg-accent);
+    color: var(--cp-bg-page);
+    border-bottom-color: var(--cp-fg-accent);
+  }
+}
+
+// Form variants
+.form-control-card,
+.form-select-card {
+  background-color: var(--cp-bg-card);
+  border-color: color-mix(in srgb, var(--cp-bg-card) 70%, var(--cp-fg-page));
+  color: var(--cp-fg-page);
+
+  &:focus {
+    background-color: var(--cp-bg-card);
+    border-color: var(--cp-fg-accent);
+    color: var(--cp-fg-page);
+    box-shadow: 0 0 0 0.25rem color-mix(in srgb, var(--cp-fg-accent) 25%, transparent);
+  }
+
+  &:disabled,
+  &[readonly] {
+    background-color: color-mix(in srgb, var(--cp-bg-card) 95%, var(--cp-fg-page));
+    border-color: color-mix(in srgb, var(--cp-bg-card) 70%, var(--cp-fg-page));
+    opacity: 1;
+  }
+}
+
+// Progress bar variants
+.progress-bar-card {
+  background-color: var(--cp-bg-card);
+  color: var(--cp-fg-page);
+}
+
+.progress-bar-accent {
+  background-color: var(--cp-fg-accent);
+  color: var(--cp-bg-page);
+}

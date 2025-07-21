@@ -821,7 +821,7 @@ wheels = [
 
 [[package]]
 name = "wagtail-cmspage"
-version = "2025.7.3"
+version = "2025.7.5"
 source = { editable = "." }
 dependencies = [
     { name = "django" },

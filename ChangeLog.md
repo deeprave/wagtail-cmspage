@@ -1,5 +1,69 @@
 ## ChangeLog
 
+### 2025.7.5
+
+#### Added
+
+* New `cmspage_include` template tag for safe template inclusion:
+  * Gracefully handles empty, blank, or None template variables
+  * Renders nothing instead of throwing errors when template path is empty
+  * Delegates to Django's built-in `include` tag for full compatibility
+  * Usage: `{% load cmspage_tags %}{% cmspage_include template_var %}`
+  * Supports all include tag features: `with`, `only`, context variables
+* Self-contained theme switcher component:
+  * Added `theme_switcher` to default template includes
+  * Provides light/dark/auto theme switching with localStorage persistence
+  * Embedded JavaScript for zero external dependencies
+  * Fully accessible with ARIA labels and keyboard navigation
+  * Configurable via context variables:
+    * `theme_switcher_enabled`: Enable/disable the switcher (default: True)
+    * `theme_switcher_position`: Customize position with top/right values
+    * `theme_switcher_icons`: Custom icon classes for light/auto/dark modes
+  * Usage: `{% include include.theme_switcher %}` for CMS pages
+  * Fallback: `{% include "cmspage/includes/theme_switcher.html" %}` for non-CMS pages
+
+#### Changed
+
+* Moved theme switcher styles from projects to wagtail-cmspage SCSS
+* Theme switcher now included as standard component in wagtail-cmspage
+* Completely revamped README.md with modern formatting, feature overview, and clear installation guide
+* Updated documentation with CSS Styling & Bootstrap Integration section
+* Enhanced CMSPAGE.md with comprehensive Bootstrap 5 integration guide
+* Added comprehensive Content Editor Guide for non-technical users
+
+### 2025.7.4
+
+#### Changed
+
+* **BREAKING**: Removed obsolete `Backgrounds` enum - replaced with new semantic `Palette` enum
+* Updated `Palette` enum with Bootstrap-independent semantic color classes using `cp-*` prefix:
+  * `NONE` → `cp-transparent` (transparent background)
+  * `PAGE` → `cp-page` (respects light/dark mode)
+  * `LIGHT` → `cp-light` (fixed light theme)
+  * `DARK` → `cp-dark` (fixed dark theme)
+  * `WHITE` → `cp-white` (black on white)
+  * `BLACK` → `cp-black` (white on black)
+  * `HIGHLIGHT` → `cp-highlight` (highlight theme)
+  * `STANDOUT` → `cp-standout` (standout theme)
+  * `SUCCESS` → `cp-success` (success/positive)
+  * `WARNING` → `cp-warning` (warning/caution)
+  * `INFO` → `cp-info` (informational)
+  * `DANGER` → `cp-danger` (error/critical)
+* Enhanced `Insets` enum with responsive padding classes (e.g., `p-1 p-sm-2`)
+* Added CSS utilities for new color palette system in `cmspage/scss/partials/_utilities.scss`
+
+#### Added
+
+* Created data migration `palette_migration.py` to convert existing palette values
+* Added comprehensive SQL migration queries and documentation in `PALETTE_MAPPING_LOG.md`
+* New migration `0006_remove_backgrounds_enum.py` documenting enum removal
+
+#### Technical
+
+* New color palette system uses CSS custom properties for theme switching
+* Bootstrap-independent design allows for better theme customization
+* Responsive padding utilities improve mobile/desktop layout consistency
+* Removed old theme toggle from base header template
 
 ### 2024.3.0
 
