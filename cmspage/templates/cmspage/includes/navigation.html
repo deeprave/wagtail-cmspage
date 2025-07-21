@@ -1,4 +1,4 @@
-{% load static wagtailadmin_tags %}
+{% load static wagtailadmin_tags cmspage_tags %}
 <div class="col-md-2">
   <div class="dropdown ps-0" id="leftMenuButton">
     <button class="btn bg-white d-md-none mb-5" type="button" data-bs-toggle="collapse"
@@ -8,7 +8,7 @@
   </div>
   <nav class="dropdown-menu border-0 collapse d-md-block" id="leftMenu">
     <ul class="nav menu-list">{% for item in navigation %}
-      {% include include.navigation_item with item=item level=0 %}
+      {% cmspage_include include.navigation_item with item=item level=0 %}
     {% endfor %}</ul>
   </nav>
 </div>

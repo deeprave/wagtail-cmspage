@@ -40,6 +40,7 @@ DEFAULT_TEMPLATE_INCLUDE_NAMES = [
     "links",
     "contact",
     "media",
+    "theme_switcher",
 ]
 # optional logging (for development)
 _logger = logging.getLogger("cmspage")

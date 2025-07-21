@@ -1,38 +1,9 @@
+{% load cmspage_tags %}
 <div class="row page-heading align-items-center">
   <div class="col-auto d-flex mb-2">
   {% if page.display_title %}<span class="d-inline-block d-none d-sm-block">
-    {% include include.logo %}
+    {% cmspage_include include.logo %}
     {% if page.title %}<p class="h1 outer-heading page-title mb-3 d-sm-inline-block">{{ page.title }}</p>{% endif %}
   </span>{% endif %}
   </div>
-  <div class="col ms-auto">
-    <div class="form-check form-switch align-self-end float-end">
-      <label class="form-check-label me-2" for="darkModeSwitch" style="cursor: pointer">
-        <span id="themeGlyph">🌘</span>
-      </label>
-      <input class="form-check-input" type="checkbox" id="darkModeSwitch">
-    </div>
-  </div>
 </div>
-<script>
-  document.addEventListener('DOMContentLoaded', (_) => {
-    const htmlElement = document.documentElement
-    const switchElement = document.getElementById('darkModeSwitch')
-    const themeGlyph = document.getElementById('themeGlyph')
-
-    function updateTheme(theme)  {
-      switchElement.checked = currentTheme === 'dark'
-      htmlElement.setAttribute('data-bs-theme', currentTheme)
-      localStorage.setItem('bsTheme', currentTheme)
-      themeGlyph.textContent = theme === 'dark' ? '🌖' : '🌘'
-    }
-
-    let currentTheme = localStorage.getItem('bsTheme') || 'light'
-    updateTheme(currentTheme)
-
-    switchElement.addEventListener('change', function () {
-      currentTheme = (this.checked) ? 'dark' : 'light'
-      updateTheme(currentTheme)
-    })
-  })
-</script>

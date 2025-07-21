@@ -5,7 +5,6 @@
 from django.db import models
 
 __all__ = (
-    "Backgrounds",
     "Palette",
     "Heights",
     "Insets",
@@ -36,36 +35,21 @@ class IntChoices(models.IntegerChoices):
         return super().choices
 
 
-class Backgrounds(Choices):
-    NONE = "bg-transparent links-dark", "Transparent"
-    PAGE = "bg-body links-dark", "Page"
-    LIGHT = "bg-light links-dark", "Light"
-    DARK = "bg-dark links-light", "Dark"
-    WHITE = "bg-white links-dark", "White"
-    BLACK = "bg-black links-light", "Black"
-    PRIMARY = "bg-primary links-dark", "Primary"
-    SECONDARY = "bg-secondary links-dark", "Secondary"
-    TERTIARY = "bg-tertiary links-dark", "Tertiary"
-    SUCCESS = "bg-success-subtle links-dark", "Success"
-    WARNING = "bg-warning-subtle links-dark", "Warning"
-    INFO = "bg-info-subtle links-dark", "Info"
-    DANGER = "bg-danger-subtle links-dark", "Danger"
-
 
 class Palette(Choices):
-    NONE = f"{Backgrounds.NONE.value} text-dark title-dark", "Dark on Transparent"
-    PAGE = f"{Backgrounds.PAGE.value} text-dark title-dark", "Dark on Page Background"
-    LIGHT = f"{Backgrounds.LIGHT.value} text-dark title-dark", "Dark on Light Background"
-    DARK = f"{Backgrounds.DARK.value} text-light title-light", "Light on Dark Background"
-    WHITE = f"{Backgrounds.LIGHT.value} text-black title-dark", "Black on White Background"
-    BLACK = f"{Backgrounds.WHITE.value} text-white title-light", "White on Black Background"
-    PRIMARY = f"{Backgrounds.PRIMARY.value} text-dark title-dark", "Dark on Primary Background"
-    SECONDARY = f"{Backgrounds.SECONDARY.value} text-dark title-dark", "Dark on Secondary Background"
-    TERTIARY = f"{Backgrounds.TERTIARY.value} text-dark title-dark", "Dark on Tertiary Background"
-    SUCCESS = f"{Backgrounds.SUCCESS.value} text-dark title-dark", "Dark on Success Background"
-    WARNING = f"{Backgrounds.WARNING.value} text-dark title-dark", "Dark on Warning Background"
-    INFO = f"{Backgrounds.INFO.value} text-dark title-dark", "Dark on Info Background"
-    DANGER = f"{Backgrounds.DANGER.value} text-dark title-dark", "Dark on Danger Background"
+    # New semantic palette using cp-* classes
+    NONE = "cp-transparent", "Transparent Background"
+    PAGE = "cp-page", "Page Theme (respects light/dark mode)"
+    LIGHT = "cp-light", "Light Theme (fixed light)"
+    DARK = "cp-dark", "Dark Theme (fixed dark)"
+    WHITE = "cp-white", "Black on White"
+    BLACK = "cp-black", "White on Black"
+    HIGHLIGHT = "cp-highlight", "Highlight Theme (alternate background)"
+    STANDOUT = "cp-standout", "Standout Theme (secondary alternate)"
+    SUCCESS = "cp-success", "Success (green for positive actions)"
+    WARNING = "cp-warning", "Warning (yellow for caution)"
+    INFO = "cp-info", "Info (using site palette colors)"
+    DANGER = "cp-danger", "Danger (red for errors/critical)"
 
 
 class Heights(Choices):
@@ -79,11 +63,11 @@ class Heights(Choices):
 
 class Insets(Choices):
     SMALLEST = "p-0", "None"
-    SMALL = "p-1", "Small"
-    MEDIUM = "p-2", "Medium"
-    LARGE = "p-3", "Large"
-    LARGER = "p-4", "Larger"
-    LARGEST = "p-5", "Largest"
+    SMALL = "p-1 p-sm-2", "Small (responsive)"
+    MEDIUM = "p-2 p-sm-3", "Medium (responsive)"
+    LARGE = "p-3 p-sm-4", "Large (responsive)"
+    LARGER = "p-4 p-sm-5", "Larger (responsive)"
+    LARGEST = "p-5 p-sm-6", "Largest (responsive)"
 
 
 class SocialIcon(Choices):

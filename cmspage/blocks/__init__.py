@@ -13,12 +13,11 @@ from .links import LinkBlock, LinksBlock
 from .carousel import CarouselImageBlock
 from .social import SocialsBlock, SocialLinkBlock
 from .title import TitleBlock, RichTextWithTitleBlock
-from .themes import Backgrounds, Palette, Heights, Insets, SocialIcon, IconColorChoices
+from .themes import Palette, Heights, Insets, SocialIcon, IconColorChoices
 from .form import FormBlock
 
 __all__ = (
     # themes
-    "Backgrounds",
     "Palette",
     "Heights",
     "Insets",

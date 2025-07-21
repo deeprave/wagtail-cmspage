@@ -68,7 +68,7 @@ class TestCMSTemplateMixin:
             "title", "header", "logo", "navigation", "navigation_item",
             "navigation_top", "navigation_top_item", "navigation_side",
             "navigation_side_item", "messages", "logo", "carousel", "main",
-            "footer", "links", "contact", "media"
+            "footer", "links", "contact", "media", "theme_switcher"
         ]
         assert result == expected
 

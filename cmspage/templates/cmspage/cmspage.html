@@ -1,8 +1,9 @@
 {% extends 'base.html' %}
+{% load cmspage_tags %}
 
 {% block navigation-top %}{% endblock navigation-top %}
-{% block header %}{% include include.header %}{% endblock header %}
-{% block navigation-left %}{% include include.navigation %}{% endblock navigation-left %}
-{% block messages %}{% include include.messages %}{% endblock messages %}
-{% block content %}{% include include.main %}{% endblock content %}
-{% block footer %}{% include include.footer %}{% endblock footer %}
+{% block header %}{% cmspage_include include.header %}{% endblock header %}
+{% block navigation-left %}{% cmspage_include include.navigation %}{% endblock navigation-left %}
+{% block messages %}{% cmspage_include include.messages %}{% endblock messages %}
+{% block content %}{% cmspage_include include.main %}{% endblock content %}
+{% block footer %}{% cmspage_include include.footer %}{% endblock footer %}
