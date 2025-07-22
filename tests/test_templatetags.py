@@ -37,16 +37,17 @@ class TestCMSPageTags:
         assert "square" in IMAGE_SIZES
         assert "extrawide" in IMAGE_SIZES
 
-        # Check that each orientation has size definitions
-        for orientation in ORIENTATIONS:
-            assert orientation in IMAGE_SIZES
-            sizes = IMAGE_SIZES[orientation]
-            assert "tiny" in sizes
-            assert "small" in sizes
-            assert "medium" in sizes
-            assert "large" in sizes
-            assert "full_width" in sizes
-            assert "original" in sizes
+    @pytest.mark.parametrize("orientation", ORIENTATIONS)
+    def test_orientation_has_all_sizes(self, orientation):
+        """Test that each orientation has all required size definitions"""
+        assert orientation in IMAGE_SIZES
+        sizes = IMAGE_SIZES[orientation]
+        assert "tiny" in sizes
+        assert "small" in sizes
+        assert "medium" in sizes
+        assert "large" in sizes
+        assert "full_width" in sizes
+        assert "original" in sizes
 
     def test_image_size_values(self):
         """Test specific image size values"""
@@ -59,9 +60,10 @@ class TestCMSPageTags:
         # Square tiny should be 150x150
         assert IMAGE_SIZES["square"]["tiny"] == "150x150"
 
-        # Original should be "original" for all orientations
-        for orientation in ORIENTATIONS:
-            assert IMAGE_SIZES[orientation]["original"] == "original"
+    @pytest.mark.parametrize("orientation", ORIENTATIONS)
+    def test_original_size_value(self, orientation):
+        """Test that 'original' size is 'original' for all orientations"""
+        assert IMAGE_SIZES[orientation]["original"] == "original"
 
     @patch("cmspage.templatetags.cmspage_tags.Template")
     def test_render_image_basic(self, mock_template_class):
@@ -314,15 +316,13 @@ class TestCMSPageIncludeTag:
             Template("{% load cmspage_tags %}{% cmspage_include %}")
 
     @pytest.mark.django_db
-    def test_cmspage_include_properly_scoped_variables(self):
+    @pytest.mark.parametrize("falsy_value", [None, "", False, 0])
+    def test_cmspage_include_properly_scoped_variables(self, falsy_value):
         """Test that cmspage_include behavior is consistent with empty variables"""
         template = Template("{% load cmspage_tags %}{% cmspage_include template_name %}")
-
-        # Test with various falsy values
-        for falsy_value in [None, "", False, 0]:
-            context = Context({"template_name": falsy_value})
-            result = template.render(context)
-            assert result == "", f"Failed for falsy value: {falsy_value}"
+        context = Context({"template_name": falsy_value})
+        result = template.render(context)
+        assert result == "", f"Failed for falsy value: {falsy_value}"
 
     # === EDGE CASE TESTS ===
 
@@ -352,35 +352,33 @@ class TestCMSPageIncludeTag:
         assert result == ""
 
     @pytest.mark.django_db
-    def test_cmspage_include_numeric_and_special_values(self):
-        """Test behavior with numeric and special values as template names"""
+    @pytest.mark.parametrize("falsy_value", [0, 0.0])
+    def test_cmspage_include_falsy_numeric_values(self, falsy_value):
+        """Test behavior with falsy numeric values as template names (should return empty string)"""
         template = Template("{% load cmspage_tags %}{% cmspage_include template_name %}")
-
-        # Test falsy numeric values (should return empty string)
-        for value in [0, 0.0]:
-            context = Context({"template_name": value})
-            result = template.render(context)
-            assert result == ""
-
-        # Test truthy numeric values (should try to load template and fail)
-        for value in [-1, 42, 1.5]:
-            context = Context({"template_name": value})
-            # Numeric values converted to strings can't be used as file paths
-            with pytest.raises((TemplateDoesNotExist, TypeError)):
-                template.render(context)
+        context = Context({"template_name": falsy_value})
+        result = template.render(context)
+        assert result == ""
 
     @pytest.mark.django_db
-    def test_cmspage_include_whitespace_edge_cases(self):
+    @pytest.mark.parametrize("truthy_value", [-1, 42, 1.5])
+    def test_cmspage_include_truthy_numeric_values(self, truthy_value):
+        """Test behavior with truthy numeric values as template names (should try to load template and fail)"""
+        template = Template("{% load cmspage_tags %}{% cmspage_include template_name %}")
+        context = Context({"template_name": truthy_value})
+        # Numeric values converted to strings can't be used as file paths
+        with pytest.raises((TemplateDoesNotExist, TypeError)):
+            template.render(context)
+
+    @pytest.mark.django_db
+    @pytest.mark.parametrize("whitespace_value", [" ", "\t", "\n", "\r", "   ", "\t\n\r "])
+    def test_cmspage_include_whitespace_edge_cases(self, whitespace_value):
         """Test behavior with various whitespace scenarios"""
         template = Template("{% load cmspage_tags %}{% cmspage_include template_name %}")
-
-        # Test whitespace-only strings
-        whitespace_values = [" ", "\t", "\n", "\r", "   ", "\t\n\r "]
-        for value in whitespace_values:
-            context = Context({"template_name": value})
-            # Whitespace strings are truthy, so should try to load template
-            with pytest.raises(TemplateDoesNotExist):
-                template.render(context)
+        context = Context({"template_name": whitespace_value})
+        # Whitespace strings are truthy, so should try to load template
+        with pytest.raises(TemplateDoesNotExist):
+            template.render(context)
 
     @pytest.mark.django_db
     def test_cmspage_include_complex_variable_expressions(self):
@@ -657,44 +655,39 @@ class TestCMSPageIncludeTag:
         assert result == ""
 
     @pytest.mark.django_db
-    def test_cmspage_include_memory_and_gc_edge_cases(self):
-        """Test memory management and garbage collection edge cases"""
-
-        # Test with objects that might have cleanup issues
+    @pytest.mark.parametrize("template_index", range(10))
+    def test_cmspage_include_memory_cleanup_nonexistent_templates(self, template_index):
+        """Test memory cleanup with nonexistent templates"""
         template = Template("{% load cmspage_tags %}{% cmspage_include template_name %}")
-
-        # Test with many temporary variables that should be cleaned up
-        for i in range(10):
-            context = Context({"template_name": f"temp_{i}.html"})
-            with pytest.raises(TemplateDoesNotExist):
-                template.render(context)
-
-        # Test successful empty string returns don't leak memory
-        for i in range(10):
-            context = Context({"template_name": ""})
-            result = template.render(context)
-            assert result == ""
+        context = Context({"template_name": f"temp_{template_index}.html"})
+        with pytest.raises(TemplateDoesNotExist):
+            template.render(context)
 
     @pytest.mark.django_db
-    def test_cmspage_include_thread_safety_simulation(self):
-        """Test behavior that simulates multi-threaded usage"""
-
-        # Test with different contexts in sequence (simulating concurrent requests)
+    @pytest.mark.parametrize("_", range(10))
+    def test_cmspage_include_memory_cleanup_empty_templates(self, _):
+        """Test memory cleanup with empty template names"""
         template = Template("{% load cmspage_tags %}{% cmspage_include template_name %}")
+        context = Context({"template_name": ""})
+        result = template.render(context)
+        assert result == ""
 
-        test_cases = [
-            {"template_name": ""},
-            {"template_name": None},
-            {"template_name": "test1.html"},
-            {"template_name": False},
-            {"template_name": "test2.html"},
-        ]
+    @pytest.mark.django_db
+    @pytest.mark.parametrize("template_value, expected_empty", [
+        ("", True),
+        (None, True),
+        ("test1.html", False),
+        (False, True),
+        ("test2.html", False),
+    ])
+    def test_cmspage_include_thread_safety_simulation(self, template_value, expected_empty):
+        """Test behavior that simulates multi-threaded usage"""
+        template = Template("{% load cmspage_tags %}{% cmspage_include template_name %}")
+        context = Context({"template_name": template_value})
 
-        for case in test_cases:
-            context = Context(case)
-            if not case["template_name"]:
-                result = template.render(context)
-                assert result == ""
-            else:
-                with pytest.raises(TemplateDoesNotExist):
-                    template.render(context)
+        if expected_empty:
+            result = template.render(context)
+            assert result == ""
+        else:
+            with pytest.raises(TemplateDoesNotExist):
+                template.render(context)

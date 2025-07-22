@@ -40,6 +40,14 @@ def migrate_palette_values(apps, schema_editor):
         "bg-danger-subtle links-dark text-dark title-dark": "cp-danger",
     }
 
+    # Helper function to get new palette value with fallback
+    def get_new_palette_value(old_value):
+        if old_value in PALETTE_MAPPING:
+            return PALETTE_MAPPING[old_value]
+        else:
+            print(f"Warning: Unmapped legacy palette value encountered: '{old_value}'.")
+            return "cp-page"
+
     # Execute the updates using raw SQL
     with connection.cursor() as cursor:
         for old_value, new_value in PALETTE_MAPPING.items():
@@ -49,7 +57,7 @@ def migrate_palette_values(apps, schema_editor):
                 SET body = REPLACE(body::text, %s, %s)::jsonb
                 WHERE body::text LIKE %s
             """,
-                [f'"palette": "{old_value}"', f'"palette": "{new_value}"', f'%"palette": "{old_value}"%'],
+                [f'"palette": "{old_value}"', f'"palette": "{get_new_palette_value(old_value)}"', f'%"palette": "{old_value}"%'],
             )
 
             # Also update the footer field if it exists
@@ -59,7 +67,7 @@ def migrate_palette_values(apps, schema_editor):
                 SET footer = REPLACE(footer::text, %s, %s)::jsonb
                 WHERE footer::text LIKE %s
             """,
-                [f'"palette": "{old_value}"', f'"palette": "{new_value}"', f'%"palette": "{old_value}"%'],
+                [f'"palette": "{old_value}"', f'"palette": "{get_new_palette_value(old_value)}"', f'%"palette": "{old_value}"%'],
             ) if connection.vendor == "postgresql" else None
 
 
