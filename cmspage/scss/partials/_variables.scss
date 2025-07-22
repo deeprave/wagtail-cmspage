@@ -28,7 +28,7 @@
   --cp-bg-card: #f8f9fa;
   --cp-fg-accent: var(--cp-brand-accent);
   --cp-bg-accent: rgba(13, 202, 240, 0.1);
-  --cp-fg-accent-hover: darken(var(--cp-brand-accent), 10%);
+  --cp-fg-accent-hover: color-mix(in srgb, var(--cp-brand-accent), black 10%);
   --cp-fg-subtle: #6c757d;
   --cp-bg-subtle: #e9ecef;
   --cp-fg-emphasis: var(--cp-brand-primary);
@@ -71,10 +71,10 @@
   --cp-bg-card: #2c2c2c;
   --cp-fg-accent: var(--cp-brand-accent);
   --cp-bg-accent: rgba(13, 202, 240, 0.2);
-  --cp-fg-accent-hover: lighten(var(--cp-brand-accent), 10%);
+  --cp-fg-accent-hover: color-mix(in srgb, var(--cp-brand-accent), white 10%);
   --cp-fg-subtle: #adb5bd;
   --cp-bg-subtle: #343a40;
-  --cp-fg-emphasis: lighten(var(--cp-brand-primary), 20%);
+  --cp-fg-emphasis: color-mix(in srgb, var(--cp-brand-primary), white 20%);
   --cp-bg-emphasis: rgba(13, 110, 253, 0.2);
 
   // Semantic colors in dark mode
@@ -101,10 +101,10 @@
     --cp-bg-card: #2c2c2c;
     --cp-fg-accent: var(--cp-brand-accent);
     --cp-bg-accent: rgba(13, 202, 240, 0.2);
-    --cp-fg-accent-hover: lighten(var(--cp-brand-accent), 10%);
+    --cp-fg-accent-hover: color-mix(in srgb, var(--cp-brand-accent), white 10%);
     --cp-fg-subtle: #adb5bd;
     --cp-bg-subtle: #343a40;
-    --cp-fg-emphasis: lighten(var(--cp-brand-primary), 20%);
+    --cp-fg-emphasis: color-mix(in srgb, var(--cp-brand-primary), white 20%);
     --cp-bg-emphasis: rgba(13, 110, 253, 0.2);
 
     // Semantic colors in auto dark mode
