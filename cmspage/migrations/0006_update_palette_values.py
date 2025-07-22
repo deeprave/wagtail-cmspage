@@ -40,12 +40,15 @@ def migrate_palette_values(apps, schema_editor):
         "bg-danger-subtle links-dark text-dark title-dark": "cp-danger",
     }
 
+    import logging
+    logger = logging.getLogger(__name__)
+
     # Helper function to get new palette value with fallback
     def get_new_palette_value(old_value):
         if old_value in PALETTE_MAPPING:
             return PALETTE_MAPPING[old_value]
         else:
-            print(f"Warning: Unmapped legacy palette value encountered: '{old_value}'.")
+            logger.warning(f"Unmapped legacy palette value encountered: '%s'.", old_value)
             return "cp-page"
 
     # Execute the updates using raw SQL
