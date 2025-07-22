@@ -1,0 +1,158 @@
+/**
+ * Theme Switcher Logic
+ * Handles theme switching between light, dark, and auto modes
+ */
+
+// Auto mode support - follow system preference when no theme is explicitly set
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    // Dark mode colors - these should match the [data-theme="dark"] values
+    // Each site needs to define these in their _color-variables.scss
+
+    // The actual color values are defined in each site's _color-variables.scss
+    // This just ensures auto mode works correctly
+  }
+}
+
+// Smooth transitions when switching themes
+:root {
+  // Add transitions to color changes for smooth theme switching
+  * {
+    transition: color 0.3s ease-in-out,
+                background-color 0.3s ease-in-out,
+                border-color 0.3s ease-in-out,
+                box-shadow 0.3s ease-in-out;
+  }
+}
+
+// Disable transitions during page load to prevent flash
+.no-transitions * {
+  transition: none !important;
+}
+
+// Theme indicator classes (optional - for UI feedback)
+[data-theme="light"] .theme-indicator-light,
+[data-theme="dark"] .theme-indicator-dark,
+:root:not([data-theme]) .theme-indicator-auto {
+  display: block;
+}
+
+[data-theme="light"] .theme-indicator-dark,
+[data-theme="light"] .theme-indicator-auto,
+[data-theme="dark"] .theme-indicator-light,
+[data-theme="dark"] .theme-indicator-auto,
+:root:not([data-theme]) .theme-indicator-light,
+:root:not([data-theme]) .theme-indicator-dark {
+  display: none;
+}
+
+// Utility classes for forcing specific themes on elements
+.force-light-theme {
+  color-scheme: light;
+  // Will use light mode colors even in light mode
+}
+
+.force-dark-theme {
+  color-scheme: dark;
+  // Will use dark mode colors even in dark mode
+}
+
+// Helper for high contrast mode support
+@media (prefers-contrast: high) {
+  :root {
+    // Increase contrast for accessibility
+    --cp-contrast-boost: 1.2;
+  }
+}
+
+// Print styles - always use light theme for printing
+@media print {
+  :root {
+    // Force light mode colors for printing
+    // Each site should define print-friendly colors in their _color-variables.scss
+  }
+}
+
+// Fixed theme switcher positioning
+.theme-switcher-fixed {
+  position: fixed;
+  top: 2px;
+  right: 2px;
+  z-index: 1050; // Above most Bootstrap components but below modals
+
+  .btn-group-vertical {
+    box-shadow: 0 0.25rem 0.75rem rgba(0, 0, 0, 0.15);
+    border-radius: 0.375rem;
+    overflow: hidden;
+
+    .btn {
+      border-radius: 0;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+      backdrop-filter: blur(4px);
+      background-color: rgba(255, 255, 255, 0.9);
+      color: #333; // Darker text for better contrast
+
+      &:last-child {
+        border-bottom: none;
+      }
+
+      &.active {
+        background-color: #39aa9b !important; // Use explicit teal for visibility in all modes
+        color: white !important;
+        border-color: #39aa9b !important;
+      }
+
+      // Ensure icons are visible in light mode
+      i {
+        color: #333;
+      }
+
+      &.active i {
+        color: white !important;
+      }
+    }
+  }
+
+  // Mobile responsiveness
+  @media (max-width: 576px) {
+    top: 2px;
+    right: 2px;
+
+    .btn-group-vertical .btn {
+      padding: 0.25rem 0.375rem;
+      font-size: 0.875rem;
+    }
+  }
+}
+
+[data-theme="dark"] .theme-switcher-fixed {
+  .btn-group-vertical .btn {
+    background-color: rgba(0, 0, 0, 0.9);
+    color: #f8f9fa; // Light text for dark mode
+    border-color: rgba(255, 255, 255, 0.3);
+
+    // Ensure icons are visible in dark mode
+    i {
+      color: #f8f9fa;
+    }
+
+    &:hover {
+      background-color: rgba(255, 255, 255, 0.2);
+      color: white;
+
+      i {
+        color: white;
+      }
+    }
+
+    &.active {
+      background-color: #39aa9b !important; // Use the original teal accent for better visibility
+      color: white !important;
+      border-color: #39aa9b !important;
+
+      i {
+        color: white !important;
+      }
+    }
+  }
+}
