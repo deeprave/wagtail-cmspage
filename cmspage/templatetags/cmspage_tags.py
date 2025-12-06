@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 import re
-from django.template import Template, Context, TemplateSyntaxError
+import logging
+from django.template import Template, Context
 from django import template
 from django.template.loader import get_template
 from wagtail.images.models import Image
@@ -51,7 +52,8 @@ def cmspage_include(parser, token):
     """
     bits = token.split_contents()
     if len(bits) != 2:
-        raise TemplateSyntaxError("'cmspage_include' tag requires exactly one argument")
+        logging.error(f"cmspage_include requires exactly one argument (got {bits})")
+        return ""
 
     # Get the template expression
     template_expr = parser.compile_filter(bits[1])
