@@ -1,6 +1,6 @@
 from django import forms
 from django.utils.functional import cached_property
-from wagtail.telepath import register
+from wagtail.admin.telepath import register
 from wagtail import blocks
 # noinspection PyProtectedMember
 from wagtail.blocks.struct_block import StructBlockAdapter
