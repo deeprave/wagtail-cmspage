@@ -53,7 +53,7 @@ def cmspage_include(parser, token):
     bits = token.split_contents()
     if len(bits) != 2:
         logging.error(f"cmspage_include requires exactly one argument (got {bits})")
-        return ""
+        return SafeIncludeNode("")
 
     # Get the template expression
     template_expr = parser.compile_filter(bits[1])
