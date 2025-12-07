@@ -18,10 +18,14 @@ class SafeIncludeNode(template.Node):
         self.template_expr = template_expr
 
     def render(self, context):
+        template_name = None
+        if not self.template_expr:
+            return ""
+
         try:
             template_name = self.template_expr.resolve(context)
         except template.VariableDoesNotExist:
-            # If variable doesn't exist, return empty string silently
+            # If the variable doesn't exist, return an empty string silently
             return ""
 
         # If template name is empty, None, or evaluates to False, return empty string
