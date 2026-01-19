@@ -312,7 +312,7 @@ class TestCMSPageIncludeTag:
     @pytest.mark.django_db
     def test_cmspage_include_syntax_error_no_arguments(self):
         """Test cmspage_include with no arguments raises TemplateSyntaxError"""
-        with pytest.raises(TemplateSyntaxError, match="'cmspage_include' tag requires exactly one argument"):
+        with pytest.raises(TemplateSyntaxError, match="requires at least one argument"):
             Template("{% load cmspage_tags %}{% cmspage_include %}")
 
     @pytest.mark.django_db
@@ -505,12 +505,12 @@ class TestCMSPageIncludeTag:
     def test_cmspage_include_syntax_validation_edge_cases(self):
         """Test template tag syntax validation edge cases"""
 
-        # Multiple arguments (should fail)
-        with pytest.raises(TemplateSyntaxError, match="exactly one argument"):
+        # Multiple arguments without 'with' (should fail with expected 'with' message)
+        with pytest.raises(TemplateSyntaxError, match="expected 'with'"):
             Template("{% load cmspage_tags %}{% cmspage_include template1 template2 %}")
 
         # No arguments (should fail)
-        with pytest.raises(TemplateSyntaxError, match="exactly one argument"):
+        with pytest.raises(TemplateSyntaxError, match="requires at least one argument"):
             Template("{% load cmspage_tags %}{% cmspage_include %}")
 
         # Empty argument (syntactically valid but will result in empty)
@@ -691,3 +691,102 @@ class TestCMSPageIncludeTag:
         else:
             with pytest.raises(TemplateDoesNotExist):
                 template.render(context)
+
+    # === WITH CLAUSE TESTS ===
+
+    @pytest.mark.django_db
+    def test_cmspage_include_with_clause_basic(self):
+        """Test cmspage_include with basic 'with' clause"""
+        from unittest.mock import patch, Mock
+
+        template = Template("{% load cmspage_tags %}{% cmspage_include template_name with var1=value1 %}")
+        context = Context({"template_name": "test.html", "value1": "test_value"})
+
+        with patch("cmspage.templatetags.cmspage_tags.get_template") as mock_get_template:
+            mock_template = Mock()
+            mock_template.render.return_value = "rendered"
+            mock_get_template.return_value = mock_template
+
+            template.render(context)
+
+            # Verify extra context was passed
+            passed_context = mock_template.render.call_args[0][0]
+            assert "var1" in passed_context
+            assert passed_context["var1"] == "test_value"
+
+    @pytest.mark.django_db
+    def test_cmspage_include_with_clause_multiple_vars(self):
+        """Test cmspage_include with multiple variables in 'with' clause"""
+        from unittest.mock import patch, Mock
+
+        template = Template("{% load cmspage_tags %}{% cmspage_include template_name with var1=value1 var2=value2 %}")
+        context = Context({"template_name": "test.html", "value1": "first", "value2": "second"})
+
+        with patch("cmspage.templatetags.cmspage_tags.get_template") as mock_get_template:
+            mock_template = Mock()
+            mock_template.render.return_value = "rendered"
+            mock_get_template.return_value = mock_template
+
+            template.render(context)
+
+            passed_context = mock_template.render.call_args[0][0]
+            assert passed_context["var1"] == "first"
+            assert passed_context["var2"] == "second"
+
+    @pytest.mark.django_db
+    def test_cmspage_include_with_clause_missing_variable(self):
+        """Test cmspage_include with 'with' clause when variable doesn't exist"""
+        from unittest.mock import patch, Mock
+
+        template = Template("{% load cmspage_tags %}{% cmspage_include template_name with var1=missing_var %}")
+        context = Context({"template_name": "test.html"})
+
+        with patch("cmspage.templatetags.cmspage_tags.get_template") as mock_get_template:
+            mock_template = Mock()
+            mock_template.render.return_value = "rendered"
+            mock_get_template.return_value = mock_template
+
+            template.render(context)
+
+            # Django's FilterExpression.resolve() returns empty string for missing variables
+            # This is consistent with Django's default template variable behavior
+            passed_context = mock_template.render.call_args[0][0]
+            assert "var1" in passed_context
+            assert passed_context["var1"] == ""
+
+    @pytest.mark.django_db
+    def test_cmspage_include_with_clause_invalid_syntax_no_equals(self):
+        """Test cmspage_include with invalid 'with' clause syntax (missing =)"""
+        with pytest.raises(TemplateSyntaxError, match="requires key=value pairs"):
+            Template("{% load cmspage_tags %}{% cmspage_include template_name with invalid %}")
+
+    @pytest.mark.django_db
+    def test_cmspage_include_with_clause_invalid_keyword(self):
+        """Test cmspage_include with invalid keyword after template"""
+        with pytest.raises(TemplateSyntaxError, match="expected 'with'"):
+            Template("{% load cmspage_tags %}{% cmspage_include template_name using var1=value1 %}")
+
+    @pytest.mark.django_db
+    def test_cmspage_include_with_clause_literal_values(self):
+        """Test cmspage_include with literal values in 'with' clause"""
+        from unittest.mock import patch, Mock
+
+        template = Template("{% load cmspage_tags %}{% cmspage_include template_name with var1='literal' var2=123 %}")
+        context = Context({"template_name": "test.html"})
+
+        with patch("cmspage.templatetags.cmspage_tags.get_template") as mock_get_template:
+            mock_template = Mock()
+            mock_template.render.return_value = "rendered"
+            mock_get_template.return_value = mock_template
+
+            template.render(context)
+
+            passed_context = mock_template.render.call_args[0][0]
+            assert passed_context["var1"] == "literal"
+            assert passed_context["var2"] == 123
+
+    @pytest.mark.django_db
+    def test_cmspage_include_no_arguments_error(self):
+        """Test cmspage_include with no arguments raises TemplateSyntaxError"""
+        with pytest.raises(TemplateSyntaxError, match="requires at least one argument"):
+            Template("{% load cmspage_tags %}{% cmspage_include %}")

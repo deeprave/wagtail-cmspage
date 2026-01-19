@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 import re
-import logging
 from django.template import Template, Context
 from django import template
 from django.template.loader import get_template
@@ -41,7 +40,11 @@ class SafeIncludeNode(template.Node):
 
         # Merge extra context from 'with' clause
         for key, var_expr in self.extra_context.items():
-            include_context[key] = var_expr.resolve(context)
+            try:
+                include_context[key] = var_expr.resolve(context)
+            except template.VariableDoesNotExist:
+                # If variable doesn't exist, set to None (consistent with main template handling)
+                include_context[key] = None
 
         # Render the included template - let all template errors bubble up
         return template_obj.render(include_context)
@@ -62,8 +65,9 @@ def cmspage_include(parser, token):
     """
     bits = token.split_contents()
     if len(bits) < 2:
-        logging.error(f"cmspage_include requires at least one argument (got {bits})")
-        return SafeIncludeNode("")
+        raise template.TemplateSyntaxError(
+            f"cmspage_include requires at least one argument (got {bits})"
+        )
 
     # Get the template expression
     template_expr = parser.compile_filter(bits[1])
@@ -78,7 +82,13 @@ def cmspage_include(parser, token):
                     key, value = bit.split("=", 1)
                     extra_context[key] = parser.compile_filter(value)
                 else:
-                    logging.error(f"cmspage_include 'with' clause requires key=value pairs (got '{bit}')")
+                    raise template.TemplateSyntaxError(
+                        f"cmspage_include 'with' clause requires key=value pairs (got '{bit}')"
+                    )
+        else:
+            raise template.TemplateSyntaxError(
+                f"cmspage_include: expected 'with' after template argument (got '{bits[2]}')"
+            )
 
     return SafeIncludeNode(template_expr, extra_context)
 
