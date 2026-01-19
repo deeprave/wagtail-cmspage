@@ -1,6 +1,6 @@
 [project]
 name = "wagtail-cmspage"
-version = "2025.12.3"
+version = "2026.1.1"
 description = "Base extensible and comprehensive: CMSPage type for Wagtail"
 authors = [
   { name = "David Nugent", email = "davidn@uniquode.io" }
