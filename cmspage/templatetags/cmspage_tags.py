@@ -14,8 +14,9 @@ class SafeIncludeNode(template.Node):
     A Node that safely includes templates, handling cases where the template variable is empty or None.
     Only suppresses errors related to missing/empty template variables, not actual template errors.
     """
-    def __init__(self, template_expr):
+    def __init__(self, template_expr, extra_context=None):
         self.template_expr = template_expr
+        self.extra_context = extra_context or {}
 
     def render(self, context):
         template_name = None
@@ -38,6 +39,10 @@ class SafeIncludeNode(template.Node):
         # Convert context to dict for template rendering
         include_context = context.flatten()
 
+        # Merge extra context from 'with' clause
+        for key, var_expr in self.extra_context.items():
+            include_context[key] = var_expr.resolve(context)
+
         # Render the included template - let all template errors bubble up
         return template_obj.render(include_context)
 
@@ -50,19 +55,32 @@ def cmspage_include(parser, token):
     Usage:
         {% load cmspage_tags %}
         {% cmspage_include template_variable %}
+        {% cmspage_include template_variable with var1=value1 var2=value2 %}
 
     If template_variable is None, empty, or doesn't exist, returns empty string instead of error.
     All other template errors (TemplateDoesNotExist, syntax errors, etc.) bubble up normally.
     """
     bits = token.split_contents()
-    if len(bits) != 2:
-        logging.error(f"cmspage_include requires exactly one argument (got {bits})")
+    if len(bits) < 2:
+        logging.error(f"cmspage_include requires at least one argument (got {bits})")
         return SafeIncludeNode("")
 
     # Get the template expression
     template_expr = parser.compile_filter(bits[1])
 
-    return SafeIncludeNode(template_expr)
+    # Parse 'with' clause if present
+    extra_context = {}
+    if len(bits) > 2:
+        if bits[2] == "with":
+            # Parse key=value pairs after 'with'
+            for bit in bits[3:]:
+                if "=" in bit:
+                    key, value = bit.split("=", 1)
+                    extra_context[key] = parser.compile_filter(value)
+                else:
+                    logging.error(f"cmspage_include 'with' clause requires key=value pairs (got '{bit}')")
+
+    return SafeIncludeNode(template_expr, extra_context)
 
 
 @register.filter(name="embedurl")
