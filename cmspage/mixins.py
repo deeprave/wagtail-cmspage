@@ -281,8 +281,8 @@ class CMSTemplateMixin:
                     pass
                 except Exception:
                     log_template_debug(f"Error resolving template: {template_name}", exc_info=True)
-        # MISS, let the user figure this out
-        return template_path
+        # MISS
+        return None
 
 
 class CMSPageMixin(CMSTemplateMixin):

@@ -40,7 +40,7 @@ class AbstractCMSPage(CMSTemplateMixin, Page):
 
     def get_template(self, request, *args, **kwargs) -> str:
         template_name = super().get_template(request, *args, **kwargs)
-        resolved = CMSTemplateMixin.find_existing_template(template_name, *self.template_styles)
+        resolved = CMSTemplateMixin.find_existing_template(template_name, *self.template_styles) or template_name
         log_template_debug(f"Resolved template: {resolved}")
         return resolved
 
