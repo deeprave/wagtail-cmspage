@@ -1,5 +1,24 @@
 ## ChangeLog
 
+### 2026.4.1
+
+#### Fixed
+
+* Fixed `TypeError: Model instances without primary key value are unhashable` during
+  Wagtail page preview, caused by `lru_cache` hashing unsaved page instances
+
+#### Changed
+
+* Converted `find_existing_template` to `@staticmethod` — cache key is now
+  `(template_path, *parts)` instead of including the model instance
+* Removed `@conditional_lru_cache` from `include_templates` — redundant since
+  the underlying `find_existing_template` is cached
+* Replaced instance-level `self.log()` with module-level `_log()` function,
+  removing `template_debug` property, `log()` method, and `logging_level`
+  class attribute from `CMSTemplateMixin`
+* Template debug logging in `get_template` now occurs at the call site after
+  `find_existing_template` returns
+
 ### 2025.7.5
 
 #### Added

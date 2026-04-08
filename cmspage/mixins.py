@@ -9,7 +9,7 @@ from django.conf import settings
 from django.template import engines, TemplateDoesNotExist
 
 
-__all__ = ("CMSTemplateMixin", "CMSPageMixin")
+__all__ = ("CMSTemplateMixin", "CMSPageMixin", "log_template_debug")
 
 # Django settings names
 CMSPAGE_TEMPLATE_STYLES = "CMSPAGE_TEMPLATE_STYLES"
@@ -44,6 +44,14 @@ DEFAULT_TEMPLATE_INCLUDE_NAMES = [
 ]
 # optional logging (for development)
 _logger = logging.getLogger("cmspage")
+
+
+def log_template_debug(message: str, *args, **kwargs) -> None:
+    """Log template resolution debug messages, gated by settings.TEMPLATE_DEBUG."""
+    if getattr(settings, "TEMPLATE_DEBUG", False):
+        level = logging.ERROR if kwargs.get("exc_info", False) else logging.DEBUG
+        kwargs.setdefault("stacklevel", 2)
+        _logger.log(level, message, *args, **kwargs)
 
 
 class CMSTemplateMixin:
@@ -121,7 +129,6 @@ class CMSTemplateMixin:
     template_extensions = DEFAULT_TEMPLATE_EXTENSIONS
     template_include_names = DEFAULT_TEMPLATE_INCLUDE_NAMES
     template_include_names_extra = None
-    logging_level = logging.DEBUG
 
     @property
     def default_template_dir(self):
@@ -149,26 +156,12 @@ class CMSTemplateMixin:
         """
         return ", ".join(names) if names else "None"
 
-    @conditional_cached_property
-    def template_debug(self) -> bool:
-        """
-        Return the template debug flag
-        """
-        return getattr(settings, "TEMPLATE_DEBUG", False)
-
     def get_context(self, request, *args, **kwargs):
         # noinspection PyUnresolvedReferences
         context = super().get_context(request, *args, **kwargs) if hasattr(super(), "get_context") else {}
         context["base_template"] = self.base_template
         context |= {"include": self.include_templates()}
         return context
-
-    def log(self, message: str, *args, **kwargs) -> logging.Logger:
-        if self.template_debug:
-            level = logging.ERROR if kwargs.get("exc_info", False) else self.logging_level
-            kwargs.setdefault("stacklevel", 2)
-            _logger.log(level, message, *args, **kwargs)
-        return _logger
 
     @conditional_cached_property
     def base_template(self) -> str:
@@ -183,7 +176,7 @@ class CMSTemplateMixin:
         elif base_path := self.base_template_path:
             if not base_template.startswith(f"{base_path}/"):
                 base_template = f"{base_path}/{base_template}"
-        self.log(f"Base template: {base_template}")
+        log_template_debug(f"Base template: {base_template}")
         return base_template
 
     @conditional_cached_property
@@ -196,7 +189,7 @@ class CMSTemplateMixin:
         """
         styles = getattr(settings, CMSPAGE_TEMPLATE_STYLES, None)
         styles = self.to_list(styles)
-        self.log(f"Template styles: {self.as_list(styles)}")
+        log_template_debug(f"Template styles: {self.as_list(styles)}")
         return styles
 
     @conditional_cached_property
@@ -205,7 +198,7 @@ class CMSTemplateMixin:
         Return the template path
         """
         base_path = getattr(settings, CMSPAGE_TEMPLATE_BASE_DIR, None) or self.default_template_dir
-        self.log(f"Base template path: {base_path}")
+        log_template_debug(f"Base template path: {base_path}")
         return base_path
 
     @conditional_cached_property
@@ -215,7 +208,7 @@ class CMSTemplateMixin:
         """
         include_path = getattr(settings, CMSPAGE_TEMPLATE_INCLUDE_DIR, None) or self.default_include_dir
         include_path = f"{self.base_template_path}/{include_path}" if include_path else self.base_template_path
-        self.log(f"Include path: {include_path}")
+        log_template_debug(f"Include path: {include_path}")
         return include_path
 
     @conditional_cached_property
@@ -225,7 +218,7 @@ class CMSTemplateMixin:
             getattr(settings, CMSPAGE_TEMPLATE_INCLUDE_FILES_EXTRA, None) or self.template_include_names_extra
         )
         include_names = self.to_list(include_names) + self.to_list(include_names_extra)
-        self.log(f"Include template names: {self.as_list(include_names)}")
+        log_template_debug(f"Include template names: {self.as_list(include_names)}")
         return list(include_names)
 
     def get_include_templates(self) -> Dict[str, str]:
@@ -245,7 +238,6 @@ class CMSTemplateMixin:
         }
         return include_templates
 
-    @conditional_lru_cache(maxsize=128)
     def include_templates(self) -> dict:
         """
         Return a dictionary of include templates
@@ -254,13 +246,14 @@ class CMSTemplateMixin:
         resolved_include_paths = {
             include_name: template_name
             for include_name, include_path in templates.items()
-            if (template_name := self.find_existing_template(include_path, *self.template_styles)) is not None
+            if (template_name := CMSTemplateMixin.find_existing_template(include_path, *self.template_styles)) is not None
         }
-        self.log(f"Resolved includes: {json.dumps(resolved_include_paths, indent=2)}")
+        log_template_debug(f"Resolved includes: {json.dumps(resolved_include_paths, indent=2)}")
         return resolved_include_paths
 
+    @staticmethod
     @conditional_lru_cache
-    def find_existing_template(self, template_path: str, *parts: Optional[str]) -> str | None:
+    def find_existing_template(template_path: str, *parts: Optional[str]) -> str | None:
         """
         Return an existing template path based on the additional path parts provided
         """
@@ -283,14 +276,13 @@ class CMSTemplateMixin:
                 # noinspection PyBroadException
                 try:
                     _ = engine.engine.find_template(template_name)
-                    self.log(f"Resolved template: {template_name}")
                     return template_name  # HIT
                 except TemplateDoesNotExist:
                     pass
                 except Exception:
-                    self.log(f"Error resolving template: {template_name}", exc_info=True)
-        # MISS, let the user figure this out
-        return template_path
+                    log_template_debug(f"Error resolving template: {template_name}", exc_info=True)
+        # MISS
+        return None
 
 
 class CMSPageMixin(CMSTemplateMixin):

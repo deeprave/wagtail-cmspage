@@ -7,7 +7,7 @@ from wagtail.images.models import Image as WagtailImage
 from wagtail.models import Page
 
 import cmspage.blocks as cmsblocks
-from cmspage.mixins import CMSTemplateMixin
+from cmspage.mixins import CMSTemplateMixin, log_template_debug
 
 
 class AbstractCMSPage(CMSTemplateMixin, Page):
@@ -40,7 +40,9 @@ class AbstractCMSPage(CMSTemplateMixin, Page):
 
     def get_template(self, request, *args, **kwargs) -> str:
         template_name = super().get_template(request, *args, **kwargs)
-        return self.find_existing_template(template_name, *self.template_styles)
+        resolved = CMSTemplateMixin.find_existing_template(template_name, *self.template_styles) or template_name
+        log_template_debug(f"Resolved template: {resolved}")
+        return resolved
 
     def get_context(self, request, *args, **kwargs):
         return super().get_context(request, *args, **kwargs)

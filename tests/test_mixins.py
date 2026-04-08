@@ -97,9 +97,10 @@ class TestCMSTemplateMixin:
         result = mixin_instance.base_template
         assert result == "custom/base.html"
 
-    @patch("django.template.engines")
+    @patch("cmspage.mixins.engines")
     def test_find_existing_template_found(self, mock_engines, mixin_instance):
         """Test find_existing_template when template is found"""
+        CMSTemplateMixin.find_existing_template.cache_clear()
         mock_engine = Mock()
         mock_engine.engine.find_template.return_value = Mock()
         mock_engines.all.return_value = [mock_engine]
@@ -107,16 +108,17 @@ class TestCMSTemplateMixin:
         result = mixin_instance.find_existing_template("cmspage/bootstrap5/test.html")
         assert result == "cmspage/bootstrap5/test.html"
 
-    @patch("django.template.engines")
+    @patch("cmspage.mixins.engines")
     def test_find_existing_template_not_found(self, mock_engines, mixin_instance):
         """Test find_existing_template when no template is found"""
+        CMSTemplateMixin.find_existing_template.cache_clear()
         mock_engine = Mock()
         mock_engine.engine.find_template.side_effect = TemplateDoesNotExist("Not found")
         mock_engines.all.return_value = [mock_engine]
 
         result = mixin_instance.find_existing_template("cmspage/nonexistent.html")
-        # Returns original path as fallback when not found
-        assert result == "cmspage/nonexistent.html"
+        # Returns None when no template is found
+        assert result is None
 
     def test_include_templates_basic(self, mixin_instance, settings):
         """Test basic include_templates functionality"""
