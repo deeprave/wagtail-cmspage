@@ -174,17 +174,6 @@
   color: var(--heading-color);
 }
 
-@media (min-width: $breakpoint-lg) {
-  .collapsing-button-width {
-    width: 50%;
-  }
-}
-
-.collapsing-button-width {
-  width: 100%;
-  color: var(--heading-color);
-}
-
 .overlay-text-left {
 }
 
@@ -307,7 +296,7 @@
 }
 
 .block-title {
-  font-size: 4.0rem;
+  font-size: var(--cp-block-title-size, 2.5rem);
   color: var(--heading-color);
 }
 

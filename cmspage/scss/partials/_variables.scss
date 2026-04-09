@@ -60,7 +60,7 @@
 }
 
 // Dark mode colors
-[data-theme="dark"] {
+[data-bs-theme="dark"] {
   --cp-fg-page: #f8f9fa;
   --cp-bg-page: #1a1a1a;
   --cp-fg-menu: #f8f9fa;
@@ -90,7 +90,7 @@
 
 // Auto mode - respects system preference
 @media (prefers-color-scheme: dark) {
-  :root:not([data-theme="light"]) {
+  :root:not([data-bs-theme="light"]) {
     --cp-fg-page: #f8f9fa;
     --cp-bg-page: #1a1a1a;
     --cp-fg-menu: #f8f9fa;
@@ -142,7 +142,7 @@
     --cp-fg-accent: #0000ff;
   }
 
-  [data-theme="dark"] {
+  [data-bs-theme="dark"] {
     --cp-fg-page: #ffffff;
     --cp-bg-page: #000000;
     --cp-fg-heading: #ffffff;

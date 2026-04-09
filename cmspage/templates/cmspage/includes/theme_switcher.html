@@ -108,10 +108,10 @@ Context variables:
 
       if (theme === 'auto') {
         // Remove explicit theme attribute to let CSS handle auto mode
-        root.removeAttribute('data-theme');
+        root.removeAttribute('data-bs-theme');
       } else {
         // Set explicit theme
-        root.setAttribute('data-theme', theme);
+        root.setAttribute('data-bs-theme', theme);
       }
 
       // Remove no-transitions class after a brief delay

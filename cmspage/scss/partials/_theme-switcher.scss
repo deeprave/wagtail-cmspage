@@ -5,8 +5,8 @@
 
 // Auto mode support - follow system preference when no theme is explicitly set
 @media (prefers-color-scheme: dark) {
-  :root:not([data-theme="light"]) {
-    // Dark mode colors - these should match the [data-theme="dark"] values
+  :root:not([data-bs-theme="light"]) {
+    // Dark mode colors - these should match the [data-bs-theme="dark"] values
     // Each site needs to define these in their _color-variables.scss
 
     // The actual color values are defined in each site's _color-variables.scss
@@ -31,18 +31,18 @@
 }
 
 // Theme indicator classes (optional - for UI feedback)
-[data-theme="light"] .theme-indicator-light,
-[data-theme="dark"] .theme-indicator-dark,
-:root:not([data-theme]) .theme-indicator-auto {
+[data-bs-theme="light"] .theme-indicator-light,
+[data-bs-theme="dark"] .theme-indicator-dark,
+:root:not([data-bs-theme]) .theme-indicator-auto {
   display: block;
 }
 
-[data-theme="light"] .theme-indicator-dark,
-[data-theme="light"] .theme-indicator-auto,
-[data-theme="dark"] .theme-indicator-light,
-[data-theme="dark"] .theme-indicator-auto,
-:root:not([data-theme]) .theme-indicator-light,
-:root:not([data-theme]) .theme-indicator-dark {
+[data-bs-theme="light"] .theme-indicator-dark,
+[data-bs-theme="light"] .theme-indicator-auto,
+[data-bs-theme="dark"] .theme-indicator-light,
+[data-bs-theme="dark"] .theme-indicator-auto,
+:root:not([data-bs-theme]) .theme-indicator-light,
+:root:not([data-bs-theme]) .theme-indicator-dark {
   display: none;
 }
 
@@ -125,7 +125,7 @@
   }
 }
 
-[data-theme="dark"] .theme-switcher-fixed {
+[data-bs-theme="dark"] .theme-switcher-fixed {
   .btn-group-vertical .btn {
     background-color: rgba(0, 0, 0, 0.9);
     color: #f8f9fa; // Light text for dark mode
