@@ -109,6 +109,16 @@ class TestMenuLink:
         assert url == "/test-page/"
         mock_relative_url.assert_called_once_with(site, request=request)
 
+    def test_get_url_with_unresolvable_page_returns_none(self, site, test_page, rf):
+        """Test unresolved page URLs are left for callers to handle"""
+        request = rf.get("/")
+        menu_link = MenuLink(site=site, menu_title="Page Link", link_page=test_page)
+
+        with patch.object(test_page, "relative_url", return_value=None):
+            url = menu_link.get_url(site=site, request=request)
+
+        assert url is None
+
     def test_url_property_with_document(self, site, test_document):
         """Test url property when link_document is set"""
         menu_link = MenuLink(site=site, menu_title="Document Link", link_document=test_document)

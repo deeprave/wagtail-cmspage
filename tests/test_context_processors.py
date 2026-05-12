@@ -35,6 +35,7 @@ def mock_site_find_for_request(mock_site):
 def mock_menulink(id, title, url, parent_id=None):
     menulink = Mock(spec=MenuLink)
     menulink.id = id
+    menulink.parent_id = parent_id
     menulink.menu_title = title
     menulink.menu_link_title = title  # Add this property
     menulink.menu_link_icon = "page"
@@ -199,6 +200,39 @@ def test_navigation_passes_request_to_menu_link_url(rf, mock_site):
 
     assert result["navigation"][0]["url"] == "/request-aware/"
     link.get_url.assert_called_once_with(site=mock_site, request=request)
+
+
+def test_navigation_links_children_when_child_precedes_parent(rf):
+    """Test navigation hierarchy assembly does not depend on link order"""
+    request = rf.get("/")
+    request.user = AnonymousUser()
+    child = mock_menulink(id=2, title="Child", url="/parent/child/", parent_id=1)
+    parent = mock_menulink(id=1, title="Parent", url="/parent/", parent_id=None)
+
+    with patch("cmspage.context_processors.MenuLink.get_cached_menu_links", return_value=[child, parent]):
+        result = navigation(request)
+
+    assert result["navigation"] == [
+        {
+            "id": 1,
+            "title": "Parent",
+            "icon": "page",
+            "icon_color": "body",
+            "type": "Page",
+            "url": "/parent/",
+            "children": [
+                {
+                    "id": 2,
+                    "title": "Child",
+                    "icon": "page",
+                    "icon_color": "body",
+                    "type": "Page",
+                    "url": "/parent/child/",
+                    "children": [],
+                }
+            ],
+        }
+    ]
 
 
 def test_navigation_with_circular_reference(rf):
