@@ -39,7 +39,7 @@ def _menu_link_url(link: MenuLink, site: Site, request: HttpRequest | None) -> s
     return link.url
 
 
-def _nav_pages_for_site(site: Site, user: User | None, request: HttpRequest | None = None) -> List[dict]:
+def _nav_pages_for_site(site: Site | None, user: User | None, request: HttpRequest | None = None) -> List[dict]:
     if site is None:
         return []
 

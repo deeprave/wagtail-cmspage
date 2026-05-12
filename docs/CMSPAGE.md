@@ -1204,6 +1204,11 @@ TEMPLATES = [
 - `site_hostname`: Site hostname
 - `site_is_default`: Default site flag
 
+Use `cmspage_context` when templates need both navigation and site variables so
+the current site is resolved once per request. Registering `navigation` and
+`site_variables` separately remains supported, but each processor resolves the
+current Wagtail site independently.
+
 ### Individual Processors
 
 ```python

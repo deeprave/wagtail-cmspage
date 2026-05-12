@@ -241,6 +241,17 @@ class TestMenuLink:
             mock_cache.delete.assert_any_call("menu_links:1:0")
             mock_cache.delete.assert_any_call(MenuLink.MENU_LINKS_KEY)
 
+    def test_clear_menu_link_cache_skips_invalid_registry_entries(self):
+        """Test invalid menu cache registry entries are ignored"""
+        with patch("cmspage.models.menu_link.cache") as mock_cache:
+            mock_cache.get.return_value = {(None, 1), (1, None), (1, 0)}
+
+            MenuLink.clear_cached_menu_links()
+
+            mock_cache.delete.assert_any_call("menu_links:1:0")
+            mock_cache.delete.assert_any_call(MenuLink.MENU_LINKS_KEY)
+            assert mock_cache.delete.call_count == 2
+
     def test_ordered_queryset(self, site):
         """Test ordering of menu links"""
         # Create links in reverse order
