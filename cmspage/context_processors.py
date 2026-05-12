@@ -31,10 +31,10 @@ def _site_variables(site: Site | None) -> dict:
     }
 
 
-def _menu_link_url(link: MenuLink, site: Site, request: HttpRequest | None) -> str:
+def _menu_link_url(link: MenuLink, site: Site | None, request: HttpRequest | None) -> str | None:
     if get_url := getattr(link, "get_url", None):
         url = get_url(site=site, request=request)
-        if isinstance(url, str):
+        if isinstance(url, str) or url is None:
             return url
     return link.url
 
@@ -66,11 +66,12 @@ def _nav_pages_for_site(site: Site | None, user: User | None, request: HttpReque
         id_to_link[link.id] = node
 
         if link.parent:
-            if parent := id_to_link.get(link.parent.id):
+            parent_id = link.parent_id
+            if parent := id_to_link.get(parent_id):
                 parent["children"].append(node)
                 continue
             # Handle orphaned nodes or log an error
-            unlinked[link.parent].append(node)
+            unlinked[parent_id].append(node)
         else:
             tree.append(node)
 

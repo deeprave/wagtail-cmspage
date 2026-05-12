@@ -260,11 +260,11 @@ class MenuLink(PreviewableMixin, DraftStateMixin, RevisionMixin, Indexed, models
     def url(self):
         return self.get_url()
 
-    def get_url(self, site: Site | None = None, request: HttpRequest | None = None):
+    def get_url(self, site: Site | None = None, request: HttpRequest | None = None) -> str | None:
         if self.link_page:
             if site is not None:
-                return self.link_page.relative_url(site, request=request) or "#"
-            return self.link_page.get_url(request=request) or "#"
+                return self.link_page.relative_url(site, request=request)
+            return self.link_page.get_url(request=request)
         elif self.link_document:
             return self.link_document.url
         elif self.link_url:
