@@ -1,5 +1,16 @@
 ## ChangeLog
 
+### 2026.5.1
+
+#### Fixed
+
+* Fixed N+1 Wagtail site lookups when building menu navigation by resolving the
+  current site once and reusing it across navigation and site context values.
+* Updated menu link URL generation to pass the current request through to
+  Wagtail page URL resolution, allowing request-scoped URL caching to be used
+  while building menus.
+* Fixed menu cache invalidation for anonymous-user cache entries.
+
 ### 2026.4.1
 
 #### Fixed

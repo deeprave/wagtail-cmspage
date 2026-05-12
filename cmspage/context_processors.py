@@ -14,7 +14,35 @@ User = get_user_model()
 logger = logging.getLogger("cmspage.context_processors")
 
 
-def _nav_pages_for_site(site: Site, user: User|None) -> List[dict]:
+def _site_variables(site: Site | None) -> dict:
+    if site is None:
+        return {
+            "site": None,
+            "site_name": "",
+            "site_hostname": "",
+            "site_is_default": False,
+        }
+
+    return {
+        "site": site,
+        "site_name": site.site_name,
+        "site_hostname": site.hostname,
+        "site_is_default": site.is_default_site,
+    }
+
+
+def _menu_link_url(link: MenuLink, site: Site, request: HttpRequest | None) -> str:
+    if get_url := getattr(link, "get_url", None):
+        url = get_url(site=site, request=request)
+        if isinstance(url, str):
+            return url
+    return link.url
+
+
+def _nav_pages_for_site(site: Site, user: User | None, request: HttpRequest | None = None) -> List[dict]:
+    if site is None:
+        return []
+
     user_id = user.pk if user else 0
     cached_menu_links = MenuLink.get_cached_menu_links(site, user_id)
 
@@ -32,7 +60,7 @@ def _nav_pages_for_site(site: Site, user: User|None) -> List[dict]:
             "type": link.menu_link_type,
             "icon": link.menu_link_icon,
             "icon_color": link.menu_icon_color,
-            "url": link.url,
+            "url": _menu_link_url(link, site, request),
             "children": [],
         }
         id_to_link[link.id] = node
@@ -58,7 +86,7 @@ def _nav_pages_for_site(site: Site, user: User|None) -> List[dict]:
 def navigation(request: HttpRequest) -> dict:
     user = request.user if request.user.is_authenticated else None
     site: Site = Site.find_for_request(request)
-    return {"navigation": _nav_pages_for_site(site, user)}
+    return {"navigation": _nav_pages_for_site(site, user, request)}
 
 
 def site_variables(request: HttpRequest) -> dict:
@@ -67,25 +95,20 @@ def site_variables(request: HttpRequest) -> dict:
     """
     try:
         site: Site = Site.find_for_request(request)
-        return {
-            "site": site,
-            "site_name": site.site_name,
-            "site_hostname": site.hostname,
-            "site_is_default": site.is_default_site,
-        }
+        return _site_variables(site)
     except Site.DoesNotExist:
         # No site found for this request
-        return {
-            "site": None,
-            "site_name": "",
-            "site_hostname": "",
-            "site_is_default": False,
-        }
+        return _site_variables(None)
 
 
 def cmspage_context(request: HttpRequest) -> dict:
     # combines all the above context processors into one
-    context = {}
-    context.update(navigation(request))
-    context.update(site_variables(request))
+    try:
+        site: Site = Site.find_for_request(request)
+    except Site.DoesNotExist:
+        site = None
+
+    user = request.user if request.user.is_authenticated else None
+    context = {"navigation": _nav_pages_for_site(site, user, request)}
+    context.update(_site_variables(site))
     return context

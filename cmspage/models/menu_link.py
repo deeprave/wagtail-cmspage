@@ -257,8 +257,13 @@ class MenuLink(PreviewableMixin, DraftStateMixin, RevisionMixin, Indexed, models
 
     @property
     def url(self):
+        return self.get_url()
+
+    def get_url(self, site: Site | None = None, request=None):
         if self.link_page:
-            return self.link_page.url
+            if site:
+                return self.link_page.relative_url(site, request=request) or "#"
+            return self.link_page.get_url(request=request) or "#"
         elif self.link_document:
             return self.link_document.url
         elif self.link_url:
@@ -340,7 +345,7 @@ class MenuLink(PreviewableMixin, DraftStateMixin, RevisionMixin, Indexed, models
         registry = cache.get(cls.MENU_LINKS_KEY) or set()
 
         for site_id, user_id in registry:
-            if site_id and user_id:  # Basic validation
+            if site_id is not None and user_id is not None:
                 cache_key = f"menu_links:{site_id}:{user_id}"
                 cache.delete(cache_key)
 

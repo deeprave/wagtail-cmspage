@@ -29,9 +29,9 @@
             <div class="mt-auto {{ card.justify }} text-md-end">
               {% if card.link.link_url %}
                 {% if card.link.link_title == '-' %}
-                  <div class="inline-block link-arrow text-dark">{% include "icons/right-pointing-arrow-icon.svg" %}</div>
+                  <div class="inline-block link-arrow">{% include "icons/right-pointing-arrow-icon.svg" %}</div>
                 {% elif card.link.link_title %}
-                  <div class="btn w-100 btn-secondary">{{ card.link.link_title }}</div>
+                  <div class="btn w-100 {{ card.palette }}">{{ card.link.link_title }}</div>
                 {% endif %}
               {% endif %}
             </div>

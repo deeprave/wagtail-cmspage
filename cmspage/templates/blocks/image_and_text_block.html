@@ -18,7 +18,7 @@
   {% if self.link.link_url %}
     <div class="row m-2 p-3">
       <div class="col {{ self.justify }}">
-        <div class="btn btn-outline-primary btn-lg collapsing-button-width">
+        <div class="btn btn-lg collapsing-button-width {{ self.palette }}">
           {{ self.link.button_title }}
         </div>
       </div>
@@ -46,7 +46,7 @@
   {% if self.link.link_url %}
     <div class="row m-1 p-1">
       <div class="col {{ self.justify }}">
-        <div class="btn btn-outline-primary btn-lg collapsing-button-width">
+        <div class="btn btn-lg collapsing-button-width {{ self.palette }}">
           {{ self.link.button_title }}
         </div>
       </div>

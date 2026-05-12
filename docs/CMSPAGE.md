@@ -487,30 +487,44 @@ Palette.INFO          # cp-info - Informational
 Palette.DANGER        # cp-danger - Error/critical
 ```
 
+These semantic classes are the only supported palette contract for current `cmspage` content. Sites should override the `--cp-*` CSS custom properties to supply brand-specific colours, rather than composing palettes from Bootstrap utility classes such as `bg-*`, `text-*`, `title-*`, or `links-*`.
+
 ### CSS Custom Properties
 
-The theme system uses CSS custom properties that automatically adapt:
+The theme system uses semantic CSS custom properties that sites override to supply their own brand colours while preserving readable foreground/background pairings:
 
 ```css
-/* Light mode (default) */
+/* Site light mode */
 :root {
-  --cp-fg-page: #548b8f;
+  --cp-fg-page: #1f2d21;
   --cp-bg-page: #ffffff;
-  --cp-fg-menu: #1a3d29;
-  --cp-bg-menu: rgba(193, 215, 227, 0.1);
+  --cp-fg-heading: #1f2d21;
+  --cp-fg-menu: #1f5f54;
+  --cp-bg-menu: rgba(193, 215, 227, 0.5);
+  --cp-bg-card: #f3f5f2;
+  --cp-fg-highlight: #1f2d21;
+  --cp-bg-highlight: #d8ece7;
+  --cp-fg-standout: #1f2d21;
+  --cp-bg-standout: #ecf5dd;
 }
 
-/* Dark mode */
-[data-theme="dark"] {
+/* Site dark mode */
+[data-bs-theme="dark"] {
   --cp-fg-page: #e0ffe0;
   --cp-bg-page: #1a1a1a;
-  --cp-fg-menu: #b8e6b8;
-  --cp-bg-menu: rgba(33, 47, 41, 0.1);
+  --cp-fg-heading: #e0ffe0;
+  --cp-fg-menu: #fff3cd;
+  --cp-bg-menu: #212f29;
+  --cp-bg-card: #2a3d30;
+  --cp-fg-highlight: #e0ffe0;
+  --cp-bg-highlight: #355242;
+  --cp-fg-standout: #e0ffe0;
+  --cp-bg-standout: #4d5d4a;
 }
 
 /* Auto mode (follows system preference) */
 @media (prefers-color-scheme: dark) {
-  :root:not([data-theme="light"]) {
+  :root:not([data-bs-theme="light"]) {
     /* Dark mode variables */
   }
 }

@@ -587,24 +587,24 @@ class TestCMSPageIncludeTag:
         assert result == ""
 
         # Test with custom objects - Django template system passes objects directly
-        # without automatically converting to string, so these will cause TypeErrors
+        # without automatically converting to string, so invalid objects bubble up
+        # as template loading errors.
         class EmptyStringObj:
             def __str__(self):
                 return ""
 
         context = Context({"template_name": EmptyStringObj()})
-        # This will cause TypeError because Django tries to use object as path directly
-        with pytest.raises(TypeError):
+        with pytest.raises((TemplateDoesNotExist, TypeError)):
             template.render(context)
 
         # Test with an object that has a truthy value but is not a string
-        # This will also cause TypeError since Django expects string paths
+        # This will also raise since Django expects string paths
         class TruthyObj:
             def __bool__(self):
                 return True
 
         context = Context({"template_name": TruthyObj()})
-        with pytest.raises(TypeError):
+        with pytest.raises((TemplateDoesNotExist, TypeError)):
             template.render(context)
 
     @pytest.mark.django_db

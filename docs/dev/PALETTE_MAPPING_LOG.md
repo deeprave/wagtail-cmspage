@@ -1,30 +1,33 @@
 # Palette Migration Mapping Log
 
-This document provides the exact mappings between old Bootstrap-based palette values and new semantic cp-* values for database migration.
-It is of no interest otherwise unless you have previously built a site using cmspage and need to migrate the palette values.
+This document is historical migration guidance for sites that still store the old Bootstrap-era palette strings in StreamField JSON.
+The live `cmspage` contract is the semantic `cp-*` palette defined in `cmspage.blocks.themes.Palette`.
+Do not use the old `bg-* text-* title-* links-*` class stacks in new content, templates, or seed data.
 
-## Complete Value Mappings
+## Historical Mapping
 
 ### Original Enum → New Enum Mappings
 
 
-| Original Enum Key | Original CSS Value                                  | New Enum Key | New CSS Value    | Description                                    |
-| ----------------- | --------------------------------------------------- | ------------ | ---------------- | ---------------------------------------------- |
-| `NONE`            | `bg-transparent links-dark text-dark title-dark`    | `NONE`       | `cp-transparent` | Dark on Transparent → Transparent Background  |
-| `PAGE`            | `bg-body links-dark text-dark title-dark`           | `PAGE`       | `cp-page`        | Dark on Page Background → Page Theme          |
-| `LIGHT`           | `bg-light links-dark text-dark title-dark`          | `LIGHT`      | `cp-light`       | Dark on Light Background → Light Theme        |
-| `DARK`            | `bg-dark links-light text-light title-light`        | `DARK`       | `cp-dark`        | Light on Dark Background → Dark Theme         |
-| `WHITE`           | `bg-light links-dark text-black title-dark`         | `WHITE`      | `cp-white`       | Black on White Background → Black on White    |
-| `BLACK`           | `bg-white links-dark text-white title-light`        | `BLACK`      | `cp-black`       | White on Black Background → White on Black    |
-| `PRIMARY`         | `bg-primary links-dark text-dark title-dark`        | `HIGHLIGHT`  | `cp-highlight`   | Dark on Primary Background → Highlight Theme  |
-| `SECONDARY`       | `bg-secondary links-dark text-dark title-dark`      | `STANDOUT`   | `cp-standout`    | Dark on Secondary Background → Standout Theme |
-| `TERTIARY`        | `bg-tertiary links-dark text-dark title-dark`       | `INFO`       | `cp-info`        | Dark on Tertiary Background → Info Theme      |
-| `SUCCESS`         | `bg-success-subtle links-dark text-dark title-dark` | `SUCCESS`    | `cp-success`     | Dark on Success Background → Success          |
-| `WARNING`         | `bg-warning-subtle links-dark text-dark title-dark` | `WARNING`    | `cp-warning`     | Dark on Warning Background → Warning          |
-| `INFO`            | `bg-info-subtle links-dark text-dark title-dark`    | `INFO`       | `cp-info`        | Dark on Info Background → Info                |
-| `DANGER`          | `bg-danger-subtle links-dark text-dark title-dark`  | `DANGER`     | `cp-danger`      | Dark on Danger Background → Danger            |
+| Historical Enum Key | Historical CSS Value                               | Current Enum Key | Current CSS Value | Description                                     |
+| ------------------- | -------------------------------------------------- | ---------------- | ----------------- | ----------------------------------------------- |
+| `NONE`              | `bg-transparent links-dark text-dark title-dark`   | `NONE`           | `cp-transparent`  | Transparent wrapper using semantic foregrounds  |
+| `PAGE`              | `bg-body links-dark text-dark title-dark`          | `PAGE`           | `cp-page`         | Page-surface wrapper that follows the site mode |
+| `LIGHT`             | `bg-light links-dark text-dark title-dark`         | `LIGHT`          | `cp-light`        | Fixed light theme wrapper                       |
+| `DARK`              | `bg-dark links-light text-light title-light`       | `DARK`           | `cp-dark`         | Fixed dark theme wrapper                        |
+| `WHITE`             | `bg-light links-dark text-black title-dark`        | `WHITE`          | `cp-white`        | Black on white                                  |
+| `BLACK`             | `bg-white links-dark text-white title-light`       | `BLACK`          | `cp-black`        | White on black                                  |
+| `PRIMARY`           | `bg-primary links-dark text-dark title-dark`       | `HIGHLIGHT`      | `cp-highlight`    | Highlight / alternate surface                   |
+| `SECONDARY`         | `bg-secondary links-dark text-dark title-dark`     | `STANDOUT`       | `cp-standout`     | Standout / secondary alternate surface          |
+| `TERTIARY`          | `bg-tertiary links-dark text-dark title-dark`      | `INFO`           | `cp-info`         | Informational site-colored surface              |
+| `SUCCESS`           | `bg-success-subtle links-dark text-dark title-dark`| `SUCCESS`        | `cp-success`      | Positive / success state                        |
+| `WARNING`           | `bg-warning-subtle links-dark text-dark title-dark`| `WARNING`        | `cp-warning`      | Warning / caution state                         |
+| `INFO`              | `bg-info-subtle links-dark text-dark title-dark`   | `INFO`           | `cp-info`         | Informational state                             |
+| `DANGER`            | `bg-danger-subtle links-dark text-dark title-dark` | `DANGER`         | `cp-danger`       | Error / destructive state                       |
 
-## SQL Query Templates
+## Migration Queries
+
+These queries are only for one-time cleanup of old stored palette strings. They are not part of normal theming.
 
 ### PostgreSQL UPDATE Query
 

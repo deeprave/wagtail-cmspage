@@ -174,6 +174,33 @@ def test_cmspage_context(mock_request):
         assert result["navigation"][0]["title"] == "Home"
 
 
+def test_cmspage_context_finds_site_once(mock_request, mock_site):
+    """Test cmspage_context reuses the resolved Wagtail site"""
+    with (
+        patch("wagtail.models.Site.find_for_request", return_value=mock_site) as mock_find_site,
+        patch("cmspage.context_processors.MenuLink.get_cached_menu_links", return_value=[]),
+    ):
+        result = cmspage_context(mock_request)
+
+    assert result["site"] == mock_site
+    assert result["navigation"] == []
+    mock_find_site.assert_called_once_with(mock_request)
+
+
+def test_navigation_passes_request_to_menu_link_url(rf, mock_site):
+    """Test navigation lets Wagtail cache page URL lookups on the request"""
+    request = rf.get("/")
+    request.user = AnonymousUser()
+    link = mock_menulink(id=1, title="Home", url="/", parent_id=None)
+    link.get_url.return_value = "/request-aware/"
+
+    with patch("cmspage.context_processors.MenuLink.get_cached_menu_links", return_value=[link]):
+        result = navigation(request)
+
+    assert result["navigation"][0]["url"] == "/request-aware/"
+    link.get_url.assert_called_once_with(site=mock_site, request=request)
+
+
 def test_navigation_with_circular_reference(rf):
     """Test navigation handling with circular parent references"""
     # Create menu links with potential circular reference

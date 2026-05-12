@@ -98,6 +98,17 @@ class TestMenuLink:
         assert url  # Should not be empty
         assert menu_link.link_page == test_page
 
+    def test_get_url_with_page_uses_request_aware_relative_url(self, site, test_page, rf):
+        """Test get_url passes the request through to Wagtail page URL generation"""
+        request = rf.get("/")
+        menu_link = MenuLink(site=site, menu_title="Page Link", link_page=test_page)
+
+        with patch.object(test_page, "relative_url", return_value="/test-page/") as mock_relative_url:
+            url = menu_link.get_url(site=site, request=request)
+
+        assert url == "/test-page/"
+        mock_relative_url.assert_called_once_with(site, request=request)
+
     def test_url_property_with_document(self, site, test_document):
         """Test url property when link_document is set"""
         menu_link = MenuLink(site=site, menu_title="Document Link", link_document=test_document)
@@ -219,6 +230,16 @@ class TestMenuLink:
 
             # Should call cache.delete for each cache key and the registry
             assert mock_cache.delete.call_count >= 1
+
+    def test_clear_menu_link_cache_includes_anonymous_user_cache(self):
+        """Test anonymous-user menu cache entries are invalidated"""
+        with patch("cmspage.models.menu_link.cache") as mock_cache:
+            mock_cache.get.return_value = {(1, 0)}
+
+            MenuLink.clear_cached_menu_links()
+
+            mock_cache.delete.assert_any_call("menu_links:1:0")
+            mock_cache.delete.assert_any_call(MenuLink.MENU_LINKS_KEY)
 
     def test_ordered_queryset(self, site):
         """Test ordering of menu links"""

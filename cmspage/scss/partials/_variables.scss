@@ -33,6 +33,10 @@
   --cp-bg-subtle: #e9ecef;
   --cp-fg-emphasis: var(--cp-brand-primary);
   --cp-bg-emphasis: rgba(13, 110, 253, 0.1);
+  --cp-fg-highlight: var(--cp-brand-text);
+  --cp-bg-highlight: var(--cp-bg-accent);
+  --cp-fg-standout: var(--cp-brand-text);
+  --cp-bg-standout: var(--cp-bg-emphasis);
 
   // Fixed light theme
   --cp-fg-light: #212529;
@@ -76,6 +80,10 @@
   --cp-bg-subtle: #343a40;
   --cp-fg-emphasis: color-mix(in srgb, var(--cp-brand-primary), white 20%);
   --cp-bg-emphasis: rgba(13, 110, 253, 0.2);
+  --cp-fg-highlight: var(--cp-fg-page);
+  --cp-bg-highlight: var(--cp-bg-accent);
+  --cp-fg-standout: var(--cp-fg-page);
+  --cp-bg-standout: var(--cp-bg-emphasis);
 
   // Semantic colors in dark mode
   --cp-fg-success: #ffffff;
@@ -106,6 +114,10 @@
     --cp-bg-subtle: #343a40;
     --cp-fg-emphasis: color-mix(in srgb, var(--cp-brand-primary), white 20%);
     --cp-bg-emphasis: rgba(13, 110, 253, 0.2);
+    --cp-fg-highlight: var(--cp-fg-page);
+    --cp-bg-highlight: var(--cp-bg-accent);
+    --cp-fg-standout: var(--cp-fg-page);
+    --cp-bg-standout: var(--cp-bg-emphasis);
 
     // Semantic colors in auto dark mode
     --cp-fg-success: #ffffff;
@@ -130,6 +142,10 @@
     --cp-bg-card: #f8f8f8;
     --cp-fg-accent: #000000;
     --cp-bg-accent: #e0e0e0;
+    --cp-fg-highlight: #000000;
+    --cp-bg-highlight: #e0e0e0;
+    --cp-fg-standout: #000000;
+    --cp-bg-standout: #e0e0e0;
   }
 }
 
@@ -147,6 +163,10 @@
     --cp-bg-page: #000000;
     --cp-fg-heading: #ffffff;
     --cp-fg-accent: #ffff00;
+    --cp-fg-highlight: #ffffff;
+    --cp-bg-highlight: #000000;
+    --cp-fg-standout: #ffffff;
+    --cp-bg-standout: #000000;
   }
 }
 
