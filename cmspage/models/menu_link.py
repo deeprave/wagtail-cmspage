@@ -7,6 +7,7 @@ from django.core.exceptions import ValidationError
 from django.db import models
 from django.db.models.signals import post_save, post_delete
 from django.dispatch import receiver
+from django.http import HttpRequest
 from wagtail.admin.panels import FieldPanel, FieldRowPanel, PageChooserPanel, MultiFieldPanel
 from wagtail.admin.widgets import AdminPageChooser
 from wagtail.models import Site, PreviewableMixin, DraftStateMixin, RevisionMixin
@@ -259,9 +260,9 @@ class MenuLink(PreviewableMixin, DraftStateMixin, RevisionMixin, Indexed, models
     def url(self):
         return self.get_url()
 
-    def get_url(self, site: Site | None = None, request=None):
+    def get_url(self, site: Site | None = None, request: HttpRequest | None = None):
         if self.link_page:
-            if site:
+            if site is not None:
                 return self.link_page.relative_url(site, request=request) or "#"
             return self.link_page.get_url(request=request) or "#"
         elif self.link_document:
