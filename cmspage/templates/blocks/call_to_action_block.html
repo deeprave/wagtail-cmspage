@@ -3,7 +3,7 @@
   <div class="col {{ self.inset }} {{ self.bg.background }} {{ self.bg.opacity }} {{ value.jusify }}">
     {% if value.link.link_url %}<a href="{{ value.link.link_url }}" class="text-decoration-none text-reset">{% endif %}
     {% if value.title %}
-    <div class="btn btn-dark rounded-2 shadow-lg {{ self.palette }} w-100">
+    <div class="btn rounded-2 shadow-lg {{ self.palette }} w-100">
       <span class="{% if self.cursive %}block-title{% else %} block-text-large display-6{% endif %} p-2">{{ value.title }}</span>
     </div>
     {% endif %}
