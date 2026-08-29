@@ -1278,7 +1278,7 @@ dev = [
     { name = "pytest-cov", specifier = ">=7.0.0" },
     { name = "pytest-django", specifier = ">=4.9" },
     { name = "pytest-mock", specifier = ">=3.14" },
-    { name = "testcontainers", specifier = ">=4.9.0" },
+    { name = "testcontainers", specifier = ">=4.15.0" },
 ]
 
 [[package]]
