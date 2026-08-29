@@ -3,7 +3,7 @@ from pathlib import Path
 import random
 import string
 
-from testcontainers.postgres import PostgresContainer
+from testcontainers.community.postgres import PostgresContainer
 
 import django
 from django.conf import settings
