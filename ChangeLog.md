@@ -1,5 +1,19 @@
 ## ChangeLog
 
+### 2026.8.1
+
+#### Changed
+
+* Constrained `django` to `<7.0` and `wagtail` to `<9.0` to avoid untested
+  future major versions.
+* Migrated the test suite's `testcontainers` import from
+  `testcontainers.postgres` to `testcontainers.community.postgres`, and
+  bumped the minimum `testcontainers` dev dependency to `4.15.0` accordingly.
+
+#### Added
+
+* Added Dependabot configuration for weekly `uv` and GitHub Actions updates.
+
 ### 2026.5.1
 
 #### Fixed
