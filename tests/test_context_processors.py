@@ -32,7 +32,7 @@ def mock_site_find_for_request(mock_site):
         yield
 
 
-def mock_menulink(id, title, url, parent_id=None):
+def mock_menulink(id, title, url, parent_id=None, staff_only=False, link_type="Page"):
     menulink = Mock(spec=MenuLink)
     menulink.id = id
     menulink.parent_id = parent_id
@@ -40,11 +40,42 @@ def mock_menulink(id, title, url, parent_id=None):
     menulink.menu_link_title = title  # Add this property
     menulink.menu_link_icon = "page"
     menulink.menu_icon_color = "body"  # Add this property
-    menulink.menu_link_type = "Page"
+    menulink.menu_link_type = link_type
     menulink.url = url
-    menulink.staff_only = False  # Add this property
+    menulink.staff_only = staff_only
     menulink.parent = Mock(spec=MenuLink, id=parent_id) if parent_id else None
     return menulink
+
+
+def _nav_ids(items):
+    ids = []
+    for item in items:
+        ids.append(item["id"])
+        ids.extend(_nav_ids(item.get("children") or []))
+    return ids
+
+
+def _nav_titles(items):
+    titles = []
+    for item in items:
+        titles.append(item["title"])
+        titles.extend(_nav_titles(item.get("children") or []))
+    return titles
+
+
+@pytest.fixture
+def inaccessible_user(request):
+    if request.param == "anonymous":
+        return AnonymousUser()
+    return Mock(
+        spec=User,
+        is_authenticated=True,
+        is_active=True,
+        is_staff=False,
+        is_superuser=False,
+        pk=2,
+        id=2,
+    )
 
 
 @pytest.mark.parametrize(
@@ -303,6 +334,121 @@ def test_navigation_with_deep_nesting(rf):
                 current = current["children"][0]
 
 
+@pytest.mark.parametrize("inaccessible_user", ["anonymous", "authenticated_non_staff"], indirect=True)
+def test_navigation_excludes_children_of_staff_only_parent(rf, inaccessible_user):
+    """A hidden staff-only parent removes its descendants from the visible menu."""
+    parent = mock_menulink(id=10, title="Admin", url="/admin/", parent_id=None, staff_only=True)
+    child = mock_menulink(
+        id=23,
+        title="ContactUs",
+        url="https://rjf.org.au/admin/django/rjf/contactus/",
+        parent_id=10,
+        link_type="URL",
+    )
+    public = mock_menulink(id=1, title="Home", url="/", parent_id=None)
+    request = rf.get("/")
+    request.user = inaccessible_user
+
+    with patch("cmspage.context_processors.MenuLink.get_cached_menu_links", return_value=[parent, child, public]):
+        result = navigation(request)
+
+    assert _nav_ids(result["navigation"]) == [1]
+    assert _nav_titles(result["navigation"]) == ["Home"]
+
+
+@pytest.mark.parametrize("inaccessible_user", ["anonymous", "authenticated_non_staff"], indirect=True)
+def test_navigation_excludes_staff_only_child_of_visible_parent(rf, inaccessible_user):
+    """A visible parent stays; its staff-only child and descendants do not."""
+    public_parent = mock_menulink(id=2, title="About", url="/about/", parent_id=None)
+    staff_child = mock_menulink(id=10, title="Admin", url="/admin/", parent_id=2, staff_only=True)
+    grandchild = mock_menulink(
+        id=23,
+        title="ContactUs",
+        url="https://rjf.org.au/admin/django/rjf/contactus/",
+        parent_id=10,
+        link_type="URL",
+    )
+    public = mock_menulink(id=1, title="Home", url="/", parent_id=None)
+    request = rf.get("/")
+    request.user = inaccessible_user
+
+    with patch(
+        "cmspage.context_processors.MenuLink.get_cached_menu_links",
+        return_value=[public, public_parent, staff_child, grandchild],
+    ):
+        result = navigation(request)
+
+    assert _nav_ids(result["navigation"]) == [1, 2]
+    assert _nav_titles(result["navigation"]) == ["Home", "About"]
+    assert result["navigation"][1]["children"] == []
+
+
+def test_navigation_excludes_descendants_when_inaccessible_parent_is_listed_last(rf):
+    """Descendants stay hidden even when they appear before their inaccessible parent."""
+    child = mock_menulink(
+        id=23,
+        title="ContactUs",
+        url="https://rjf.org.au/admin/django/rjf/contactus/",
+        parent_id=10,
+        link_type="URL",
+    )
+    grandchild = mock_menulink(id=24, title="Messages", url="/admin/messages/", parent_id=23, link_type="URL")
+    parent = mock_menulink(id=10, title="Admin", url="/admin/", parent_id=None, staff_only=True)
+    public = mock_menulink(id=1, title="Home", url="/", parent_id=None)
+    request = rf.get("/")
+    request.user = AnonymousUser()
+
+    with patch(
+        "cmspage.context_processors.MenuLink.get_cached_menu_links",
+        return_value=[child, grandchild, parent, public],
+    ):
+        result = navigation(request)
+
+    assert _nav_ids(result["navigation"]) == [1]
+    assert _nav_titles(result["navigation"]) == ["Home"]
+
+
+def test_navigation_includes_staff_only_branch_for_staff(rf):
+    parent = mock_menulink(id=10, title="Admin", url="/admin/", parent_id=None, staff_only=True)
+    child = mock_menulink(
+        id=23,
+        title="ContactUs",
+        url="https://rjf.org.au/admin/django/rjf/contactus/",
+        parent_id=10,
+        link_type="URL",
+    )
+    request = rf.get("/")
+    request.user = Mock(
+        spec=User,
+        is_authenticated=True,
+        is_active=True,
+        is_staff=True,
+        is_superuser=False,
+        pk=1,
+        id=1,
+    )
+
+    with patch("cmspage.context_processors.MenuLink.get_cached_menu_links", return_value=[parent, child]):
+        result = navigation(request)
+
+    assert _nav_ids(result["navigation"]) == [10, 23]
+    assert _nav_titles(result["navigation"]) == ["Admin", "ContactUs"]
+    assert result["navigation"][0]["children"][0]["title"] == "ContactUs"
+
+
+def test_navigation_excludes_items_whose_parent_is_missing(rf):
+    child = mock_menulink(id=23, title="ContactUs", url="/missing-parent/", parent_id=99, link_type="URL")
+    public = mock_menulink(id=1, title="Home", url="/", parent_id=None)
+    request = rf.get("/")
+    request.user = AnonymousUser()
+
+    with patch("cmspage.context_processors.MenuLink.get_cached_menu_links", return_value=[child, public]):
+        result = navigation(request)
+
+    assert _nav_ids(result["navigation"]) == [1]
+    assert _nav_titles(result["navigation"]) == ["Home"]
+
+
 def test_navigation_empty_menu_links(rf):
     """Test navigation with no menu links"""
     request = rf.get("/")
@@ -446,3 +592,35 @@ class TestNavigationIntegration:
             assert parent_nav is not None
             assert len(parent_nav["children"]) == 1
             assert parent_nav["children"][0]["title"] == "Child"
+
+    def test_navigation_excludes_children_of_staff_only_parent(self, rf):
+        """A hidden staff-only parent removes its descendants from the visible menu."""
+        from django.core.cache import cache
+        from wagtail.models import Site
+
+        site = Site.objects.first() or Site.objects.create(hostname="localhost", port=80, site_name="Test Site")
+        parent = MenuLink.objects.create(
+            site=site,
+            menu_title="Admin",
+            link_url="/admin/",
+            menu_order=1,
+            staff_only=True,
+        )
+        MenuLink.objects.create(
+            site=site,
+            menu_title="ContactUs",
+            link_url="https://rjf.org.au/admin/django/rjf/contactus/",
+            parent=parent,
+            menu_order=1,
+        )
+        MenuLink.objects.create(site=site, menu_title="Home", link_url="/", menu_order=2)
+
+        request = rf.get("/")
+        request.user = AnonymousUser()
+        cache.clear()
+
+        with patch("wagtail.models.Site.find_for_request", return_value=site):
+            result = navigation(request)
+
+        created = {"Home", "Admin", "ContactUs"}
+        assert [title for title in _nav_titles(result["navigation"]) if title in created] == ["Home"]

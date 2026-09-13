@@ -39,12 +39,7 @@ class MenuLinkManager(models.Manager):
         return (
             self.get_queryset()
             .filter(site=site)
-            .select_related(
-                "site",
-                "parent",
-                "link_page",
-                "link_document"
-            )
+            .select_related("site", "parent", "link_page", "link_document")
             .order_by("menu_order", "id")
         )
 
@@ -183,7 +178,7 @@ class MenuLink(PreviewableMixin, DraftStateMixin, RevisionMixin, Indexed, models
     link_url = models.CharField(
         "External Link",
         blank=True,
-        help_text="Set a custom URL if not linking to a page or document." "Title is required for this link type",
+        help_text="Set a custom URL if not linking to a page or document.Title is required for this link type",
     )
     menu_icon = models.CharField(
         "Icon",
@@ -212,6 +207,7 @@ class MenuLink(PreviewableMixin, DraftStateMixin, RevisionMixin, Indexed, models
 
     def get_preview_context(self, request, mode_name):
         from cmspage.models import CMSFooterPage
+
         return {
             "level": 0,
             "navigation": self.get_menu_links(self.site),
@@ -223,7 +219,7 @@ class MenuLink(PreviewableMixin, DraftStateMixin, RevisionMixin, Indexed, models
                 "footer": "cmspage/includes/footer.html",
                 "navigation": "cmspage/includes/navigation.html",
                 "navigation_item": "cmspage/includes/navigation_item.html",
-            }
+            },
         }
 
     def get_preview_template(self, request, mode_name):
@@ -404,6 +400,12 @@ class MenuLink(PreviewableMixin, DraftStateMixin, RevisionMixin, Indexed, models
                 FieldRowPanel([FieldPanel("menu_icon"), FieldPanel("menu_icon_color"), FieldPanel("menu_order")]),
             ],
         ),
+        MultiFieldPanel(
+            [
+                FieldPanel("staff_only"),
+            ],
+            heading="Settings",
+        ),
     ]
 
     search_fields = [
@@ -412,6 +414,7 @@ class MenuLink(PreviewableMixin, DraftStateMixin, RevisionMixin, Indexed, models
         SearchField("title"),
         SearchField("url"),
     ]
+
 
 @receiver([post_save, post_delete], sender=MenuLink)
 def clear_menu_link_cache(sender, instance, **kwargs):

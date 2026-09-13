@@ -39,6 +39,10 @@ def _menu_link_url(link: MenuLink, site: Site | None, request: HttpRequest | Non
     return link.url
 
 
+def _user_can_see_staff_links(user: User | None) -> bool:
+    return bool(user and user.is_active and (user.is_staff or user.is_superuser))
+
+
 def _nav_pages_for_site(site: Site | None, user: User | None, request: HttpRequest | None = None) -> List[dict]:
     if site is None:
         return []
@@ -49,10 +53,27 @@ def _nav_pages_for_site(site: Site | None, user: User | None, request: HttpReque
     tree = []
     id_to_link = {}
     unlinked = defaultdict(list)
+    excluded = set()
+
+    def exclude(link_id: int) -> None:
+        if link_id in excluded:
+            return
+        excluded.add(link_id)
+        node = id_to_link.pop(link_id, None)
+        if node:
+            for child in node.get("children", []):
+                exclude(child["id"])
 
     for link in cached_menu_links:
         # noinspection PyUnresolvedReferences
-        if link.staff_only and not (user and user.is_active and (user.is_staff or user.is_superuser)):
+        hide_staff = link.staff_only and not _user_can_see_staff_links(user)
+        if hide_staff:
+            title = link.menu_title or link.menu_link_title
+            logger.debug("Excluded staff-only menu parent %s: %s", link.id, title)
+            exclude(link.id)
+            continue
+        if link.parent_id and link.parent_id in excluded:
+            exclude(link.id)
             continue
         node = {
             "id": link.id,
@@ -70,7 +91,6 @@ def _nav_pages_for_site(site: Site | None, user: User | None, request: HttpReque
             if parent := id_to_link.get(parent_id):
                 parent["children"].append(node)
                 continue
-            # Handle orphaned nodes or log an error
             unlinked[parent_id].append(node)
         else:
             tree.append(node)
@@ -79,6 +99,9 @@ def _nav_pages_for_site(site: Site | None, user: User | None, request: HttpReque
         for parent_id, children in unlinked.items():
             if parent := id_to_link.get(parent_id):
                 parent["children"].extend(children)
+            elif parent_id in excluded:
+                for child in children:
+                    exclude(child["id"])
             else:
                 logger.error(f"Orphaned menu link(s): {children}")
     return tree
