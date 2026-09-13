@@ -1,0 +1,4 @@
+schema: spec-driven
+created: 2026-09-13
+goal: Eliminate repeated wagtail-rendition cache/DB lookups from render_image
+  when rendering CMS pages

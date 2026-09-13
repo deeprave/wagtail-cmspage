@@ -378,3 +378,34 @@ class TestMenuLinkPerformance:
 
         # Cache should be cleared (via signal)
         # This is tested by mocking in other tests
+
+
+def _panel_field_names(panels):
+    names = []
+    for panel in panels:
+        field_name = getattr(panel, "field_name", None)
+        if field_name:
+            names.append(field_name)
+        children = getattr(panel, "children", None)
+        if children:
+            names.extend(_panel_field_names(children))
+    return names
+
+
+def test_menu_link_settings_panel_includes_staff_only():
+    field_names = _panel_field_names(MenuLink.panels)
+    assert "staff_only" in field_names
+    assert "id" not in field_names
+
+
+@pytest.mark.parametrize(
+    "field_name,needle",
+    [
+        ("link_url", "document. Title"),
+        ("link_document", "URL). Leave"),
+        ("link_page", "document). Leave"),
+    ],
+)
+def test_menu_link_help_texts_separate_sentences(field_name, needle):
+    help_text = MenuLink._meta.get_field(field_name).help_text
+    assert needle in help_text

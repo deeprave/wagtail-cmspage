@@ -11,7 +11,7 @@ class MenuLinkViewSet(SnippetViewSet):
     menu_label = "Menu Links"
     menu_icon = "list-ul"
     menu_order = 300
-    list_display = ["title", "parent_link", "menu_order", "menu_link_type"]
+    list_display = ["id", "title", "parent_link", "menu_order", "menu_link_type"]
 
     def get_queryset(self, request):
         site = Site.find_for_request(request)
