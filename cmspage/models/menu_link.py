@@ -158,7 +158,7 @@ class MenuLink(PreviewableMixin, DraftStateMixin, RevisionMixin, Indexed, models
         related_name="menu_links",
         verbose_name="Select Page",
         help_text=(
-            "Select an internal page to link (leave blank for custom URL or document)."
+            "Select an internal page to link (leave blank for custom URL or document). "
             "Leave title blank to use this page's title"
         ),
     )
@@ -170,7 +170,7 @@ class MenuLink(PreviewableMixin, DraftStateMixin, RevisionMixin, Indexed, models
         related_name="+",
         verbose_name="Select Document",
         help_text=(
-            "Select a document to link (leave blank for internal page or custom URL)."
+            "Select a document to link (leave blank for internal page or custom URL). "
             "Leave title blank to use this document's title"
         ),
     )
@@ -178,7 +178,7 @@ class MenuLink(PreviewableMixin, DraftStateMixin, RevisionMixin, Indexed, models
     link_url = models.CharField(
         "External Link",
         blank=True,
-        help_text="Set a custom URL if not linking to a page or document.Title is required for this link type",
+        help_text="Set a custom URL if not linking to a page or document. Title is required for this link type",
     )
     menu_icon = models.CharField(
         "Icon",
