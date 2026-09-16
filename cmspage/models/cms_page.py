@@ -1,9 +1,12 @@
+from collections import defaultdict
+from collections.abc import Mapping
+
 from django.db import models
 from modelcluster.contrib.taggit import ClusterTaggableManager
 from wagtail.admin.panels import FieldRowPanel, FieldPanel
 from wagtail.embeds import blocks as embed_blocks
 from wagtail.fields import StreamField
-from wagtail.images.models import Image as WagtailImage
+from wagtail.images.models import AbstractImage
 from wagtail.models import Page
 
 import cmspage.blocks as cmsblocks
@@ -114,30 +117,27 @@ class CMSPageBase(AbstractCMSPage):
         return context
 
     @classmethod
+    def _mapping(cls, value):
+        return value if isinstance(value, Mapping) else {}
+
+    @classmethod
     def _iter_images_from_block(cls, block):
         """Yield image instances referenced by a StreamField block."""
         if hasattr(block, "block_type"):
-            block_type = block.block_type
             value = block.value if hasattr(block, "value") else None
-
-            if block_type == "cards":
-                cards = (value or {}).get("cards", [])
-                for card in cards:
-                    image = card.get("image") if isinstance(card, dict) else None
+            mapping = cls._mapping(value)
+            if block.block_type == "cards":
+                for card in mapping.get("cards") or []:
+                    image = cls._mapping(card).get("image")
                     if image is not None:
                         yield image
-            elif block_type == "carousel":
-                carousel_items = (value or {}).get("carousel", [])
-                for item in carousel_items:
-                    image = item.get("carousel_image") if isinstance(item, dict) else None
+            elif block.block_type == "carousel":
+                for item in mapping.get("carousel") or []:
+                    image = cls._mapping(item).get("carousel_image")
                     if image is not None:
                         yield image
-            elif block_type in ["image_and_text", "large_image", "small_image_and_text", "hero"]:
-                image = (value or {}).get("image") if isinstance(value, dict) else None
-                if image is not None:
-                    yield image
-            elif isinstance(value, dict):
-                image = value.get("image") or value.get("carousel_image")
+            else:
+                image = mapping.get("image") or mapping.get("carousel_image")
                 if image is not None and hasattr(image, "id"):
                     yield image
 
@@ -145,10 +145,10 @@ class CMSPageBase(AbstractCMSPage):
             for item in block:
                 yield from cls._iter_images_from_block(item)
 
-        elif isinstance(block, WagtailImage):
+        elif isinstance(block, AbstractImage):
             yield block
 
-        elif isinstance(block, dict):
+        elif isinstance(block, Mapping):
             image = block.get("image") or block.get("carousel_image")
             if image is not None and hasattr(image, "id"):
                 yield image
@@ -160,18 +160,21 @@ class CMSPageBase(AbstractCMSPage):
     @staticmethod
     def _attach_prefetched_renditions(images):
         """Copy renditions onto the StreamField image instances `{% image %}` will use."""
-        from cmspage.models import CMSPageImage
-
         instances = [image for image in images if image is not None and getattr(image, "id", None)]
         if not instances:
             return
 
-        fetched = CMSPageImage.objects.filter(id__in={image.id for image in instances}).prefetch_related("renditions")
-        renditions_by_id = {image.id: list(image.renditions.all()) for image in fetched}
+        by_model = defaultdict(list)
         for image in instances:
-            renditions = renditions_by_id.get(image.id)
-            if renditions is not None:
-                image.prefetched_renditions = renditions
+            by_model[type(image)].append(image)
+
+        for model, model_images in by_model.items():
+            fetched = model.objects.filter(id__in={image.id for image in model_images}).prefetch_renditions()
+            renditions_by_id = {image.id: image.prefetched_renditions for image in fetched}
+            for image in model_images:
+                renditions = renditions_by_id.get(image.id)
+                if renditions is not None:
+                    image.prefetched_renditions = renditions
 
     def _prefetch_stream_renditions(self, stream):
         if not stream:
