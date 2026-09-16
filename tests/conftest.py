@@ -1,7 +1,9 @@
 #!/usr/bin/env python
-from pathlib import Path
+import atexit
 import random
 import string
+import tempfile
+from pathlib import Path
 
 from testcontainers.community.postgres import PostgresContainer
 
@@ -21,6 +23,9 @@ if not settings.configured:
         "postgres:16-alpine", username=POSTGRES_USER, password=POSTGRES_PASSWORD, dbname=POSTGRES_DB, driver="psychopg"
     )
     postgres_container.start()
+
+    _test_media_dir = tempfile.TemporaryDirectory(prefix="cmspage-test-media-")
+    atexit.register(_test_media_dir.cleanup)
 
     DATABASES = {
         "default": {
@@ -87,6 +92,8 @@ if not settings.configured:
             },
         ],
         WAGTAILADMIN_STATIC_FILE_VERSION_STRINGS=False,
+        MEDIA_ROOT=_test_media_dir.name,
+        MEDIA_URL="/media/",
     )
 
 django.setup()
