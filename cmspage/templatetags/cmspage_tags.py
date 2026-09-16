@@ -157,8 +157,8 @@ def render_image(
     {{% load wagtailimages_tags %}}
     {{% image image {image_size}{cropping} format-webp as webp_image %}}
     <source srcset="{{{{ webp_image.url }}}}" type="image/webp"{css_class}>
-    {{% image image {image_size} as the_image %}}
-    <img src="{{ image.url }}" {alt}{css_class}>
+    {{% image image {image_size}{cropping} as the_image %}}
+    <img src="{{{{ the_image.url }}}}" {alt}{css_class}>
     """
 
     # Create and render the template
