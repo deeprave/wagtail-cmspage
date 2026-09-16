@@ -213,67 +213,18 @@ class TestCMSPageImagePrefetch:
         # Assert that no image IDs were extracted
         assert len(image_ids) == 0
 
-    def test_image_id_deduplication(self):
-        # sourcery skip: extract-duplicate-method
-        """Test that image IDs are deduplicated when prefetching"""
-        # Create duplicate image IDs
-        duplicate_ids = [self.image1.id, self.image1.id, self.image2.id]
-        deduped_ids = list(set(duplicate_ids))
+    def test_attach_prefetched_renditions_on_block_image_instances(self):
+        spec = "fill-150x100"
+        self.image1.get_rendition(spec)
 
-        # Verify deduplication
-        assert len(duplicate_ids) == 3
-        assert len(deduped_ids) == 2
-        assert self.image1.id in deduped_ids
-        assert self.image2.id in deduped_ids
+        CMSPage._attach_prefetched_renditions([self.image1, self.image1])
 
-        # Test that CMSPageImage.objects.filter works with the deduplicated IDs
-        images = CMSPageImage.objects.filter(id__in=deduped_ids)
-        assert images.count() == 2
+        assert any(rendition.filter_spec == spec for rendition in self.image1.prefetched_renditions)
 
-        # Create a dictionary mapping image IDs to images
-        image_dict = {img.id: img for img in images}
-        assert len(image_dict) == 2
-        assert self.image1.id in image_dict
-        assert self.image2.id in image_dict
+        from django.db import connection
+        from django.test.utils import CaptureQueriesContext
 
-    def test_extract_and_prefetch_integration(self):
-        """Test the integration of image extraction and prefetching"""
-        # Test extraction from different block types
-        cards_ids = CMSPage._extract_image_ids_from_block(
-            MagicMock(block_type="cards", value={"cards": [{"image": self.image1}, {"image": self.image2}]})
-        )
+        with CaptureQueriesContext(connection) as ctx:
+            self.image1.get_rendition(spec)
 
-        carousel_ids = CMSPage._extract_image_ids_from_block(
-            MagicMock(
-                block_type="carousel",
-                value={"carousel": [{"carousel_image": self.image2}, {"carousel_image": self.image3}]},
-            )
-        )
-
-        image_text_ids = CMSPage._extract_image_ids_from_block(
-            MagicMock(block_type="image_and_text", value={"image": self.image1})
-        )
-
-        # Combine all IDs
-        all_ids = cards_ids + carousel_ids + image_text_ids
-
-        # Verify extraction worked correctly
-        assert len(cards_ids) == 2
-        assert len(carousel_ids) == 2
-        assert len(image_text_ids) == 1
-        assert len(all_ids) == 5  # Total with duplicates
-
-        # Deduplicate IDs
-        deduped_ids = list(set(all_ids))
-        assert len(deduped_ids) == 3  # Should be 3 unique IDs
-
-        # Fetch images using the deduplicated IDs
-        images = CMSPageImage.objects.filter(id__in=deduped_ids)
-        assert images.count() == 3
-
-        # Create a dictionary mapping image IDs to images (simulating _prefetched_images)
-        prefetched_images = {img.id: img for img in images}
-        assert len(prefetched_images) == 3
-        assert self.image1.id in prefetched_images
-        assert self.image2.id in prefetched_images
-        assert self.image3.id in prefetched_images
+        assert not any("rendition" in query["sql"].lower() for query in ctx.captured_queries)
