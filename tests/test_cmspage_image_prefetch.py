@@ -1,9 +1,13 @@
-import pytest
-from unittest.mock import MagicMock
+from collections.abc import Mapping
+from unittest.mock import MagicMock, patch
 
+import pytest
+from django.db import connection
+from django.test.utils import CaptureQueriesContext
+from wagtail.images.models import Image as WagtailImage
 from wagtail.images.tests.utils import get_test_image_file
 
-from cmspage.models import CMSPage, CMSPageImage
+from cmspage.models import CMSFooterPage, CMSPage, CMSPageImage
 
 
 @pytest.mark.django_db
@@ -213,67 +217,72 @@ class TestCMSPageImagePrefetch:
         # Assert that no image IDs were extracted
         assert len(image_ids) == 0
 
-    def test_image_id_deduplication(self):
-        # sourcery skip: extract-duplicate-method
-        """Test that image IDs are deduplicated when prefetching"""
-        # Create duplicate image IDs
-        duplicate_ids = [self.image1.id, self.image1.id, self.image2.id]
-        deduped_ids = list(set(duplicate_ids))
+    def test_iter_images_from_hero_streamfield_structvalue(self):
+        page = CMSPage(title="Prefetch", body=[("hero", {"image": self.image1})])
+        block = page.body[0]
 
-        # Verify deduplication
-        assert len(duplicate_ids) == 3
-        assert len(deduped_ids) == 2
-        assert self.image1.id in deduped_ids
-        assert self.image2.id in deduped_ids
+        assert type(block.value).__name__ == "StructValue"
+        assert isinstance(block.value, Mapping)
 
-        # Test that CMSPageImage.objects.filter works with the deduplicated IDs
-        images = CMSPageImage.objects.filter(id__in=deduped_ids)
-        assert images.count() == 2
+        images = list(CMSPage._iter_images_from_block(block))
 
-        # Create a dictionary mapping image IDs to images
-        image_dict = {img.id: img for img in images}
-        assert len(image_dict) == 2
-        assert self.image1.id in image_dict
-        assert self.image2.id in image_dict
+        assert [image.id for image in images] == [self.image1.id]
 
-    def test_extract_and_prefetch_integration(self):
-        """Test the integration of image extraction and prefetching"""
-        # Test extraction from different block types
-        cards_ids = CMSPage._extract_image_ids_from_block(
-            MagicMock(block_type="cards", value={"cards": [{"image": self.image1}, {"image": self.image2}]})
+    def test_iter_images_from_cards_streamfield_structvalue(self):
+        page = CMSPage(
+            title="Prefetch",
+            body=[("cards", {"cards": [{"image": self.image1}, {"image": self.image2}]})],
         )
 
-        carousel_ids = CMSPage._extract_image_ids_from_block(
-            MagicMock(
-                block_type="carousel",
-                value={"carousel": [{"carousel_image": self.image2}, {"carousel_image": self.image3}]},
-            )
-        )
+        images = list(CMSPage._iter_images_from_block(page.body[0]))
 
-        image_text_ids = CMSPage._extract_image_ids_from_block(
-            MagicMock(block_type="image_and_text", value={"image": self.image1})
-        )
+        assert [image.id for image in images] == [self.image1.id, self.image2.id]
 
-        # Combine all IDs
-        all_ids = cards_ids + carousel_ids + image_text_ids
+    def test_iter_images_from_footer_streamfield_structvalue(self):
+        footer = CMSFooterPage(title="Footer", footer=[("info", {"image": self.image3})])
 
-        # Verify extraction worked correctly
-        assert len(cards_ids) == 2
-        assert len(carousel_ids) == 2
-        assert len(image_text_ids) == 1
-        assert len(all_ids) == 5  # Total with duplicates
+        images = list(CMSPage._iter_images_from_block(footer.footer[0]))
 
-        # Deduplicate IDs
-        deduped_ids = list(set(all_ids))
-        assert len(deduped_ids) == 3  # Should be 3 unique IDs
+        assert [image.id for image in images] == [self.image3.id]
 
-        # Fetch images using the deduplicated IDs
-        images = CMSPageImage.objects.filter(id__in=deduped_ids)
-        assert images.count() == 3
+    def _assert_get_rendition_skips_cache_and_sql(self, image, spec):
+        rendition_model = image.get_rendition_model()
+        with patch.object(rendition_model.cache_backend, "get_many") as get_many:
+            with CaptureQueriesContext(connection) as ctx:
+                rendition = image.get_rendition(spec)
 
-        # Create a dictionary mapping image IDs to images (simulating _prefetched_images)
-        prefetched_images = {img.id: img for img in images}
-        assert len(prefetched_images) == 3
-        assert self.image1.id in prefetched_images
-        assert self.image2.id in prefetched_images
-        assert self.image3.id in prefetched_images
+        assert rendition.filter_spec == spec
+        get_many.assert_not_called()
+        assert not any("rendition" in query["sql"].lower() for query in ctx.captured_queries)
+
+    def test_attach_prefetched_renditions_on_fresh_image_instance(self):
+        spec = "fill-150x100"
+        self.image1.get_rendition(spec)
+        fresh = type(self.image1).objects.get(pk=self.image1.pk)
+
+        CMSPage._attach_prefetched_renditions([fresh])
+
+        self._assert_get_rendition_skips_cache_and_sql(fresh, spec)
+
+    def test_attach_prefetched_renditions_for_default_wagtail_image(self):
+        spec = "fill-150x100"
+        image = WagtailImage.objects.create(title="Default Image", file=get_test_image_file())
+        image.get_rendition(spec)
+        fresh = WagtailImage.objects.get(pk=image.pk)
+
+        CMSPage._attach_prefetched_renditions([fresh])
+
+        self._assert_get_rendition_skips_cache_and_sql(fresh, spec)
+
+    def test_prefetch_stream_renditions_on_body_and_footer_instances(self):
+        spec = "fill-150x100"
+        self.image1.get_rendition(spec)
+        self.image3.get_rendition(spec)
+        page = CMSPage(title="Prefetch", body=[("hero", {"image": self.image1})])
+        footer = CMSFooterPage(title="Footer", footer=[("info", {"image": self.image3})])
+
+        page._prefetch_stream_renditions(page.body)
+        page._prefetch_stream_renditions(footer.footer)
+
+        self._assert_get_rendition_skips_cache_and_sql(page.body[0].value.get("image"), spec)
+        self._assert_get_rendition_skips_cache_and_sql(footer.footer[0].value.get("image"), spec)

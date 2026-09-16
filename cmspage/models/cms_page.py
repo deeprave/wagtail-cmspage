@@ -1,9 +1,12 @@
+from collections import defaultdict
+from collections.abc import Mapping
+
 from django.db import models
 from modelcluster.contrib.taggit import ClusterTaggableManager
 from wagtail.admin.panels import FieldRowPanel, FieldPanel
 from wagtail.embeds import blocks as embed_blocks
 from wagtail.fields import StreamField
-from wagtail.images.models import Image as WagtailImage
+from wagtail.images.models import AbstractImage
 from wagtail.models import Page
 
 import cmspage.blocks as cmsblocks
@@ -104,83 +107,85 @@ class CMSPageBase(AbstractCMSPage):
 
     def get_context(self, request, *args, **kwargs):
         context = super().get_context(request, *args, **kwargs)
-        context["page_footer"] = CMSFooterPage.objects.live().first()
+        footer = CMSFooterPage.objects.live().first()
+        context["page_footer"] = footer
 
-        # Prefetch images for all blocks to avoid N+1 queries
-        if self.body:
-            self._prefetch_block_images()
+        self._prefetch_stream_renditions(self.body)
+        if footer is not None:
+            self._prefetch_stream_renditions(footer.footer)
 
         return context
 
     @classmethod
-    def _extract_image_ids_from_block(cls, block):
-        """
-        Extract image IDs from a block, checking the block type to determine if it can contain images.
-        Only recurses into block types that are known to contain images.
-        """
-        ids = []
+    def _mapping(cls, value):
+        return value if isinstance(value, Mapping) else {}
 
-        # Check if the block has a block_type attribute
+    @classmethod
+    def _iter_images_from_block(cls, block):
+        """Yield image instances referenced by a StreamField block."""
         if hasattr(block, "block_type"):
-            block_type = block.block_type
-
-            # Handle specific block types that contain images
-            if block_type == "cards":
-                # Cards block has a "cards" field, which is a list of cards, each with an "image" field
-                cards = block.value.get("cards", [])
-                ids.extend(card["image"].id for card in cards if card.get("image"))
-            elif block_type == "carousel":
-                # Carousel block has a "carousel" field, which is a list of carousel items, each with a "carousel_image" field
-                carousel_items = block.value.get("carousel", [])
-                ids.extend(item["carousel_image"].id for item in carousel_items if item.get("carousel_image"))
-            elif block_type in ["image_and_text", "large_image", "small_image_and_text", "hero"]:
-                # These blocks have an "image" field directly
-                if block.value.get("image"):
-                    ids.append(block.value["image"].id)
-
-            elif hasattr(block, "value") and isinstance(block.value, dict):
-                # Check for common image field names in the block's value
-                if "image" in block.value and block.value["image"] and hasattr(block.value["image"], "id"):
-                    ids.append(block.value["image"].id)
-                elif (
-                    "carousel_image" in block.value
-                    and block.value["carousel_image"]
-                    and hasattr(block.value["carousel_image"], "id")
-                ):
-                    ids.append(block.value["carousel_image"].id)
+            value = block.value if hasattr(block, "value") else None
+            mapping = cls._mapping(value)
+            if block.block_type == "cards":
+                for card in mapping.get("cards") or []:
+                    image = cls._mapping(card).get("image")
+                    if image is not None:
+                        yield image
+            elif block.block_type == "carousel":
+                for item in mapping.get("carousel") or []:
+                    image = cls._mapping(item).get("carousel_image")
+                    if image is not None:
+                        yield image
+            else:
+                image = mapping.get("image") or mapping.get("carousel_image")
+                if image is not None and hasattr(image, "id"):
+                    yield image
 
         elif isinstance(block, list):
             for item in block:
-                ids.extend(cls._extract_image_ids_from_block(item))
+                yield from cls._iter_images_from_block(item)
 
-        elif hasattr(block, "id") and isinstance(block, WagtailImage):
-            ids.append(block.id)
+        elif isinstance(block, AbstractImage):
+            yield block
 
-        elif isinstance(block, dict):
-            # Check for common image field names
-            if "image" in block and block["image"] and hasattr(block["image"], "id"):
-                ids.append(block["image"].id)
-            elif "carousel_image" in block and block["carousel_image"] and hasattr(block["carousel_image"], "id"):
-                ids.append(block["carousel_image"].id)
+        elif isinstance(block, Mapping):
+            image = block.get("image") or block.get("carousel_image")
+            if image is not None and hasattr(image, "id"):
+                yield image
 
-        return ids
+    @classmethod
+    def _extract_image_ids_from_block(cls, block):
+        return [image.id for image in cls._iter_images_from_block(block) if getattr(image, "id", None)]
+
+    @staticmethod
+    def _attach_prefetched_renditions(images):
+        """Copy renditions onto the StreamField image instances `{% image %}` will use."""
+        instances = [image for image in images if image is not None and getattr(image, "id", None)]
+        if not instances:
+            return
+
+        by_model = defaultdict(list)
+        for image in instances:
+            by_model[type(image)].append(image)
+
+        for model, model_images in by_model.items():
+            fetched = model.objects.filter(id__in={image.id for image in model_images}).prefetch_renditions()
+            renditions_by_id = {image.id: image.prefetched_renditions for image in fetched}
+            for image in model_images:
+                renditions = renditions_by_id.get(image.id)
+                if renditions is not None:
+                    image.prefetched_renditions = renditions
+
+    def _prefetch_stream_renditions(self, stream):
+        if not stream:
+            return
+        images = []
+        for block in stream:
+            images.extend(self._iter_images_from_block(block))
+        self._attach_prefetched_renditions(images)
 
     def _prefetch_block_images(self):
-        """Prefetch all images used in StreamField blocks to avoid N+1 queries"""
-        image_ids = []
-
-        for block in self.body:
-            image_ids.extend(self._extract_image_ids_from_block(block))
-
-        if image_ids:
-            # Deduplicate image_ids to avoid redundant queries
-            deduped_image_ids = list(set(image_ids))
-            # Prefetch all images with select_related to get both CMSPageImage and WagtailImage data
-            from cmspage.models import CMSPageImage
-
-            images = CMSPageImage.objects.filter(id__in=deduped_image_ids).select_related()
-            # Store in a cache for template access
-            self._prefetched_images = {img.id: img for img in images}
+        self._prefetch_stream_renditions(self.body)
 
     class Meta:
         app_label = "cmspage"

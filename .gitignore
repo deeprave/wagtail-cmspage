@@ -15,4 +15,5 @@ dist/
 /cmspage/scss/*.css
 /cmspage/scss/*.css.map
 original_images/
+/images/
 .guide.yaml
