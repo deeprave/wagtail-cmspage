@@ -38,9 +38,9 @@ wagtail-cmspage provides ready-to-use page types, content blocks, and templates 
 ## 📦 Installation
 
 ### Requirements
-- Python 3.8+
-- Django 4.2+
-- Wagtail 5.0+
+- Python 3.13+
+- Django 5.2.16+
+- Wagtail 8.1+
 
 ### Quick Start
 
